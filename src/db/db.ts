@@ -25,4 +25,4 @@ const Database = database({
 });
 type Database = typeof Database.Type;
 
-const evolu = createEvolu(Database, { indexes });
+export const evolu = createEvolu(Database, { indexes });

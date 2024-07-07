@@ -17,6 +17,8 @@ import { createPortal } from "react-dom";
 import { Surface } from "@/components/ui/Surface";
 import { Toolbar } from "@/components/ui/Toolbar";
 import { Icon } from "@/components/ui/Icon";
+import { EvoluProvider } from "@evolu/react";
+import { evolu } from "@/db/db";
 
 const useDarkmode = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(
@@ -112,9 +114,9 @@ export default function Document({ params }: { params: { room: string } }) {
   );
 
   return (
-    <>
+    <EvoluProvider value={evolu}>
       {DarkModeSwitcher}
       <BlockEditor hasCollab={hasCollab} ydoc={ydoc} provider={provider} />
-    </>
+    </EvoluProvider>
   );
 }

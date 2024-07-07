@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { EvoluProvider } from "@evolu/react";
+import { evolu } from "@/db/db";
 
 const inter = Inter({ subsets: ["latin"] });
 
