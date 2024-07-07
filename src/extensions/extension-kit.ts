@@ -79,7 +79,7 @@ export const ExtensionKit = ({
     heading: false,
     horizontalRule: false,
     blockquote: false,
-    history: false,
+    // history: false,
     codeBlock: false,
   }),
   CodeBlockLowlight.configure({

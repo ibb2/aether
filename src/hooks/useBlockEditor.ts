@@ -48,16 +48,16 @@ export const useBlockEditor = ({
         ...ExtensionKit({
           provider,
         }),
-        Collaboration.configure({
-          document: ydoc,
-        }),
-        CollaborationCursor.configure({
-          provider,
-          user: {
-            name: randomElement(userNames),
-            color: randomElement(userColors),
-          },
-        }),
+        // Collaboration.configure({
+        //   document: ydoc,
+        // }),
+        // CollaborationCursor.configure({
+        //   provider,
+        //   user: {
+        //     name: randomElement(userNames),
+        //     color: randomElement(userColors),
+        //   },
+        // }),
       ],
       editorProps: {
         attributes: {
