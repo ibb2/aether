@@ -1,5 +1,7 @@
 "use client";
 
+import * as S from "@effect/schema/Schema";
+
 import {
   Dialog,
   DialogClose,
@@ -13,8 +15,21 @@ import {
 import { Button } from "../ui/Button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import React, { useState } from "react";
+import { NonEmptyString1000, useEvolu } from "@evolu/react";
+import type { Database } from "@/db/db";
 
 export const NotebookDialog = () => {
+  const [notebookName, setNotebookName] = React.useState("");
+
+  const { create } = useEvolu<Database>();
+
+  const handler = () => {
+    create("notebooks", {
+      title: S.decodeSync(NonEmptyString1000)(notebookName),
+    });
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -29,13 +44,22 @@ export const NotebookDialog = () => {
         </DialogHeader>
         <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
           <Label htmlFor="name">Name</Label>
-          <Input type="text" id="name" placeholder="new notebook" />
+          <Input
+            type="text"
+            id="name"
+            placeholder="new notebook"
+            onChange={(e) => setNotebookName(e.target.value)}
+          />
         </div>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="secondary">Cancel</Button>
           </DialogClose>
-          <Button type="submit">Create</Button>
+          <DialogClose asChild>
+            <Button type="submit" onClick={handler}>
+              Create
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

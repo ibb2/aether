@@ -47,7 +47,7 @@ export type UsersTable = typeof UsersTable.Type;
 export const NotebooksTable = table({
   id: NotebookId,
   title: NonEmptyString1000,
-  notesId: NotesId,
+  notesId: S.NullOr(NotesId),
   userId: S.NullOr(UserId),
   isPinned: S.NullOr(SqliteBoolean),
 });
@@ -66,8 +66,8 @@ export const ExportedDatasTable = table({
   id: ExportedDataId,
   noteId: NoteId,
   jsonExportedName: NonEmptyString50,
-  jsonExportData: S.Uint8Array,
+  // jsonExportData: S.Uint8Array,
   yjsExportedName: NonEmptyString50,
-  yjsExportedData: S.Uint8Array,
+  // yjsExportedData: S.Uint8Array,
 });
 export type ExportedDatasTable = typeof ExportedDatasTable.Type;

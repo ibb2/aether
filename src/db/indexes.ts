@@ -8,6 +8,6 @@ export const indexes = createIndexes((create) => [
   // Notes indexes
   create("indexNoteCreatedAt").on("notes").column("createdAt"),
   // Exported Data indexes
-  create("indexExportedDataCreatedAt").on("expportedData").column("createdAt"),
-  create("indexExportedDataNoteId").on("exportedData").column("userId"),
+  create("indexExportedDataCreatedAt").on("exportedData").column("createdAt"),
+  // create("indexExportedDataNoteId").on("exportedData").column("userId"),
 ]);

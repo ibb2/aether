@@ -23,6 +23,6 @@ const Database = database({
   notes: NotesTable,
   exportedData: ExportedDatasTable,
 });
-type Database = typeof Database.Type;
+export type Database = typeof Database.Type;
 
 export const evolu = createEvolu(Database, { indexes });

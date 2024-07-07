@@ -3,6 +3,8 @@ import { memo, useCallback } from "react";
 import { Editor } from "@tiptap/react";
 import { TableOfContents } from "../TableOfContents";
 import { NotebookDialog } from "../dialogs/notebook";
+import { useQuery } from "@evolu/react";
+import { notebooksQuery } from "@/db/queries";
 
 export const Sidebar = memo(
   ({
@@ -14,6 +16,8 @@ export const Sidebar = memo(
     isOpen?: boolean;
     onClose: () => void;
   }) => {
+    const { rows } = useQuery(notebooksQuery);
+
     const handlePotentialClose = useCallback(() => {
       if (window.innerWidth < 1024) {
         onClose();
@@ -32,6 +36,11 @@ export const Sidebar = memo(
         <div className="w-full h-full overflow-hidden">
           <div className="w-full h-full p-6 overflow-auto">
             <NotebookDialog />
+            {rows.map((notebook) => (
+              <>
+                <p>{notebook.title}</p>
+              </>
+            ))}
             {/* <TableOfContents onItemClick={handlePotentialClose} editor={editor} /> */}
           </div>
         </div>
