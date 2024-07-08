@@ -3,9 +3,12 @@ import { memo, useCallback } from "react";
 import { Editor } from "@tiptap/react";
 import { TableOfContents } from "../TableOfContents";
 import { NotebookDialog } from "../dialogs/notebook";
-import { useQueries, useQuery } from "@evolu/react";
+import { useEvolu, useQueries, useQuery } from "@evolu/react";
 import { notebooksQuery, notesQuery } from "@/db/queries";
 import { NoteDialog } from "../dialogs/note";
+import { Button } from "../ui/Button";
+import { Trash2 } from "lucide-react";
+import type { Database } from "@/db/db";
 
 export const Sidebar = memo(
   ({
@@ -17,6 +20,8 @@ export const Sidebar = memo(
     isOpen?: boolean;
     onClose: () => void;
   }) => {
+    const { update } = useEvolu<Database>();
+
     const [notebooks, notes] = useQueries([notebooksQuery, notesQuery]);
 
     console.log("Notebooks1: ", notebooks);
@@ -34,6 +39,10 @@ export const Sidebar = memo(
       isOpen && "w-80 border-r border-r-neutral-200 dark:border-r-neutral-800",
     );
 
+    const deleteNote = (noteId) => {
+      update("notes", { id: noteId, isDeleted: true });
+    };
+
     return (
       <div className={windowClassName}>
         <div className="w-full h-full overflow-hidden">
@@ -46,8 +55,16 @@ export const Sidebar = memo(
                   <p className="pb-3">{notebook.title}</p>
                   {notes.rows.map((note) => (
                     <>
-                      {note.notebookId === notebook.id && (
-                        <p className="pl-10">{note.name}</p>
+                      {note.notebookId === notebook.id && !note.isDeleted && (
+                        <div className="grid grid-cols-2 py-2">
+                          <p className="pl-10 ">{note.name}</p>
+                          <Button
+                            variant="destructive"
+                            onClick={() => deleteNote(note.id)}
+                          >
+                            <Trash2 />
+                          </Button>
+                        </div>
                       )}
                     </>
                   ))}
