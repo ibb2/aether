@@ -14,7 +14,7 @@ import {
 export const UserId = id("User");
 export type UserId = typeof UserId.Type;
 
-const NotebookId = id("Notebook");
+export const NotebookId = id("Notebook");
 export type NotebookId = typeof NotebookId.Type;
 
 export const NoteId = id("Note");

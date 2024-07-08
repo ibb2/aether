@@ -3,8 +3,9 @@ import { memo, useCallback } from "react";
 import { Editor } from "@tiptap/react";
 import { TableOfContents } from "../TableOfContents";
 import { NotebookDialog } from "../dialogs/notebook";
-import { useQuery } from "@evolu/react";
-import { notebooksQuery } from "@/db/queries";
+import { useQueries, useQuery } from "@evolu/react";
+import { notebooksQuery, notesQuery } from "@/db/queries";
+import { NoteDialog } from "../dialogs/note";
 
 export const Sidebar = memo(
   ({
@@ -16,7 +17,9 @@ export const Sidebar = memo(
     isOpen?: boolean;
     onClose: () => void;
   }) => {
-    const { rows } = useQuery(notebooksQuery);
+    const [notebooks, notes] = useQueries([notebooksQuery, notesQuery]);
+
+    console.log("Notebooks1: ", notebooks);
 
     const handlePotentialClose = useCallback(() => {
       if (window.innerWidth < 1024) {
@@ -35,12 +38,22 @@ export const Sidebar = memo(
       <div className={windowClassName}>
         <div className="w-full h-full overflow-hidden">
           <div className="w-full h-full p-6 overflow-auto">
+            <NoteDialog />
             <NotebookDialog />
-            {rows.map((notebook) => (
-              <>
-                <p>{notebook.title}</p>
-              </>
-            ))}
+            <div className="p-6">
+              {notebooks.rows.map((notebook) => (
+                <>
+                  <p className="pb-3">{notebook.title}</p>
+                  {notes.rows.map((note) => (
+                    <>
+                      {note.notebookId === notebook.id && (
+                        <p className="pl-10">{note.name}</p>
+                      )}
+                    </>
+                  ))}
+                </>
+              ))}
+            </div>
             {/* <TableOfContents onItemClick={handlePotentialClose} editor={editor} /> */}
           </div>
         </div>
