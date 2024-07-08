@@ -49,37 +49,35 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   }
 
   return (
-    <EditorContext.Provider value={providerValue}>
-      <div className="flex h-full" ref={menuContainerRef}>
-        <Sidebar
-          isOpen={leftSidebar.isOpen}
-          onClose={leftSidebar.close}
-          editor={editor}
+    <div className="flex h-full" ref={menuContainerRef}>
+      <Sidebar
+        isOpen={leftSidebar.isOpen}
+        onClose={leftSidebar.close}
+        editor={editor}
+      />
+      <div className="relative flex flex-col flex-1 h-full overflow-hidden">
+        <EditorHeader
+          characters={characterCount.characters()}
+          // collabState={collabState}
+          // users={displayedUsers}
+          words={characterCount.words()}
+          isSidebarOpen={leftSidebar.isOpen}
+          toggleSidebar={leftSidebar.toggle}
         />
-        <div className="relative flex flex-col flex-1 h-full overflow-hidden">
-          <EditorHeader
-            characters={characterCount.characters()}
-            // collabState={collabState}
-            // users={displayedUsers}
-            words={characterCount.words()}
-            isSidebarOpen={leftSidebar.isOpen}
-            toggleSidebar={leftSidebar.toggle}
-          />
-          <EditorContent
-            editor={customEditor}
-            ref={editorRef}
-            className="flex-1 overflow-y-auto"
-          />
-          <ContentItemMenu editor={customEditor!} />
-          <LinkMenu editor={customEditor!} appendTo={menuContainerRef} />
-          <TextMenu editor={customEditor!} />
-          <ColumnsMenu editor={customEditor!} appendTo={menuContainerRef} />
-          <TableRowMenu editor={customEditor!} appendTo={menuContainerRef} />
-          <TableColumnMenu editor={customEditor!} appendTo={menuContainerRef} />
-          <ImageBlockMenu editor={customEditor!} appendTo={menuContainerRef} />
-        </div>
+        <EditorContent
+          editor={customEditor}
+          ref={editorRef}
+          className="flex-1 overflow-y-auto"
+        />
+        <ContentItemMenu editor={customEditor!} />
+        <LinkMenu editor={customEditor!} appendTo={menuContainerRef} />
+        <TextMenu editor={customEditor!} />
+        <ColumnsMenu editor={customEditor!} appendTo={menuContainerRef} />
+        <TableRowMenu editor={customEditor!} appendTo={menuContainerRef} />
+        <TableColumnMenu editor={customEditor!} appendTo={menuContainerRef} />
+        <ImageBlockMenu editor={customEditor!} appendTo={menuContainerRef} />
       </div>
-    </EditorContext.Provider>
+    </div>
   );
 };
 
