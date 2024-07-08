@@ -79,7 +79,8 @@
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0",
     "y-prosemirror": "^1.2.9",
-    "yjs": "^13.6.18"
+    "yjs": "^13.6.18",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
