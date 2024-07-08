@@ -29,13 +29,13 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const { editor, users, characterCount, collabState, leftSidebar } =
     useBlockEditor({ ydoc, provider });
 
-  const customEditor! = useEditor({
+  const customEditor = useEditor({
     extensions: [
       ...ExtensionKit({
         provider,
       }),
     ],
-    content: blankContent,
+    content: initialContent,
   });
 
   const displayedUsers = users.slice(0, 3);
@@ -59,8 +59,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         <div className="relative flex flex-col flex-1 h-full overflow-hidden">
           <EditorHeader
             characters={characterCount.characters()}
-            collabState={collabState}
-            users={displayedUsers}
+            // collabState={collabState}
+            // users={displayedUsers}
             words={characterCount.words()}
             isSidebarOpen={leftSidebar.isOpen}
             toggleSidebar={leftSidebar.toggle}

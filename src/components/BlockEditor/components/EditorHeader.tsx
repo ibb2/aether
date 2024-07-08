@@ -1,22 +1,22 @@
-import { Icon } from '@/components/ui/Icon'
-import { EditorInfo } from './EditorInfo'
-import { EditorUser } from '../types'
-import { WebSocketStatus } from '@hocuspocus/provider'
-import { Toolbar } from '@/components/ui/Toolbar'
+import { Icon } from "@/components/ui/Icon";
+import { EditorInfo } from "./EditorInfo";
+import { EditorUser } from "../types";
+import { WebSocketStatus } from "@hocuspocus/provider";
+import { Toolbar } from "@/components/ui/Toolbar";
 
 export type EditorHeaderProps = {
-  isSidebarOpen?: boolean
-  toggleSidebar?: () => void
-  characters: number
-  words: number
-  collabState: WebSocketStatus
-  users: EditorUser[]
-}
+  isSidebarOpen?: boolean;
+  toggleSidebar?: () => void;
+  characters: number;
+  words: number;
+  collabState: WebSocketStatus;
+  users: EditorUser[];
+};
 
 export const EditorHeader = ({
   characters,
-  collabState,
-  users,
+  // collabState,
+  // users,
   words,
   isSidebarOpen,
   toggleSidebar,
@@ -26,16 +26,21 @@ export const EditorHeader = ({
       <div className="flex flex-row gap-x-1.5 items-center">
         <div className="flex items-center gap-x-1.5">
           <Toolbar.Button
-            tooltip={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+            tooltip={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
             onClick={toggleSidebar}
             active={isSidebarOpen}
-            className={isSidebarOpen ? 'bg-transparent' : ''}
+            className={isSidebarOpen ? "bg-transparent" : ""}
           >
-            <Icon name={isSidebarOpen ? 'PanelLeftClose' : 'PanelLeft'} />
+            <Icon name={isSidebarOpen ? "PanelLeftClose" : "PanelLeft"} />
           </Toolbar.Button>
         </div>
       </div>
-      <EditorInfo characters={characters} words={words} collabState={collabState} users={users} />
+      {/* <EditorInfo
+        characters={characters}
+        words={words}
+        collabState={collabState}
+        users={users}
+      /> */}
     </div>
-  )
-}
+  );
+};
