@@ -7,3 +7,7 @@ export const notebooksQuery = evolu.createQuery((db) =>
 export const notesQuery = evolu.createQuery((db) =>
   db.selectFrom("notes").selectAll(),
 );
+
+export const initialExportedData = evolu.createQuery((db) =>
+  db.selectFrom("exportedData").selectAll(),
+);

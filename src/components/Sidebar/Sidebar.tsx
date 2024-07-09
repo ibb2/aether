@@ -48,8 +48,6 @@ export const Sidebar = memo(
     // Use the query result here
     const { rows: exportedDataRows } = useQuery(exportedDataQuery);
 
-    console.log("Selected notes: ", exportedDataRows);
-
     const handlePotentialClose = useCallback(() => {
       if (window.innerWidth < 1024) {
         onClose();

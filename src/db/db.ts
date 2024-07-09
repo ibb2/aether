@@ -8,6 +8,7 @@ import {
   id,
   table,
   createEvolu,
+  useQuery,
 } from "@evolu/react";
 import {
   ExportedDatasTable,
@@ -35,25 +36,45 @@ export const evolu = createEvolu(Database, {
     // Create a default notebook, note and exported data for users.
     // This will essentiaily be the onboarding experience for users in due time.
 
-    const { id: notebookId } = evolu.create("notebooks", {
-      title: S.decodeSync(NonEmptyString1000)("My first journal"),
-    });
-
-    const { id: noteId } = evolu.create("notes", {
-      name: S.decodeSync(NonEmptyString1000)("Initial note"),
-      notebookId,
-    });
-
-    evolu.create("exportedData", {
-      noteId,
-      jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
-      jsonData: blankContent,
-    });
+    const initialized = localStorage.getItem("isInitialized");
+    const defaultData = localStorage.getItem("default");
 
     const setNote = useNoteStore.getState().setNote;
 
-    setNote(blankContent, `doc_${noteId}`, noteId);
+    if (defaultData !== null) {
+      const { data, name, note_id, exported_data_id } = JSON.parse(defaultData);
+      setNote(data, name, note_id, exported_data_id);
+    }
 
-    console.log("Created initial data");
+    if (initialized === null || JSON.parse(initialized) === 0) {
+      const { id: notebookId } = evolu.create("notebooks", {
+        title: S.decodeSync(NonEmptyString1000)("My first journal"),
+      });
+
+      const { id: noteId } = evolu.create("notes", {
+        name: S.decodeSync(NonEmptyString1000)("Initial note"),
+        notebookId,
+      });
+
+      const { id: exportedDataId } = evolu.create("exportedData", {
+        noteId,
+        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
+        jsonData: blankContent,
+      });
+
+      setNote(blankContent, `doc_${noteId}`, noteId, exportedDataId);
+
+      const defaultDataRaw = {
+        data: blankContent,
+        name: `doc_${noteId}`,
+        note_id: noteId,
+        exported_data_id: exportedDataId,
+      };
+
+      localStorage.setItem("isInitialized", JSON.stringify(1));
+      localStorage.setItem("default", JSON.stringify(defaultDataRaw));
+
+      console.log("Created initial data");
+    }
   },
 });

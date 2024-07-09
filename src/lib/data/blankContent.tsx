@@ -10,7 +10,7 @@ export const blankContent = {
       content: [
         {
           type: "text",
-          text: "",
+          text: "Click here to start writing...",
         },
       ],
     },

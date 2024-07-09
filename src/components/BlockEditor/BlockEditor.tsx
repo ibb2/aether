@@ -3,6 +3,7 @@
 import * as S from "@effect/schema/Schema";
 
 import { EditorContent, PureEditorContent, useEditor } from "@tiptap/react";
+import { Editor } from "@tiptap/core";
 import React, { useMemo, useRef } from "react";
 
 import { LinkMenu } from "@/components/menus";
@@ -23,18 +24,21 @@ import { ContentItemMenu } from "../menus/ContentItemMenu";
 import { initialContent } from "@/lib/data/initialContent";
 import { blankContent } from "@/lib/data/blankContent";
 import ExtensionKit from "@/extensions/extension-kit";
-import { useEvolu } from "@evolu/react";
-import type { Database } from "@/db/db";
+import { useEvolu, useQuery } from "@evolu/react";
+import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
 import { NonEmptyString50 } from "@/db/schema";
-import { useDebounce } from "use-debounce";
+import { useDebounce, useDebouncedCallback } from "use-debounce";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
   const editorRef = useRef<PureEditorContent | null>(null);
 
+  // State
+  const [lastSaveTime, setLastSaveTime] = React.useState(Date.now());
+
   // Evolu
-  const { create, createOrUpdate } = useEvolu<Database>();
+  const { create, createOrUpdate, update } = useEvolu<Database>();
 
   // NoteStore zustand
   const { id, name, noteId, data, setNote } = useNoteStore((state) => ({
@@ -45,8 +49,48 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     setNote: state.setNote,
   }));
 
-  const { editor, users, characterCount, collabState, leftSidebar } =
-    useBlockEditor({ ydoc, provider });
+  const { users, characterCount, collabState, leftSidebar } = useBlockEditor({
+    ydoc,
+    provider,
+  });
+
+  const exportedDataQuery = evolu.createQuery((db) =>
+    db
+      .selectFrom("exportedData")
+      .where("id", "=", id)
+      .select("id")
+      .select("jsonData")
+      .select("noteId"),
+  );
+
+  // Use the query result here
+  const { rows: exportedDataRows } = useQuery(exportedDataQuery);
+
+  // Get initial data
+  const getInitialData = (editor: Editor) => {
+    const { id, jsonData, noteId } = exportedDataRows[0];
+    setNote(jsonData!, name, noteId!, id);
+    editor.commands.setContent(jsonData!);
+  };
+
+  const saveData = React.useCallback(
+    (editor: any) => {
+      if (editor) {
+        const updatedData = editor.getJSON();
+        update("exportedData", {
+          id,
+          noteId,
+          jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
+          jsonData: updatedData,
+        });
+        console.info("Debouncing...");
+        setLastSaveTime(Date.now());
+      }
+    },
+    [id, noteId, update],
+  );
+
+  const debouncedSave = useDebouncedCallback(saveData, 2000);
 
   const customEditor = useEditor({
     extensions: [
@@ -60,28 +104,25 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
     onCreate({ editor }) {
       // The editor is ready.
+      getInitialData(editor);
     },
     onUpdate({ editor }) {
       // The content has changed.
       // Content does not seem to be the content of the editor
+      // Update as of 9/7/2024 it seems that yes infact this works as expected?
+      // Unsure of the issue that caused it to fail.
 
-      const { id: updatedExportedData } = createOrUpdate("exportedData", {
-        id,
-        noteId,
-        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
-        jsonData: editor.getJSON(),
-      });
-
-      console.log("Updated document: ", updatedExportedData);
+      if (debouncedSave) {
+        debouncedSave(editor);
+      }
     },
     onSelectionUpdate({ editor }) {
       // The selection has changed.
-
-      console.log("Selection");
+      // console.log("Selection");
     },
     onTransaction({ editor, transaction }) {
       // The editor state has changed.
-      console.log("Transaction", transaction);
+      // console.log("Transaction", transaction);
     },
     onFocus({ editor, event }) {
       // The editor is focused.
@@ -94,27 +135,17 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
   });
 
-  const debounceEditor = useDebounce(customEditor?.state.doc.content, 2000);
-
-  React.useEffect(() => {
-    if (debounceEditor && customEditor !== null) {
-      const { id: updatedExportedData } = createOrUpdate("exportedData", {
-        id,
-        noteId,
-        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
-        jsonData: customEditor.getJSON(),
-      });
-      console.info("Saved the data ", updatedExportedData);
-    }
-  }, [
-    provider,
-    data,
-    debounceEditor,
-    customEditor,
-    createOrUpdate,
-    id,
-    noteId,
-  ]);
+  // React.useEffect(() => {
+  //   if (debounceEditor && customEditor !== null) {
+  //     const { id: updatedExportedData } = update("exportedData", {
+  //       id,
+  //       noteId,
+  //       jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
+  //       jsonData: customEditor.getJSON(),
+  //     });
+  //     console.info("Saved the data ", updatedExportedData);
+  //   }
+  // }, [provider, data, debounceEditor, customEditor, update, id, noteId]);
 
   const displayedUsers = users.slice(0, 3);
 
@@ -124,17 +155,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
   if (!editor) {
     return null;
-  }
-
-  function Editor() {
-    console.log("log on every editor change");
-
-    const editor = useEditor({
-      extensions: [StarterKit],
-      content: "<p>Hello World!</p>",
-    });
-
-    return <EditorContent editor={editor} />;
   }
 
   return (
