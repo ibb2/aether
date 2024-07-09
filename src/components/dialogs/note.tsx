@@ -27,12 +27,13 @@ import React, { useState } from "react";
 import { NonEmptyString1000, useEvolu, useQuery, String } from "@evolu/react";
 import type { Database } from "@/db/db";
 import { notebooksQuery } from "@/db/queries";
-import { NotebookId, NotebooksTable } from "@/db/schema";
+import { NonEmptyString50, NotebookId, NotebooksTable } from "@/db/schema";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from "@radix-ui/react-dropdown-menu";
+import { initialContent } from "@/lib/data/initialContent";
 
 export const NoteDialog = () => {
   const [noteName, setNoteName] = React.useState("");
@@ -43,10 +44,18 @@ export const NoteDialog = () => {
   const [selectedNotebook, setSelectedNotebook] = React.useState(rows[0].id);
 
   const handler = () => {
-    create("notes", {
+    const { id: noteId } = create("notes", {
       name: S.decodeSync(NonEmptyString1000)(noteName),
       notebookId: selectedNotebook,
     });
+
+    const { id: exportedDataId } = create("exportedData", {
+      noteId,
+      jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
+      jsonData: initialContent,
+    });
+
+    console.log("Exported Data for note created: ", exportedDataId);
   };
 
   return (

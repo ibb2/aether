@@ -1,3 +1,4 @@
+import * as S from "@effect/schema/Schema";
 import { cn } from "@/lib/utils";
 import { memo, useCallback } from "react";
 import { Editor } from "@tiptap/react";
@@ -11,6 +12,7 @@ import { Trash2 } from "lucide-react";
 import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
 import { Brand } from "effect/Brand";
+import { NonEmptyString50 } from "@/db/schema";
 
 export const Sidebar = memo(
   ({
@@ -64,9 +66,13 @@ export const Sidebar = memo(
     const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
       const noteData = exportedDataRows.find((row) => row.noteId === noteId);
       if (noteData) {
-        setNote(noteData.jsonData, "doc", noteId);
+        setNote(
+          noteData.jsonData!,
+          S.decodeSync(NonEmptyString50)(noteData.noteId ?? ""),
+          noteId,
+        );
+        editor.commands.setContent(noteData.jsonData!);
       }
-      console.log("Select Note function: ", data);
     };
 
     return (
@@ -87,7 +93,6 @@ export const Sidebar = memo(
                           <Button
                             className=" cursor-pointer text-left"
                             onClick={() => {
-                              console.log("Note id: ", note.id);
                               selectNote(note.id);
                             }}
                           >

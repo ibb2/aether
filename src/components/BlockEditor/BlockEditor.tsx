@@ -33,12 +33,15 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const { create } = useEvolu<Database>();
 
   // NoteStore zustand
-  const { id, name, data, setNote } = useNoteStore((state) => ({
+  const { id, name, data, setNote, setEditor } = useNoteStore((state) => ({
     id: state.id!,
     name: state.name,
     data: state.data,
     setNote: state.setNote,
+    setEditor: state.setEditor,
   }));
+
+  console.log("🥰", data);
 
   const { editor, users, characterCount, collabState, leftSidebar } =
     useBlockEditor({ ydoc, provider });
@@ -50,6 +53,14 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
       }),
     ],
     content: data,
+    onBeforeCreate({ editor }) {
+      // Before the view is created.
+
+      setEditor(editor);
+    },
+    onCreate({ editor }) {
+      // The editor is ready.
+    },
     onUpdate({ editor }) {
       // The content has changed.
       // Content does not seem to be the content of the editor
@@ -78,6 +89,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
   });
 
+  React.useEffect(() => {}, [provider, setEditor, data]);
+
   const displayedUsers = users.slice(0, 3);
 
   const providerValue = useMemo(() => {
@@ -88,12 +101,23 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     return null;
   }
 
+  function Editor() {
+    console.log("log on every editor change");
+
+    const editor = useEditor({
+      extensions: [StarterKit],
+      content: "<p>Hello World!</p>",
+    });
+
+    return <EditorContent editor={editor} />;
+  }
+
   return (
     <div className="flex h-full" ref={menuContainerRef}>
       <Sidebar
         isOpen={leftSidebar.isOpen}
         onClose={leftSidebar.close}
-        editor={editor}
+        editor={customEditor!}
       />
       <div className="relative flex flex-col flex-1 h-full overflow-hidden">
         <EditorHeader
