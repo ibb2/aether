@@ -1,5 +1,7 @@
 "use client";
 
+import * as S from "@effect/schema/Schema";
+
 import { EditorContent, PureEditorContent, useEditor } from "@tiptap/react";
 import React, { useMemo, useRef } from "react";
 
@@ -24,24 +26,24 @@ import ExtensionKit from "@/extensions/extension-kit";
 import { useEvolu } from "@evolu/react";
 import type { Database } from "@/db/db";
 import useNoteStore from "@/store/note";
+import { NonEmptyString50 } from "@/db/schema";
+import { useDebounce } from "use-debounce";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
   const editorRef = useRef<PureEditorContent | null>(null);
 
   // Evolu
-  const { create } = useEvolu<Database>();
+  const { create, createOrUpdate } = useEvolu<Database>();
 
   // NoteStore zustand
-  const { id, name, data, setNote, setEditor } = useNoteStore((state) => ({
+  const { id, name, noteId, data, setNote } = useNoteStore((state) => ({
     id: state.id!,
     name: state.name,
+    noteId: state.noteId!,
     data: state.data,
     setNote: state.setNote,
-    setEditor: state.setEditor,
   }));
-
-  console.log("🥰", data);
 
   const { editor, users, characterCount, collabState, leftSidebar } =
     useBlockEditor({ ydoc, provider });
@@ -55,8 +57,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     content: data,
     onBeforeCreate({ editor }) {
       // Before the view is created.
-
-      setEditor(editor);
     },
     onCreate({ editor }) {
       // The editor is ready.
@@ -64,10 +64,15 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     onUpdate({ editor }) {
       // The content has changed.
       // Content does not seem to be the content of the editor
-      // const { id: exportedDataId } = create("exportedData", {
-      //   noteId: id,
-      //   jsonData: editor.getJSON(),
-      // });
+
+      const { id: updatedExportedData } = createOrUpdate("exportedData", {
+        id,
+        noteId,
+        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
+        jsonData: editor.getJSON(),
+      });
+
+      console.log("Updated document: ", updatedExportedData);
     },
     onSelectionUpdate({ editor }) {
       // The selection has changed.
@@ -89,7 +94,27 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
   });
 
-  React.useEffect(() => {}, [provider, setEditor, data]);
+  const debounceEditor = useDebounce(customEditor?.state.doc.content, 2000);
+
+  React.useEffect(() => {
+    if (debounceEditor && customEditor !== null) {
+      const { id: updatedExportedData } = createOrUpdate("exportedData", {
+        id,
+        noteId,
+        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
+        jsonData: customEditor.getJSON(),
+      });
+      console.info("Saved the data ", updatedExportedData);
+    }
+  }, [
+    provider,
+    data,
+    debounceEditor,
+    customEditor,
+    createOrUpdate,
+    id,
+    noteId,
+  ]);
 
   const displayedUsers = users.slice(0, 3);
 

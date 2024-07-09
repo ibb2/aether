@@ -10,7 +10,7 @@ export const blankContent = {
       content: [
         {
           type: "text",
-          text: "Welcome to our React Block Editor Template built on top of ",
+          text: "",
         },
       ],
     },

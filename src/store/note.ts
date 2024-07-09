@@ -1,32 +1,30 @@
-import { evolu } from "@/db/db";
-import { NoteId } from "@/db/schema";
-import * as S from "@effect/schema/Schema";
-import { useQuery } from "@evolu/react";
 import { create } from "zustand";
 import { Brand } from "effect/Brand";
-import { Editor } from "@tiptap/react";
 
 interface NoteState {
-  id: (string & Brand<"Id"> & Brand<"Note">) | null;
+  id: (string & Brand<"Id"> & Brand<"ExportedData">) | null;
+  noteId: (string & Brand<"Id"> & Brand<"Note">) | null;
   name: string;
   data: {} | null;
-  editor: any | null;
   setNote: (
     data: {},
     name: string,
-    id: string & Brand<"Id"> & Brand<"Note">,
+    noteId: string & Brand<"Id"> & Brand<"Note">,
+    id: string & Brand<"Id"> & Brand<"ExportedData">,
   ) => void;
-  setEditor: (editor: any) => void;
 }
 
 const useNoteStore = create<NoteState>()((set) => ({
   name: "",
   id: null,
+  noteId: null,
   data: null,
-  editor: null,
-  setNote: (data: {}, name: string, id: string & Brand<"Id"> & Brand<"Note">) =>
-    set(() => ({ data, name, id })),
-  setEditor: (editor: any) => set(() => ({ editor })),
+  setNote: (
+    data: {},
+    name: string,
+    noteId: string & Brand<"Id"> & Brand<"Note">,
+    id: string & Brand<"Id"> & Brand<"ExportedData">,
+  ) => set(() => ({ data, name, noteId, id })),
 }));
 
 export default useNoteStore;

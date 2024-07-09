@@ -4,7 +4,7 @@ import { memo, useCallback } from "react";
 import { Editor } from "@tiptap/react";
 import { TableOfContents } from "../TableOfContents";
 import { NotebookDialog } from "../dialogs/notebook";
-import { useEvolu, useQueries, useQuery } from "@evolu/react";
+import { useEvolu, useQueries, useQuery, String } from "@evolu/react";
 import { notebooksQuery, notesQuery } from "@/db/queries";
 import { NoteDialog } from "../dialogs/note";
 import { Button } from "../ui/Button";
@@ -12,7 +12,8 @@ import { Trash2 } from "lucide-react";
 import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
 import { Brand } from "effect/Brand";
-import { NonEmptyString50 } from "@/db/schema";
+import { NonEmptyString50, NoteId } from "@/db/schema";
+import React from "react";
 
 export const Sidebar = memo(
   ({
@@ -37,7 +38,11 @@ export const Sidebar = memo(
 
     // Move the exportedDataQuery outside of selectNote
     const exportedDataQuery = evolu.createQuery((db) =>
-      db.selectFrom("exportedData").select("jsonData").select("noteId"),
+      db
+        .selectFrom("exportedData")
+        .select("id")
+        .select("jsonData")
+        .select("noteId"),
     );
 
     // Use the query result here
@@ -64,14 +69,18 @@ export const Sidebar = memo(
 
     // Update selectNote to use the query results
     const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
-      const noteData = exportedDataRows.find((row) => row.noteId === noteId);
-      if (noteData) {
+      const exportedData = exportedDataRows.find(
+        (row) => row.noteId === noteId,
+      );
+      console.log("JSON Data, ", exportedData?.jsonData);
+      if (exportedData) {
         setNote(
-          noteData.jsonData!,
-          S.decodeSync(NonEmptyString50)(noteData.noteId ?? ""),
+          exportedData.jsonData!,
+          S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
           noteId,
+          exportedData.id,
         );
-        editor.commands.setContent(noteData.jsonData!);
+        editor.commands.setContent(exportedData.jsonData!);
       }
     };
 
