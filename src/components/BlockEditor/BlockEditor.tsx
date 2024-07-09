@@ -21,10 +21,24 @@ import { ContentItemMenu } from "../menus/ContentItemMenu";
 import { initialContent } from "@/lib/data/initialContent";
 import { blankContent } from "@/lib/data/blankContent";
 import ExtensionKit from "@/extensions/extension-kit";
+import { useEvolu } from "@evolu/react";
+import type { Database } from "@/db/db";
+import useNoteStore from "@/store/note";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
   const editorRef = useRef<PureEditorContent | null>(null);
+
+  // Evolu
+  const { create } = useEvolu<Database>();
+
+  // NoteStore zustand
+  const { id, name, data, setNote } = useNoteStore((state) => ({
+    id: state.id!,
+    name: state.name,
+    data: state.data,
+    setNote: state.setNote,
+  }));
 
   const { editor, users, characterCount, collabState, leftSidebar } =
     useBlockEditor({ ydoc, provider });
@@ -35,7 +49,33 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         provider,
       }),
     ],
-    content: initialContent,
+    content: data,
+    onUpdate({ editor }) {
+      // The content has changed.
+      // Content does not seem to be the content of the editor
+      // const { id: exportedDataId } = create("exportedData", {
+      //   noteId: id,
+      //   jsonData: editor.getJSON(),
+      // });
+    },
+    onSelectionUpdate({ editor }) {
+      // The selection has changed.
+
+      console.log("Selection");
+    },
+    onTransaction({ editor, transaction }) {
+      // The editor state has changed.
+      console.log("Transaction", transaction);
+    },
+    onFocus({ editor, event }) {
+      // The editor is focused.
+    },
+    onBlur({ editor, event }) {
+      // The editor isn’t focused anymore.
+    },
+    onDestroy() {
+      // The editor is being destroyed.
+    },
   });
 
   const displayedUsers = users.slice(0, 3);

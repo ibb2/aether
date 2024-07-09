@@ -65,7 +65,7 @@ export type NotesTable = typeof NotesTable.Type;
 export const ExportedDatasTable = table({
   id: ExportedDataId,
   noteId: NoteId,
-  jsonExportedName: NonEmptyString50,
+  jsonExportedName: S.NullOr(NonEmptyString50),
   jsonData: S.Struct({}),
   yjsExportedName: S.NullOr(NonEmptyString50),
   // yjsExportedData: S.Uint8Array,

@@ -64,7 +64,7 @@ export const Sidebar = memo(
     const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
       const noteData = exportedDataRows.find((row) => row.noteId === noteId);
       if (noteData) {
-        setNote(noteData.jsonData);
+        setNote(noteData.jsonData, "doc", noteId);
       }
       console.log("Select Note function: ", data);
     };
