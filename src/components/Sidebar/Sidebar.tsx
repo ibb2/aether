@@ -57,7 +57,7 @@ export const Sidebar = memo(
     }, [onClose]);
 
     const windowClassName = cn(
-      "absolute top-0 left-0 bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
+      "absolute top-0 left-0 bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full z-[999] w-0 duration-300 transition-all",
       "dark:bg-black lg:dark:bg-black/30",
       !isOpen && "border-r-transparent",
       isOpen && "w-80 border-r border-r-neutral-200 dark:border-r-neutral-800",
