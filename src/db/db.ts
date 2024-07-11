@@ -56,6 +56,7 @@ export const evolu = createEvolu(Database, {
       const { id: noteId } = evolu.create("notes", {
         title: S.decodeSync(NonEmptyString1000)("Initial note"),
         notebookId,
+        isNote: true,
       });
 
       const { id: exportedDataId } = evolu.create("exportedData", {

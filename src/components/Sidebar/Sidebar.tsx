@@ -172,61 +172,16 @@ export const Sidebar = memo(
 
             <div className="flex-1">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                {treeData.map((notebook) => {
-                  console.log("Notebook", notebook);
-                  return (
-                    <div key={notebook.id}>
-                      <ContextMenu>
-                        <ContextMenuTrigger
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}
-                          asChild
-                        >
-                          <div
-                            // href="#"
-                            className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                          >
-                            {/* <Home className="h-4 w-4" /> */}
-                            {notebook.title}
-                          </div>
-                        </ContextMenuTrigger>
-                        <ContextMenuContent>
-                          <ContextMenuItem
-                            onSelect={(e) => {
-                              e.preventDefault();
-                            }}
-                          >
-                            <SectionDialog notebookId={notebook.id}>
-                              <p className="w-full">New Section (folder)</p>
-                            </SectionDialog>
-                          </ContextMenuItem>
-                          <ContextMenuItem
-                            onSelect={(e) => {
-                              e.preventDefault();
-                            }}
-                          >
-                            <NoteDialog
-                              notebookId={notebook.id}
-                              notebookTitle={notebook.title!}
-                            >
-                              <p className="w-full">New Note</p>
-                            </NoteDialog>
-                            {/* New Note */}
-                          </ContextMenuItem>
-                          {/* <ContextMenuItem>Team</ContextMenuItem>
-                            <ContextMenuItem>Subscription</ContextMenuItem> */}
-                        </ContextMenuContent>
-                      </ContextMenu>
-                      <TreeMenu data={notebook} level={0} />
-                    </div>
-                  );
-                })}
+                {treeData.map((notebook) => (
+                  <div key={notebook.id}>
+                    <TreeMenu
+                      data={notebook}
+                      level={0}
+                      id={notebook.id}
+                      title={notebook.title}
+                    />
+                  </div>
+                ))}
               </nav>
             </div>
           </div>
