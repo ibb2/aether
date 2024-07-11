@@ -99,9 +99,10 @@ export const Sidebar = memo(
               <Link
                 href="/"
                 className="flex items-center gap-2 font-semibold pb-3"
+                onClick={(e) => e.preventDefault()}
               >
                 {/* <Package2 className="h-6 w-6" /> */}
-                <span className="">Aether notes</span>
+                <span>Aether notes</span>
               </Link>
               {/* <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
                 <Bell className="h-4 w-4" />
@@ -109,24 +110,29 @@ export const Sidebar = memo(
               </Button> */}
             </div>
 
-            {/* <div className="flex flex-col max-w-min justify-center">
-              <NoteDialog />
-              <NotebookDialog />
-            </div> */}
-
             <div className="flex-1">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                 {notebooks.rows.map((notebook) => (
                   <div key={notebook.id}>
                     <ContextMenu>
-                      <ContextMenuTrigger>
-                        <Link
-                          href="#"
+                      <ContextMenuTrigger
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                        asChild
+                      >
+                        <div
+                          // href="#"
                           className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                         >
                           {/* <Home className="h-4 w-4" /> */}
                           {notebook.title}
-                        </Link>
+                        </div>
                       </ContextMenuTrigger>
                       <ContextMenuContent className="z-[9999]">
                         <ContextMenuItem

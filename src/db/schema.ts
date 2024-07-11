@@ -63,6 +63,8 @@ export const SectionsTable = table({
   notesId: S.NullOr(NotesId),
   userId: S.NullOr(UserId),
   isPinned: S.NullOr(SqliteBoolean),
+  isSection: S.NullOr(SqliteBoolean),
+  isFolder: S.NullOr(SqliteBoolean),
 });
 export type SectionsTable = typeof SectionsTable.Type;
 
@@ -72,6 +74,7 @@ export const NotesTable = table({
   notebookId: NotebookId,
   exportedData: S.NullOr(ExportedDataId),
   userId: S.NullOr(UserId),
+  isNote: S.NullOr(SqliteBoolean),
 });
 export type NotesTable = typeof NotesTable.Type;
 

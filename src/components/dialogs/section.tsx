@@ -34,6 +34,8 @@ export const SectionDialog = ({ notebookId, children }: SectionDialogProps) => {
     create("sections", {
       title: S.decodeSync(NonEmptyString1000)(sectionName),
       notebookId: notebookId,
+      isFolder: true,
+      isSection: true,
     });
   };
 
