@@ -15,6 +15,7 @@ import {
   NonEmptyString50,
   NotebooksTable,
   NotesTable,
+  SectionsTable,
   UsersTable,
 } from "./schema";
 import { indexes } from "./indexes";
@@ -25,6 +26,7 @@ import { blankContent } from "@/lib/data/blankContent";
 const Database = database({
   users: UsersTable,
   notebooks: NotebooksTable,
+  sections: SectionsTable,
   notes: NotesTable,
   exportedData: ExportedDatasTable,
 });
@@ -52,7 +54,7 @@ export const evolu = createEvolu(Database, {
       });
 
       const { id: noteId } = evolu.create("notes", {
-        name: S.decodeSync(NonEmptyString1000)("Initial note"),
+        title: S.decodeSync(NonEmptyString1000)("Initial note"),
         notebookId,
       });
 

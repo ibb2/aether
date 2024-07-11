@@ -34,18 +34,42 @@ import {
   DropdownMenuContent,
 } from "@radix-ui/react-dropdown-menu";
 import { initialContent } from "@/lib/data/initialContent";
+import { Brand } from "effect/Brand";
+import useNoteDialogStore from "@/store/note-dialog-store";
 
-export const NoteDialog = () => {
+interface NoteDialogProps {
+  notebookId: string & Brand<"Id"> & Brand<"Notebook">;
+  notebookTitle: string & Brand<"String"> & Brand<"NonEmptyString1000">;
+  children: any;
+}
+
+export const NoteDialog = ({
+  notebookId,
+  notebookTitle,
+  children,
+}: NoteDialogProps) => {
   const [noteName, setNoteName] = React.useState("");
+
+  // Zustand Stores
+  const { notebookIdFromStore, notebookTitleFromStore, open, toggle } =
+    useNoteDialogStore((state) => ({
+      notebookIdFromStore: state.notebookId,
+      notebookTitleFromStore: state.notebookTitle,
+      open: state.open,
+      toggle: state.toggle,
+    }));
 
   const { rows } = useQuery(notebooksQuery);
   const { create } = useEvolu<Database>();
 
-  const [selectedNotebook, setSelectedNotebook] = React.useState(rows[0].id);
+  const [selectedNotebook, setSelectedNotebook] = React.useState(
+    notebookIdFromStore!,
+  );
+  const [isOpen, setIsOpen] = useState(open);
 
   const handler = () => {
     const { id: noteId } = create("notes", {
-      name: S.decodeSync(NonEmptyString1000)(noteName),
+      title: S.decodeSync(NonEmptyString1000)(noteName),
       notebookId: selectedNotebook,
     });
 
@@ -60,15 +84,11 @@ export const NoteDialog = () => {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">New note</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>New notebook</DialogTitle>
-          <DialogDescription>
-            Organise your toughts and ideas in a new space.
-          </DialogDescription>
+          <DialogTitle>New note</DialogTitle>
+          <DialogDescription>A clean slate.</DialogDescription>
         </DialogHeader>
         <div className="grid w-full max-w-sm items-center gap-1.5 pt-2.5">
           <div className="py-2">
@@ -83,7 +103,7 @@ export const NoteDialog = () => {
           <div className="w-full pb-2">
             <Label htmlFor="notebooks">Notebooks</Label>
             <Select
-              value={S.decodeSync(String)(selectedNotebook)}
+              value={selectedNotebook}
               onValueChange={(value) => {
                 setSelectedNotebook(S.decodeSync(NotebookId)(value));
                 console.info("Changed value", value);

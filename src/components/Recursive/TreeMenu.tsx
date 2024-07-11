@@ -8,13 +8,13 @@ const TreeMenu = ({ data, id }) => {
   const { rows: notes } = useQuery(notesQuery);
 
   return (
-    <div className="pl-4">
+    <div className="pl-4 my-4">
       {data.rows.map((parent) => {
         return (
           <div key={parent.title}>
             <Link
               href="#"
-              className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
               key={parent.id}
             >
               {/* <Home className="h-4 w-4" /> */}

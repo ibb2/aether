@@ -17,6 +17,9 @@ export type UserId = typeof UserId.Type;
 export const NotebookId = id("Notebook");
 export type NotebookId = typeof NotebookId.Type;
 
+export const SectionId = id("Section");
+export type SectionId = typeof SectionId.Type;
+
 export const NoteId = id("Note");
 export type NoteId = typeof NoteId.Type;
 
@@ -53,9 +56,19 @@ export const NotebooksTable = table({
 });
 export type NotebooksTable = typeof NotebooksTable.Type;
 
+export const SectionsTable = table({
+  id: SectionId,
+  title: NonEmptyString1000,
+  notebookId: NotebookId,
+  notesId: S.NullOr(NotesId),
+  userId: S.NullOr(UserId),
+  isPinned: S.NullOr(SqliteBoolean),
+});
+export type SectionsTable = typeof SectionsTable.Type;
+
 export const NotesTable = table({
   id: NoteId,
-  name: NonEmptyString1000,
+  title: NonEmptyString1000,
   notebookId: NotebookId,
   exportedData: S.NullOr(ExportedDataId),
   userId: S.NullOr(UserId),

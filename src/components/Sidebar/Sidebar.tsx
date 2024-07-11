@@ -16,6 +16,13 @@ import { NonEmptyString50, NoteId } from "@/db/schema";
 import React from "react";
 import Link from "next/link";
 import TreeMenu from "../Recursive/TreeMenu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { SectionDialog } from "../dialogs/section";
 
 export const Sidebar = memo(
   ({
@@ -29,7 +36,7 @@ export const Sidebar = memo(
   }) => {
     const { update } = useEvolu<Database>();
 
-    // NoteStore zustand
+    // Zustand stores
     const { name, data, setNote } = useNoteStore((state) => ({
       name: state.name,
       data: state.data,
@@ -87,8 +94,8 @@ export const Sidebar = memo(
     return (
       <div className={windowClassName}>
         <div className="w-full h-full overflow-hidden">
-          <div className="w-full h-full p-6 overflow-auto">
-            <div className="flex h-14 items-center border-b px-4 lg:px-6">
+          <div className="w-full h-full p-5 overflow-auto">
+            <div className="flex h-14 items-center border-b px-4 mb-8 lg:px-6">
               <Link
                 href="/"
                 className="flex items-center gap-2 font-semibold pb-3"
@@ -102,23 +109,54 @@ export const Sidebar = memo(
               </Button> */}
             </div>
 
-            <div className="flex flex-col max-w-min justify-center">
+            {/* <div className="flex flex-col max-w-min justify-center">
               <NoteDialog />
               <NotebookDialog />
-            </div>
+            </div> */}
 
             <div className="flex-1">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                 {notebooks.rows.map((notebook) => (
-                  <Link
-                    href="#"
-                    className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                    key={notebook.id}
-                  >
-                    {/* <Home className="h-4 w-4" /> */}
-                    {notebook.title}
+                  <div key={notebook.id}>
+                    <ContextMenu>
+                      <ContextMenuTrigger>
+                        <Link
+                          href="#"
+                          className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+                        >
+                          {/* <Home className="h-4 w-4" /> */}
+                          {notebook.title}
+                        </Link>
+                      </ContextMenuTrigger>
+                      <ContextMenuContent className="z-[9999]">
+                        <ContextMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                          }}
+                        >
+                          <SectionDialog notebookId={notebook.id}>
+                            <p className="w-full">New Section (folder)</p>
+                          </SectionDialog>
+                        </ContextMenuItem>
+                        <ContextMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                          }}
+                        >
+                          <NoteDialog
+                            notebookId={notebook.id}
+                            notebookTitle={notebook.title!}
+                          >
+                            <p className="w-full">New Note</p>
+                          </NoteDialog>
+                          {/* New Note */}
+                        </ContextMenuItem>
+                        {/* <ContextMenuItem>Team</ContextMenuItem>
+                            <ContextMenuItem>Subscription</ContextMenuItem> */}
+                      </ContextMenuContent>
+                    </ContextMenu>
                     <TreeMenu data={notes} id={notebook.id} />
-                  </Link>
+                  </div>
                 ))}
               </nav>
             </div>
