@@ -64,10 +64,11 @@ export const Sidebar = memo(
     }, [onClose]);
 
     const windowClassName = cn(
-      "absolute top-0 left-0 bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full z-[999] w-0 duration-300 transition-all",
+      "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
       "dark:bg-black lg:dark:bg-black/30",
+      "min-h-svh",
       !isOpen && "border-r-transparent",
-      isOpen && "w-80 border-r border-r-neutral-200 dark:border-r-neutral-800",
+      isOpen && "w-full",
     );
 
     const deleteNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
@@ -93,8 +94,8 @@ export const Sidebar = memo(
 
     return (
       <div className={windowClassName}>
-        <div className="w-full h-full overflow-hidden">
-          <div className="w-full h-full p-5 overflow-auto">
+        <div className="w-full min-h-svh overflow-hidden">
+          <div className="w-full h-full p-5 overflow-auto min-h-svh">
             <div className="flex h-14 items-center border-b px-4 mb-8 lg:px-6">
               <Link
                 href="/"
@@ -134,7 +135,7 @@ export const Sidebar = memo(
                           {notebook.title}
                         </div>
                       </ContextMenuTrigger>
-                      <ContextMenuContent className="z-[9999]">
+                      <ContextMenuContent>
                         <ContextMenuItem
                           onSelect={(e) => {
                             e.preventDefault();

@@ -30,12 +30,21 @@ import useNoteStore from "@/store/note";
 import { NonEmptyString50 } from "@/db/schema";
 import { useDebounce, useDebouncedCallback } from "use-debounce";
 
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { useSidebar } from "@/hooks/useSidebar";
+import { cn } from "@/lib/utils";
+
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
   const editorRef = useRef<PureEditorContent | null>(null);
 
   // State
   const [lastSaveTime, setLastSaveTime] = React.useState(Date.now());
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
   // Evolu
   const { create, createOrUpdate, update } = useEvolu<Database>();
@@ -49,10 +58,12 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     setNote: state.setNote,
   }));
 
-  const { users, characterCount, collabState, leftSidebar } = useBlockEditor({
+  const { users, characterCount, collabState } = useBlockEditor({
     ydoc,
     provider,
   });
+
+  const leftSidebar = useSidebar();
 
   const exportedDataQuery = evolu.createQuery((db) =>
     db
@@ -157,20 +168,40 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     return null;
   }
 
+  const windowClassName = cn(
+    // "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
+    // "dark:bg-black lg:dark:bg-black/30",
+    "min-h-svh",
+    // !leftSidebar.isOpen && "border-r-transparent",
+    // leftSidebar.isOpen &&
+    //   "w-80 border-r border-r-neutral-200 dark:border-r-neutral-800",
+  );
+
   return (
-    <div className="flex h-full" ref={menuContainerRef}>
-      <Sidebar
-        isOpen={leftSidebar.isOpen}
-        onClose={leftSidebar.close}
-        editor={customEditor!}
-      />
-      <div className="relative flex flex-col flex-1 h-full overflow-hidden">
+    <ResizablePanelGroup
+      direction="horizontal"
+      className="flex h-full"
+      ref={menuContainerRef}
+    >
+      {leftSidebar.isOpen && (
+        <ResizablePanel defaultSize={20} className={windowClassName}>
+          <Sidebar
+            isOpen={leftSidebar.isOpen}
+            onClose={leftSidebar.close}
+            editor={customEditor!}
+          />
+        </ResizablePanel>
+      )}
+      {leftSidebar.isOpen && (
+        <ResizableHandle withHandle className="min-h-svh" />
+      )}
+      <ResizablePanel className="relative flex flex-col flex-1 h-full overflow-hidden">
         <EditorHeader
           characters={characterCount.characters()}
           // collabState={collabState}
           // users={displayedUsers}
           words={characterCount.words()}
-          isSidebarOpen={leftSidebar.isOpen}
+          isSidebarOpen={sidebarOpen}
           toggleSidebar={leftSidebar.toggle}
         />
         <EditorContent
@@ -185,8 +216,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         <TableRowMenu editor={customEditor!} appendTo={menuContainerRef} />
         <TableColumnMenu editor={customEditor!} appendTo={menuContainerRef} />
         <ImageBlockMenu editor={customEditor!} appendTo={menuContainerRef} />
-      </div>
-    </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 };
 
