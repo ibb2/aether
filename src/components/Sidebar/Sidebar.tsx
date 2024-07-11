@@ -5,7 +5,7 @@ import { Editor } from "@tiptap/react";
 import { TableOfContents } from "../TableOfContents";
 import { NotebookDialog } from "../dialogs/notebook";
 import { useEvolu, useQueries, useQuery, String } from "@evolu/react";
-import { notebooksQuery, notesQuery } from "@/db/queries";
+import { notebooksQuery, notesQuery, sectionsQuery } from "@/db/queries";
 import { NoteDialog } from "../dialogs/note";
 import { Button } from "../ui/Button";
 import { Trash2 } from "lucide-react";
@@ -43,7 +43,14 @@ export const Sidebar = memo(
       setNote: state.setNote,
     }));
 
-    const [notebooks, notes] = useQueries([notebooksQuery, notesQuery]);
+    const [notebooks, sections, notes] = useQueries([
+      notebooksQuery,
+      sectionsQuery,
+      notesQuery,
+    ]);
+
+    // State
+    const [treeData, setTreeData] = React.useState([]);
 
     // Move the exportedDataQuery outside of selectNote
     const exportedDataQuery = evolu.createQuery((db) =>
@@ -56,6 +63,58 @@ export const Sidebar = memo(
 
     // Use the query result here
     const { rows: exportedDataRows } = useQuery(exportedDataQuery);
+
+    // Make treeview data
+
+    React.useEffect(() => {
+      const fetchData = async () => {
+        // const [notebooks, sections, notes] = await Promise.all([
+        //   fetchNotebooks(),
+        //   fetchSections(),
+        //   fetchNotes(),
+        // ]);
+        const transformedData = transformData(notebooks, sections, notes);
+        setTreeData(transformedData);
+      };
+
+      fetchData();
+    }, []);
+
+    const transformData = (notebooks, sections, notes) => {
+      const sectionMap = new Map();
+      sections.rows.forEach((section) => {
+        sectionMap.set(section.id, { ...section, sections: [], notes: [] });
+      });
+
+      notes.rows.forEach((note) => {
+        const section = sectionMap.get(note.sectionId);
+        if (section) {
+          section.notes.push(note);
+        }
+      });
+
+      sections.rows.forEach((section) => {
+        if (section.parentSectionId) {
+          const parentSection = sectionMap.get(section.parentSectionId);
+          if (parentSection) {
+            parentSection.sections.push(sectionMap.get(section.id));
+          }
+        }
+      });
+
+      return notebooks.rows.map((notebook) => ({
+        ...notebook,
+        sections: sections.rows
+          .filter(
+            (section) =>
+              section.notebookId === notebook.id && !section.parentSectionId,
+          )
+          .map((section) => sectionMap.get(section.id)),
+        notes: notes.rows.filter(
+          (note) => note.notebookId === notebook.id && !note.sectionId,
+        ),
+      }));
+    };
 
     const handlePotentialClose = useCallback(() => {
       if (window.innerWidth < 1024) {
@@ -113,58 +172,61 @@ export const Sidebar = memo(
 
             <div className="flex-1">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                {notebooks.rows.map((notebook) => (
-                  <div key={notebook.id}>
-                    <ContextMenu>
-                      <ContextMenuTrigger
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                        asChild
-                      >
-                        <div
-                          // href="#"
-                          className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+                {treeData.map((notebook) => {
+                  console.log("Notebook", notebook);
+                  return (
+                    <div key={notebook.id}>
+                      <ContextMenu>
+                        <ContextMenuTrigger
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                           }}
+                          asChild
                         >
-                          {/* <Home className="h-4 w-4" /> */}
-                          {notebook.title}
-                        </div>
-                      </ContextMenuTrigger>
-                      <ContextMenuContent>
-                        <ContextMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                          }}
-                        >
-                          <SectionDialog notebookId={notebook.id}>
-                            <p className="w-full">New Section (folder)</p>
-                          </SectionDialog>
-                        </ContextMenuItem>
-                        <ContextMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                          }}
-                        >
-                          <NoteDialog
-                            notebookId={notebook.id}
-                            notebookTitle={notebook.title!}
+                          <div
+                            // href="#"
+                            className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
                           >
-                            <p className="w-full">New Note</p>
-                          </NoteDialog>
-                          {/* New Note */}
-                        </ContextMenuItem>
-                        {/* <ContextMenuItem>Team</ContextMenuItem>
+                            {/* <Home className="h-4 w-4" /> */}
+                            {notebook.title}
+                          </div>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent>
+                          <ContextMenuItem
+                            onSelect={(e) => {
+                              e.preventDefault();
+                            }}
+                          >
+                            <SectionDialog notebookId={notebook.id}>
+                              <p className="w-full">New Section (folder)</p>
+                            </SectionDialog>
+                          </ContextMenuItem>
+                          <ContextMenuItem
+                            onSelect={(e) => {
+                              e.preventDefault();
+                            }}
+                          >
+                            <NoteDialog
+                              notebookId={notebook.id}
+                              notebookTitle={notebook.title!}
+                            >
+                              <p className="w-full">New Note</p>
+                            </NoteDialog>
+                            {/* New Note */}
+                          </ContextMenuItem>
+                          {/* <ContextMenuItem>Team</ContextMenuItem>
                             <ContextMenuItem>Subscription</ContextMenuItem> */}
-                      </ContextMenuContent>
-                    </ContextMenu>
-                    <TreeMenu data={notes} id={notebook.id} />
-                  </div>
-                ))}
+                        </ContextMenuContent>
+                      </ContextMenu>
+                      <TreeMenu data={notebook} level={0} />
+                    </div>
+                  );
+                })}
               </nav>
             </div>
           </div>
