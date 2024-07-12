@@ -8,7 +8,7 @@ import { useEvolu, useQueries, useQuery, String } from "@evolu/react";
 import { notebooksQuery, notesQuery, sectionsQuery } from "@/db/queries";
 import { NoteDialog } from "../dialogs/note";
 import { Button } from "../ui/Button";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
 import { Brand } from "effect/Brand";
@@ -50,7 +50,7 @@ export const Sidebar = memo(
     ]);
 
     // State
-    const [treeData, setTreeData] = React.useState([]);
+    const [treeData, setTreeData] = React.useState<any>([]);
 
     // Move the exportedDataQuery outside of selectNote
     const exportedDataQuery = evolu.createQuery((db) =>
@@ -155,10 +155,10 @@ export const Sidebar = memo(
       <div className={windowClassName}>
         <div className="w-full min-h-svh overflow-hidden">
           <div className="w-full h-full p-5 overflow-auto min-h-svh">
-            <div className="flex h-14 items-center border-b px-4 mb-8 lg:px-6">
+            <div className="flex h-14 items-center border-b mb-3">
               <Link
                 href="/"
-                className="flex items-center gap-2 font-semibold pb-3"
+                className="flex items-center gap-2 px-2 font-semibold"
                 onClick={(e) => e.preventDefault()}
               >
                 {/* <Package2 className="h-6 w-6" /> */}
@@ -168,10 +168,20 @@ export const Sidebar = memo(
                 <Bell className="h-4 w-4" />
                 <span className="sr-only">Toggle notifications</span>
               </Button> */}
+              <NotebookDialog>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="ml-auto h-8 w-8"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="sr-only">Add new notebook</span>
+                </Button>
+              </NotebookDialog>
             </div>
 
             <div className="flex-1">
-              <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+              <nav className="grid items-start text-sm font-medium">
                 {treeData.map((notebook) => (
                   <div key={notebook.id}>
                     <TreeMenu
@@ -179,6 +189,7 @@ export const Sidebar = memo(
                       level={0}
                       id={notebook.id}
                       title={notebook.title}
+                      editor={editor}
                     />
                   </div>
                 ))}

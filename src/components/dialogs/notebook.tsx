@@ -15,11 +15,15 @@ import {
 import { Button } from "../ui/Button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import React, { useState } from "react";
+import React, { Children, useState } from "react";
 import { NonEmptyString1000, useEvolu } from "@evolu/react";
 import type { Database } from "@/db/db";
 
-export const NotebookDialog = () => {
+interface NotebookDialogProps {
+  children: typeof Children;
+}
+
+export const NotebookDialog = ({ children }: NotebookDialogProps) => {
   const [notebookName, setNotebookName] = React.useState("");
 
   const { create } = useEvolu<Database>();
@@ -32,9 +36,7 @@ export const NotebookDialog = () => {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">New notebook</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>New notebook</DialogTitle>
