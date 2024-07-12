@@ -68,18 +68,13 @@ export const Sidebar = memo(
     // Make treeview data
 
     React.useEffect(() => {
-      const fetchData = async () => {
-        // const [notebooks, sections, notes] = await Promise.all([
-        //   fetchNotebooks(),
-        //   fetchSections(),
-        //   fetchNotes(),
-        // ]);
+      const getData = async () => {
         const transformedData = transformData(notebooks, sections, notes);
         setTreeData(transformedData);
       };
 
-      fetchData();
-    }, []);
+      getData();
+    }, [notebooks, sections, notes]);
 
     const transformData = (notebooks, sections, notes) => {
       const sectionMap = new Map();
