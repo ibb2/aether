@@ -9,6 +9,7 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { SectionDialog } from "../dialogs/section";
@@ -27,36 +28,32 @@ const TreeMenu = ({ id, title, data, level }: TreeMenuProps) => {
   const [notes, sections] = useQueries([notesQuery, sectionsQuery]);
 
   const hasChildren = data.sections?.length > 0 || data.notes?.length > 0;
-  console.log("Data", data);
-  console.log(level);
 
   const isSection = data.isSection === 1;
   const isNote = data.isNote === 1;
-
-  console.log("section", isSection);
-  console.log("note", isNote);
 
   const indentLevel = cn(isSection && "ml-8");
 
   return (
     <div className={indentLevel}>
-      <div onClick={() => setShow(!show)} className="flex flex-row">
-        {hasChildren &&
-          (show ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+      <div
+        onClick={(e) => {
+          setShow(!show);
+          e.preventDefault();
+        }}
+        className="flex flex-row items-center px-3 py-2 rounded-lg hover:bg-muted w-full"
+        key={id}
+      >
+        <div className="pr-1.5">
+          {hasChildren &&
+            (show ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+        </div>
         <ContextMenu>
-          <ContextMenuTrigger
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            asChild
-          >
+          <ContextMenuTrigger asChild>
             <div
-              // href="#"
-              className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+              className="items-center gap-3 rounded-lg text-muted-foreground hover:text-primary"
               onClick={(e) => {
                 e.preventDefault();
-                e.stopPropagation();
               }}
             >
               {/* <Home className="h-4 w-4" /> */}
@@ -67,18 +64,20 @@ const TreeMenu = ({ id, title, data, level }: TreeMenuProps) => {
             <ContextMenuItem
               onSelect={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
               }}
             >
-              <SectionDialog notebookId={data.id}>
+              <SectionDialog notebookId={id}>
                 <p className="w-full">New Section (folder)</p>
               </SectionDialog>
             </ContextMenuItem>
             <ContextMenuItem
               onSelect={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
               }}
             >
-              <NoteDialog notebookId={data.id} notebookTitle={data.title!}>
+              <NoteDialog notebookId={id} notebookTitle={title!}>
                 <p className="w-full">New Note</p>
               </NoteDialog>
               {/* New Note */}
@@ -88,23 +87,6 @@ const TreeMenu = ({ id, title, data, level }: TreeMenuProps) => {
           </ContextMenuContent>
         </ContextMenu>
       </div>
-      {/* <Link
-          href="#"
-          className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
-          key={parent.id}
-        >
-          {parent.title}
-        </Link> */}
-      {/* <div
-        className="items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
-        key={parent.id}
-      > */}
-      {/* <Home className="h-4 w-4" /> */}
-      {/* {parent.title}
-      </div> */}
-      {/* {parent.isSection && <button>{parent.title}</button>} */}
-      {/* {parent.isNote && <span>{parent.title}</span>} */}
-      {/* <div>{hasChildren && <TreeMenu data={data} level={level + 1} />}</div> */}
       {show && (
         <>
           {data.sections?.map((section) => (
@@ -117,8 +99,58 @@ const TreeMenu = ({ id, title, data, level }: TreeMenuProps) => {
             />
           ))}
           {data.notes?.map((note) => (
-            <div key={note.id} className="ml-12">
-              {note.title}
+            <div
+              key={note.id}
+              className="pl-8 px-4 rounded-md hover:bg-muted w-full"
+            >
+              <ContextMenu>
+                <ContextMenuTrigger
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  asChild
+                >
+                  <div
+                    // href="#"
+                    className="items-center gap-3 pl-2 py-1 border-l-2 border-l-muted text-muted-foreground hover:text-primary hover:bg-muted w-full"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                  >
+                    {/* <Home className="h-4 w-4" /> */}
+                    {note.title}
+                  </div>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <p className="w-full">Rename</p>
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <p className="w-full">Edit</p>
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
+                  <ContextMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <p className="w-full">Delete</p>
+                    {/* New Note */}
+                  </ContextMenuItem>
+                  {/* <ContextMenuItem>Team</ContextMenuItem>
+                    <ContextMenuItem>Subscription</ContextMenuItem> */}
+                </ContextMenuContent>
+              </ContextMenu>
             </div>
           ))}
         </>

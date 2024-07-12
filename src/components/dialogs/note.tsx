@@ -55,7 +55,6 @@ export const NoteDialog = ({
   const { create } = useEvolu<Database>();
 
   const [selectedNotebook, setSelectedNotebook] = React.useState(notebookId);
-  const [isOpen, setIsOpen] = useState(open);
 
   const handler = () => {
     const { id: noteId } = create("notes", {
