@@ -142,14 +142,20 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
     }
   };
 
+  const className = cn(
+    "flex flex-row items-center py-2 rounded-lg hover:bg-muted w-full",
+    isSection && "px-10",
+    !isSection && !isNote && "px-3",
+  );
+
   return (
-    <div className={indentLevel}>
+    <div>
       <div
         onClick={(e) => {
           setShow(!show);
           e.preventDefault();
         }}
-        className="flex flex-row items-center px-3 py-2 rounded-lg hover:bg-muted w-full"
+        className={className}
         key={id}
       >
         <div className="pr-1.5">
@@ -294,7 +300,7 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
           {data.notes?.map((note) => (
             <div
               key={note.id}
-              className="pl-8 px-4 rounded-md hover:bg-muted w-full"
+              className="pl-7 px-4 rounded-md hover:bg-muted w-full"
             >
               <NoteDialog notebookId={id} notebookTitle={title}>
                 <ContextMenu>
@@ -306,7 +312,7 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
                   >
                     <div
                       // href="#"
-                      className="items-center gap-3 pl-2 py-1 border-l-2 border-l-muted text-muted-foreground hover:text-primary hover:bg-muted w-full"
+                      className="items-center gap-3 pl-4 py-1 border-l-2 border-l-muted text-muted-foreground hover:text-primary hover:bg-muted w-full"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
