@@ -20,7 +20,7 @@ import { NonEmptyString1000, useEvolu } from "@evolu/react";
 import type { Database } from "@/db/db";
 
 interface NotebookDialogProps {
-  children: typeof Children;
+  children: any;
 }
 
 export const NotebookDialog = ({ children }: NotebookDialogProps) => {
@@ -35,7 +35,7 @@ export const NotebookDialog = ({ children }: NotebookDialogProps) => {
   };
 
   return (
-    <Dialog>
+    <Dialog modal>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

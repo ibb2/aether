@@ -40,7 +40,8 @@ export const SectionDialog = ({ notebookId, children }: SectionDialogProps) => {
   };
 
   return (
-    <Dialog>
+    <Dialog modal={false}>
+      {/* {children} */}
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

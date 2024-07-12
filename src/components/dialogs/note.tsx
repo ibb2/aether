@@ -35,6 +35,7 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { initialContent } from "@/lib/data/initialContent";
 import { Brand } from "effect/Brand";
+import useNoteDialogStore from "@/store/note-dialog";
 
 interface NoteDialogProps {
   notebookId: string & Brand<"Id"> & Brand<"Notebook">;
@@ -48,8 +49,17 @@ export const NoteDialog = ({
   children,
 }: NoteDialogProps) => {
   const [noteName, setNoteName] = React.useState("");
+  const [open, setOpen] = React.useState(false);
 
   // Zustand Stores
+  const { isOpen, toggle } = useNoteDialogStore((s) => ({
+    isOpen: s.isOpen,
+    toggle: s.toggle,
+  }));
+
+  React.useEffect(() => {
+    setOpen(isOpen);
+  }, [isOpen]);
 
   const { rows } = useQuery(notebooksQuery);
   const { create } = useEvolu<Database>();
@@ -73,7 +83,8 @@ export const NoteDialog = ({
 
   return (
     <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      {children}
+      {/* <DialogTrigger asChild>{children}</DialogTrigger> */}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>New note</DialogTitle>

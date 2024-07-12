@@ -23,6 +23,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { SectionDialog } from "../dialogs/section";
+import useNoteDialogStore from "@/store/note-dialog";
 
 export const Sidebar = memo(
   ({
