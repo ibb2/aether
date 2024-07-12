@@ -1,7 +1,13 @@
 import * as S from "@effect/schema/Schema";
 import { Database, evolu } from "@/db/db";
 import { notebooksQuery, notesQuery, sectionsQuery } from "@/db/queries";
-import { NonEmptyString50, NotebookId, NotebooksTable } from "@/db/schema";
+import {
+  NonEmptyString50,
+  NotebookId,
+  NotebooksTable,
+  SectionId,
+  SectionsTable,
+} from "@/db/schema";
 import {
   NonEmptyString1000,
   useEvolu,
@@ -77,22 +83,46 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
 
   const [sectionName, setSectionName] = React.useState("");
 
-  const dialog1handler = () => {
-    create("sections", {
+  const dialog1handler = (
+    parent: SectionsTable,
+    parentSectionId: string & Brand<"Id"> & Brand<"Section">,
+  ) => {
+    console.info("Section", parent);
+    console.info("Id for section", parentSectionId);
+    console.info("Level", level);
+    const { id: newId } = create("sections", {
       title: S.decodeSync(NonEmptyString1000)(sectionName),
       notebookId: id,
       isFolder: true,
       isSection: true,
+      parentId: level > 1 ? parentSectionId : null,
     });
+
+    if (level > 1) {
+      const previousChildrenIds =
+        parent.childrenId != null ? [...parent.childrenId, newId] : [newId];
+
+      update("sections", {
+        id: parentSectionId,
+        childrenId: previousChildrenIds,
+      });
+    }
   };
 
   const [selectedNotebook, setSelectedNotebook] = React.useState(id);
+  const [section, setSection] = React.useState(isSection ? data.id : null);
 
   const handler = () => {
     const { id: noteId } = create("notes", {
       title: S.decodeSync(NonEmptyString1000)(noteName),
       notebookId: selectedNotebook,
+      sectionId: section,
     });
+
+    const newNotesId =
+      section.notesId != null ? [...section.notesId, noteId] : [noteId];
+
+    update("sections", { id: section.id, notesId: newNotesId });
 
     const { id: exportedDataId } = create("exportedData", {
       noteId,
@@ -144,8 +174,8 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
 
   const className = cn(
     "flex flex-row items-center py-2 rounded-lg hover:bg-muted w-full cursor-pointer",
-    isSection && "px-10",
-    !isSection && !isNote && "px-3",
+    isSection && "px-9",
+    !isSection && !isNote && "px-2.5",
   );
 
   return (
@@ -157,8 +187,9 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
         }}
         className={className}
         key={id}
+        style={{ paddingLeft: level > 0 ? level * 20 : level * 30 }}
       >
-        <div className="pr-1.5">
+        <div className="pr-2">
           {hasChildren &&
             (show ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
         </div>
@@ -221,7 +252,10 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
                     <Button variant="secondary">Cancel</Button>
                   </DialogClose>
                   <DialogClose asChild>
-                    <Button type="submit" onClick={dialog1handler}>
+                    <Button
+                      type="submit"
+                      onClick={() => dialog1handler(data, data.id)}
+                    >
                       Create
                     </Button>
                   </DialogClose>
@@ -244,31 +278,53 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
                       onChange={(e) => setNoteName(e.target.value)}
                     />
                   </div>
-                  <div className="w-full pb-2">
-                    <Label htmlFor="notebooks">Notebooks</Label>
-                    <Select
-                      value={selectedNotebook}
-                      onValueChange={(value) => {
-                        setSelectedNotebook(S.decodeSync(NotebookId)(value));
-                        console.info("Changed value", value);
-                      }}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={rows[0].title} />
-                      </SelectTrigger>
-                      <SelectContent id="notebooks" className="w-full">
-                        {rows.map((notebook, index) => (
-                          <SelectItem
-                            value={notebook.id}
-                            key={index}
-                            className="w-full"
-                          >
-                            {notebook.title}
+                  {!isSection ? (
+                    <div className="w-full pb-2">
+                      <Label htmlFor="notebooks">Notebooks</Label>
+                      <Select
+                        value={selectedNotebook}
+                        onValueChange={(value) => {
+                          setSection(S.decodeSync(SectionId)(value));
+                          console.info("Changed value", value);
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={rows[0].title} />
+                        </SelectTrigger>
+                        <SelectContent id="notebooks" className="w-full">
+                          {rows.map((notebook, index) => (
+                            <SelectItem
+                              value={notebook.id}
+                              key={index}
+                              className="w-full"
+                            >
+                              {notebook.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : (
+                    <div className="w-full pb-2">
+                      <Label htmlFor="notebooks">Section</Label>
+                      <Select
+                        value={section}
+                        onValueChange={(value) => {
+                          setSection(S.decodeSync(SectionId)(value));
+                          console.info("Changed value", value);
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={data.title} />
+                        </SelectTrigger>
+                        <SelectContent id="notebooks" className="w-full">
+                          <SelectItem value={data.id} className="w-full">
+                            {data.title}
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
@@ -287,28 +343,36 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
       </div>
       {show && (
         <>
-          {data.sections?.map((section) => (
-            <TreeMenu
-              key={section.id}
-              id={id}
-              title={title}
-              data={section}
-              level={level + 1}
-              editor={editor}
-            />
-          ))}
+          {data.sections?.map((section, index) => {
+            return (
+              <>
+                {section !== undefined && (
+                  <TreeMenu
+                    // key={section.id}
+                    key={section.id}
+                    id={id}
+                    title={title}
+                    data={section}
+                    level={level + 1}
+                    editor={editor}
+                  />
+                )}
+              </>
+            );
+          })}
           {data.notes?.map((note) => (
             <div
               key={note.id}
-              className="pl-7 px-4 rounded-md hover:bg-muted w-full"
+              className="px-4 rounded-md hover:bg-muted w-full"
               onClick={() => {
                 selectNote(note.id);
               }}
+              style={{ paddingLeft: level > 0 ? level * 30 : level * 40 }}
             >
-              <NoteDialog notebookId={id} notebookTitle={title}>
+              <NoteDialog notebookId={id} notebookTitle={title} section={null}>
                 <ContextMenu>
                   <ContextMenuTrigger>
-                    <div className="items-center gap-3 pl-4 py-1 border-l-2 border-l-muted text-muted-foreground hover:text-primary hover:bg-muted w-full cursor-pointer">
+                    <div className="items-center gap-3 pl-5 py-1 border-l-2 border-l-muted text-muted-foreground hover:text-primary hover:bg-muted w-full cursor-pointer">
                       {/* <Home className="h-4 w-4" /> */}
                       {note.title}
                     </div>

@@ -40,12 +40,14 @@ import useNoteDialogStore from "@/store/note-dialog";
 interface NoteDialogProps {
   notebookId: string & Brand<"Id"> & Brand<"Notebook">;
   notebookTitle: string & Brand<"String"> & Brand<"NonEmptyString1000">;
+  section: any | null;
   children: any;
 }
 
 export const NoteDialog = ({
   notebookId,
   notebookTitle,
+  section,
   children,
 }: NoteDialogProps) => {
   const [noteName, setNoteName] = React.useState("");
@@ -100,31 +102,58 @@ export const NoteDialog = ({
               onChange={(e) => setNoteName(e.target.value)}
             />
           </div>
-          <div className="w-full pb-2">
-            <Label htmlFor="notebooks">Notebooks</Label>
-            <Select
-              value={selectedNotebook}
-              onValueChange={(value) => {
-                setSelectedNotebook(S.decodeSync(NotebookId)(value));
-                console.info("Changed value", value);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={rows[0].title} />
-              </SelectTrigger>
-              <SelectContent id="notebooks" className="w-full">
-                {rows.map((notebook, index) => (
-                  <SelectItem
-                    value={notebook.id}
-                    key={index}
-                    className="w-full"
-                  >
-                    {notebook.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {section == null ? (
+            <div className="w-full pb-2">
+              <Label htmlFor="notebooks">Notebooks</Label>
+              <Select
+                value={selectedNotebook}
+                onValueChange={(value) => {
+                  setSelectedNotebook(S.decodeSync(NotebookId)(value));
+                  console.info("Changed value", value);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={rows[0].title} />
+                </SelectTrigger>
+                <SelectContent id="notebooks" className="w-full">
+                  {rows.map((notebook, index) => (
+                    <SelectItem
+                      value={notebook.id}
+                      key={index}
+                      className="w-full"
+                    >
+                      {notebook.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div className="w-full pb-2">
+              <Select
+                value={section}
+                onValueChange={(value) => {
+                  setSelectedNotebook(S.decodeSync(NotebookId)(value));
+                  console.info("Changed value", value);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={rows[0].title} />
+                </SelectTrigger>
+                <SelectContent id="notebooks" className="w-full">
+                  {rows.map((notebook, index) => (
+                    <SelectItem
+                      value={notebook.id}
+                      key={index}
+                      className="w-full"
+                    >
+                      {notebook.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
         <DialogFooter>
           <DialogClose asChild>

@@ -79,24 +79,46 @@ export const Sidebar = memo(
     const transformData = (notebooks, sections, notes) => {
       const sectionMap = new Map();
       sections.rows.forEach((section) => {
-        sectionMap.set(section.id, { ...section, sections: [], notes: [] });
+        if (!(section.parentId !== null)) {
+          sectionMap.set(section.id, { ...section, sections: [], notes: [] });
+        }
+      });
+
+      const sectionMapAll = new Map();
+      sections.rows.forEach((section) => {
+        sectionMapAll.set(section.id, { ...section, sections: [], notes: [] });
       });
 
       notes.rows.forEach((note) => {
-        const section = sectionMap.get(note.sectionId);
-        if (section) {
-          section.notes.push(note);
-        }
+        const section = sectionMapAll.get(note.sectionId);
+        const rootSection = sectionMap.get(note.sectionId);
+        if (section) section.notes.push(note);
+        if (rootSection) rootSection.notes.push(note);
       });
 
       sections.rows.forEach((section) => {
-        if (section.parentSectionId) {
-          const parentSection = sectionMap.get(section.parentSectionId);
+        if (section.parentId) {
+          const parentSection = sectionMap.get(section.parentId);
           if (parentSection) {
-            parentSection.sections.push(sectionMap.get(section.id));
+            parentSection.sections.push(sectionMapAll.get(section.id));
           }
         }
       });
+
+      const final = notebooks.rows.map((notebook) => ({
+        ...notebook,
+        sections: sections.rows
+          .filter(
+            (section) =>
+              section.notebookId === notebook.id && !section.parentSectionId,
+          )
+          .map((section) => sectionMap.get(section.id)),
+        notes: notes.rows.filter(
+          (note) => note.notebookId === notebook.id && !note.sectionId,
+        ),
+      }));
+
+      console.log(final);
 
       return notebooks.rows.map((notebook) => ({
         ...notebook,
@@ -182,7 +204,7 @@ export const Sidebar = memo(
                   <div key={notebook.id}>
                     <TreeMenu
                       data={notebook}
-                      level={0}
+                      level={1}
                       id={notebook.id}
                       title={notebook.title}
                       editor={editor}

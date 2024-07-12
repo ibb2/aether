@@ -36,6 +36,8 @@ export type NonEmptyString50 = typeof NonEmptyString50.Type;
 
 export const NotesId = S.Array(String);
 
+export const SectionsId = S.Array(SectionId);
+
 // Tables
 export const UsersTable = table({
   id: UserId,
@@ -60,8 +62,10 @@ export const SectionsTable = table({
   id: SectionId,
   title: NonEmptyString1000,
   notebookId: NotebookId,
-  notesId: S.NullOr(NotesId),
+  notesId: S.NullOr(S.Array(NoteId)),
   userId: S.NullOr(UserId),
+  parentId: S.NullOr(SectionId),
+  childrenId: S.NullOr(SectionsId),
   isPinned: S.NullOr(SqliteBoolean),
   isSection: S.NullOr(SqliteBoolean),
   isFolder: S.NullOr(SqliteBoolean),
@@ -72,6 +76,7 @@ export const NotesTable = table({
   id: NoteId,
   title: NonEmptyString1000,
   notebookId: NotebookId,
+  sectionId: S.NullOr(SectionId),
   exportedData: S.NullOr(ExportedDataId),
   userId: S.NullOr(UserId),
   isNote: S.NullOr(SqliteBoolean),
