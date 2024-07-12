@@ -90,10 +90,12 @@ export const Sidebar = memo(
       });
 
       notes.rows.forEach((note) => {
-        const section = sectionMapAll.get(note.sectionId);
-        const rootSection = sectionMap.get(note.sectionId);
-        if (section) section.notes.push(note);
-        if (rootSection) rootSection.notes.push(note);
+        if (!note.isDeleted) {
+          const section = sectionMapAll.get(note.sectionId);
+          const rootSection = sectionMap.get(note.sectionId);
+          if (section) section.notes.push(note);
+          if (rootSection) rootSection.notes.push(note);
+        }
       });
 
       sections.rows.forEach((section) => {
@@ -105,31 +107,21 @@ export const Sidebar = memo(
         }
       });
 
-      const final = notebooks.rows.map((notebook) => ({
-        ...notebook,
-        sections: sections.rows
-          .filter(
-            (section) =>
-              section.notebookId === notebook.id && !section.parentSectionId,
-          )
-          .map((section) => sectionMap.get(section.id)),
-        notes: notes.rows.filter(
-          (note) => note.notebookId === notebook.id && !note.sectionId,
-        ),
-      }));
-
-      console.log(final);
-
       return notebooks.rows.map((notebook) => ({
         ...notebook,
         sections: sections.rows
           .filter(
             (section) =>
-              section.notebookId === notebook.id && !section.parentSectionId,
+              section.notebookId === notebook.id &&
+              !section.parentSectionId &&
+              !section.isDeleted,
           )
           .map((section) => sectionMap.get(section.id)),
         notes: notes.rows.filter(
-          (note) => note.notebookId === notebook.id && !note.sectionId,
+          (note) =>
+            note.notebookId === notebook.id &&
+            !note.sectionId &&
+            !note.isDeleted,
         ),
       }));
     };
