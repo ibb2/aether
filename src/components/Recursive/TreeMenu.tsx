@@ -143,7 +143,7 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
   };
 
   const className = cn(
-    "flex flex-row items-center py-2 rounded-lg hover:bg-muted w-full",
+    "flex flex-row items-center py-2 rounded-lg hover:bg-muted w-full cursor-pointer",
     isSection && "px-10",
     !isSection && !isNote && "px-3",
   );
@@ -301,40 +301,23 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
             <div
               key={note.id}
               className="pl-7 px-4 rounded-md hover:bg-muted w-full"
+              onClick={() => {
+                selectNote(note.id);
+              }}
             >
               <NoteDialog notebookId={id} notebookTitle={title}>
                 <ContextMenu>
-                  <ContextMenuTrigger
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                  >
-                    <div
-                      // href="#"
-                      className="items-center gap-3 pl-4 py-1 border-l-2 border-l-muted text-muted-foreground hover:text-primary hover:bg-muted w-full"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                    >
+                  <ContextMenuTrigger>
+                    <div className="items-center gap-3 pl-4 py-1 border-l-2 border-l-muted text-muted-foreground hover:text-primary hover:bg-muted w-full cursor-pointer">
                       {/* <Home className="h-4 w-4" /> */}
                       {note.title}
                     </div>
                   </ContextMenuTrigger>
                   <ContextMenuContent>
-                    <ContextMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                      }}
-                    >
+                    <ContextMenuItem>
                       <p className="w-full">Rename</p>
                     </ContextMenuItem>
-                    <ContextMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                      }}
-                    >
+                    <ContextMenuItem>
                       <p className="w-full">Edit</p>
                     </ContextMenuItem>
                     <ContextMenuSeparator />
