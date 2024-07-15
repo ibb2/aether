@@ -35,12 +35,12 @@ export const EditorHeader = ({
           </Toolbar.Button>
         </div>
       </div>
-      {/* <EditorInfo
+      <EditorInfo
         characters={characters}
         words={words}
-        collabState={collabState}
-        users={users}
-      /> */}
+        // collabState={collabState}
+        // users={users}
+      />
     </div>
   );
 };
