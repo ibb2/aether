@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "generate": "drizzle-kit generate",
+    "push": "drizzle-kit push",
     "lint": "next lint"
   },
   "dependencies": {
