@@ -30,6 +30,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import React from "react";
 
 // const Email = S.pattern(
 //   /^(?!\.)(?!.*\.\.)([A-Z0-9_+-.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i,
@@ -116,18 +117,7 @@ export default function Page() {
     },
   });
 
-  // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-
-    const formData = new FormData();
-    formData.append("username", values.username);
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-    formData.append("confirmPassword", values.confirmPassword);
-  }
+  const formRef = React.useRef<HTMLFormElement>(null);
 
   return (
     <Card className="flex flex-col p-0 content-center items-center justify-center w-[500px] ">
@@ -147,9 +137,10 @@ export default function Page() {
         )}
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(() => formRef.current?.submit())}
             action={formAction}
             className="space-y-5"
+            ref={formRef}
           >
             <FormField
               control={form.control}
@@ -216,7 +207,7 @@ export default function Page() {
               )}
             />
             <Button type="submit" className="w-full">
-              Submit
+              Sign up
             </Button>
           </form>
         </Form>

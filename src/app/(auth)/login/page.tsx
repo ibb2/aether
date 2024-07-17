@@ -1,96 +1,132 @@
-import { db } from "@/db/drizzle";
-import { eq, lt, gte, ne } from "drizzle-orm";
-import { users } from "@/db/drizzle/schema/users";
-import { lucia } from "@/lib/auth";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { verify } from "@node-rs/argon2";
+"use client";
 
-// app/login/page.tsx
-export default async function Page() {
-  return (
-    <>
-      <h1>Sign in</h1>
-      <form action={login}>
-        <label htmlFor="username">Username</label>
-        <input name="username" id="username" />
-        <br />
-        <label htmlFor="password">Password</label>
-        <input type="password" name="password" id="password" />
-        <br />
-        <button type="submit">Continue</button>
-      </form>
-    </>
-  );
-}
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-async function login(formData: FormData): Promise<ActionResult> {
-  "use server";
-  const username = formData.get("username");
-  if (
-    typeof username !== "string" ||
-    username.length < 3 ||
-    username.length > 31 ||
-    !/^[a-z0-9_-]+$/.test(username)
-  ) {
-    return {
-      error: "Invalid username",
-    };
-  }
-  const password = formData.get("password");
-  if (
-    typeof password !== "string" ||
-    password.length < 6 ||
-    password.length > 255
-  ) {
-    return {
-      error: "Invalid password",
-    };
-  }
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/Button";
+import { login } from "@/actions/auth/login";
+import { useFormState } from "react-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import React from "react";
 
-  const existingUser = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, username.toLowerCase()));
+export const formSchema = z.object({
+  username: z
+    .string()
+    .min(3, { message: "username must be at least 3 characters long" })
+    .max(100, { message: "username too long" })
+    .nonempty({ message: "username required" }),
+  password: z
+    .string()
+    .min(8, { message: "password must be 8 characters long" })
+    .max(255, { message: "password is too long" })
+    .nonempty({ message: "password required" }),
+});
 
-  if (!existingUser) {
-    // NOTE:
-    // Returning immediately allows malicious actors to figure out valid usernames from response times,
-    // allowing them to only focus on guessing passwords in brute-force attacks.
-    // As a preventive measure, you may want to hash passwords even for invalid usernames.
-    // However, valid usernames can be already be revealed with the signup page among other methods.
-    // It will also be much more resource intensive.
-    // Since protecting against this is non-trivial,
-    // it is crucial your implementation is protected against brute-force attacks with login throttling etc.
-    // If usernames are public, you may outright tell the user that the username is invalid.
-    return {
-      error: "Incorrect username or password",
-    };
-  }
+export type LoginSchema = z.infer<typeof formSchema>;
 
-  const validPassword = await verify(existingUser[0].passwordHash, password, {
-    memoryCost: 19456,
-    timeCost: 2,
-    outputLen: 32,
-    parallelism: 1,
+export default function Page() {
+  const [state, formAction] = useFormState(login, {
+    // message: "",
+    error: "",
   });
 
-  if (!validPassword) {
-    return {
-      error: "Incorrect username or password",
-    };
-  }
+  // 1. Define your form.
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
 
-  const session = await lucia.createSession(existingUser[0].id, {});
-  const sessionCookie = lucia.createSessionCookie(session.id);
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes,
+  const formRef = React.useRef<HTMLFormElement>(null);
+
+  return (
+    <Card className="flex flex-col p-0 content-center items-center justify-center w-[500px] ">
+      <CardHeader className="items-center">
+        <CardTitle>Login</CardTitle>
+        <CardDescription>Login in to your account.</CardDescription>
+      </CardHeader>
+      <CardContent className="w-full">
+        {state?.error !== "" && (
+          <Alert variant="destructive">
+            {/* <AlertCircle className="h-4 w-4" /> */}
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{state.error}</AlertDescription>
+          </Alert>
+        )}
+        <Form {...form}>
+          <form
+            ref={formRef}
+            onSubmit={form.handleSubmit(() => formRef.current?.submit())}
+            action={formAction}
+            className="space-y-5"
+          >
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="username" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is your public display name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="password" {...field} />
+                  </FormControl>
+                  {/* <FormDescription>
+                  This is your public display name.
+                </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+      <CardFooter>
+        <CardDescription>
+          Don&apost have an account?{" "}
+          <Link
+            href="signup"
+            className="underline text-zinc-600 hover:text-zinc-800"
+          >
+            Sign up.
+          </Link>
+        </CardDescription>
+      </CardFooter>
+    </Card>
   );
-  return redirect("/");
-}
-
-interface ActionResult {
-  error: string;
 }
