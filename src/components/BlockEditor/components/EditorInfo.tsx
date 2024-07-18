@@ -42,6 +42,7 @@ import {
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -218,10 +219,12 @@ export const EditorInfo = memo(({ characters, words }: EditorInfoProps) => {
       )}
       {!isLoggedIn && (
         <div>
-          <Button variant="outline" className="mr-2">
-            Login
-          </Button>
-          <Button>Sign up</Button>
+          <Link href="/login" className="mr-2">
+            <Button variant="outline">Login</Button>
+          </Link>
+          <Link href="/signup">
+            <Button>Sign up</Button>
+          </Link>
         </div>
       )}
     </div>
