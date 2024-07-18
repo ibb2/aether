@@ -19,6 +19,7 @@ import { Toolbar } from "@/components/ui/Toolbar";
 import { Icon } from "@/components/ui/Icon";
 import { EvoluProvider } from "@evolu/react";
 import { evolu } from "@/db/db";
+import { Button } from "../components/ui/Button";
 
 const useDarkmode = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(
@@ -99,7 +100,7 @@ export default function Document({ params }: { params: { room: string } }) {
     }
   }, [setProvider, collabToken, ydoc, room, hasCollab]);
 
-  if (hasCollab && (!collabToken || !provider)) return;
+  // if (hasCollab && (!collabToken || !provider)) return;
 
   const DarkModeSwitcher = createPortal(
     <Surface className="flex items-center gap-1 fixed bottom-6 right-6 z-[99999] p-1">

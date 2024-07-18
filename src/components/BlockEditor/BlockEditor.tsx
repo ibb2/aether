@@ -115,7 +115,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
     onCreate({ editor }) {
       // The editor is ready.
-      getInitialData(editor);
+
+      if (exportedDataRows[0] !== undefined) getInitialData(editor);
     },
     onUpdate({ editor }) {
       // The content has changed.
@@ -146,18 +147,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
   });
 
-  // React.useEffect(() => {
-  //   if (debounceEditor && customEditor !== null) {
-  //     const { id: updatedExportedData } = update("exportedData", {
-  //       id,
-  //       noteId,
-  //       jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
-  //       jsonData: customEditor.getJSON(),
-  //     });
-  //     console.info("Saved the data ", updatedExportedData);
-  //   }
-  // }, [provider, data, debounceEditor, customEditor, update, id, noteId]);
-
   const displayedUsers = users.slice(0, 3);
 
   const providerValue = useMemo(() => {
@@ -180,7 +169,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   return (
     <ResizablePanelGroup
       direction="horizontal"
-      className="flex h-full"
+      className="flex h-full align-self self-start"
       ref={menuContainerRef}
     >
       {leftSidebar.isOpen && (
