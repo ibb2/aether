@@ -43,6 +43,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
+import { lucia } from "@/lib/auth";
+import { validateRequest } from "@/lib/auth/validateRequests";
+import { getUser } from "@/actions/auth/validate";
+import { logout } from "@/actions/auth/logout";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -58,6 +62,23 @@ export const EditorInfo = memo(({ characters, words }: EditorInfoProps) => {
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [session, setSession] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    async function setLoginState() {
+      const { user, session } = await getUser();
+
+      if (user !== null) {
+        setIsLoggedIn(true);
+        setSession(session);
+      } else {
+        setIsLoggedIn(false);
+        setSession(null);
+      }
+    }
+
+    setLoginState();
+  }, [isLoggedIn, session]);
 
   return (
     <div className="flex items-center">
@@ -107,6 +128,7 @@ export const EditorInfo = memo(({ characters, words }: EditorInfoProps) => {
           </div>
         </div>
       )} */}
+
       {isLoggedIn && (
         <div className="flex">
           <div className="relative flex flex-row items-center ml-3 ">
@@ -194,7 +216,13 @@ export const EditorInfo = memo(({ characters, words }: EditorInfoProps) => {
                   <span>API</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                <DropdownMenuItem
+                  className="flex items-center px-1.5 py-0.5"
+                  onClick={() => {
+                    logout(session);
+                    setSession(null);
+                  }}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                   <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

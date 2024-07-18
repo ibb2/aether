@@ -20,6 +20,7 @@ import { Icon } from "@/components/ui/Icon";
 import { EvoluProvider } from "@evolu/react";
 import { evolu } from "@/db/db";
 import { Button } from "../components/ui/Button";
+import { validateRequest } from "@/lib/auth/validateRequests";
 
 const useDarkmode = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(
