@@ -37,15 +37,17 @@ import {
 } from "@/components/ui/resizable";
 import { useSidebar } from "@/hooks/useSidebar";
 import { cn } from "@/lib/utils";
-import { ReactSketchCanvas } from "react-sketch-canvas";
+import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
   const editorRef = useRef<PureEditorContent | null>(null);
+  const canvasRef = React.useRef<ReactSketchCanvasRef>(null);
 
   // State
   const [lastSaveTime, setLastSaveTime] = React.useState(Date.now());
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [readOnly, setReadOnly] = React.useState(false);
 
   // Evolu
   const { create, createOrUpdate, update } = useEvolu<Database>();
@@ -187,6 +189,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
       )}
       <ResizablePanel className="relative flex flex-col flex-1 overflow-hidden">
         <ReactSketchCanvas
+          ref={canvasRef}
+          readOnly={readOnly}
           width="100%"
           height={"100%"}
           canvasColor="transparent"
@@ -200,6 +204,9 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
           words={characterCount.words()}
           isSidebarOpen={sidebarOpen}
           toggleSidebar={leftSidebar.toggle}
+          canvasRef={canvasRef}
+          readOnly={readOnly}
+          setReadOnly={setReadOnly}
         />
         <EditorContent
           editor={customEditor}

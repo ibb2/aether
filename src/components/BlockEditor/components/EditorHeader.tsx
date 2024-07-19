@@ -3,6 +3,7 @@ import { EditorInfo } from "./EditorInfo";
 import { EditorUser } from "../types";
 import { WebSocketStatus } from "@hocuspocus/provider";
 import { Toolbar } from "@/components/ui/Toolbar";
+import { ReactSketchCanvasRef } from "react-sketch-canvas";
 
 export type EditorHeaderProps = {
   isSidebarOpen?: boolean;
@@ -11,6 +12,9 @@ export type EditorHeaderProps = {
   words: number;
   // collabState: WebSocketStatus;
   // users: EditorUser[];
+  canvasRef: ReactSketchCanvasRef | null;
+  readOnly: boolean;
+  setReadOnly: any;
 };
 
 export const EditorHeader = ({
@@ -20,9 +24,12 @@ export const EditorHeader = ({
   words,
   isSidebarOpen,
   toggleSidebar,
+  canvasRef,
+  readOnly,
+  setReadOnly,
 }: EditorHeaderProps) => {
   return (
-    <div className="flex flex-row items-center justify-between flex-none py-2 pl-6 pr-3 text-black bg-white border-neutral-200 dark:bg-inherit dark:text-white dark:border-neutral-800">
+    <div className="flex flex-row items-center justify-between flex-none py-2 pl-6 pr-3 text-black bg-white border-neutral-200 dark:bg-inherit dark:text-white dark:border-neutral-800 z-10">
       <div className="flex flex-row gap-x-1.5 items-center">
         <div className="flex items-center gap-x-1.5">
           <Toolbar.Button
@@ -40,6 +47,9 @@ export const EditorHeader = ({
         words={words}
         // collabState={collabState}
         // users={users}
+        canvasRef={canvasRef}
+        readOnly={readOnly}
+        setReadOnly={setReadOnly}
       />
     </div>
   );

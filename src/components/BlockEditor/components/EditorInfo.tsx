@@ -47,6 +47,7 @@ import { lucia } from "@/lib/auth";
 import { validateRequest } from "@/lib/auth/validateRequests";
 import { getUser } from "@/actions/auth/validate";
 import { logout } from "@/actions/auth/logout";
+import { ReactSketchCanvasRef } from "react-sketch-canvas";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -55,42 +56,85 @@ export type EditorInfoProps = {
   words: number;
   // collabState: WebSocketStatus;
   // users: EditorUser[];
+  canvasRef: ReactSketchCanvasRef | null;
+  readOnly: boolean;
+  setReadOnly: any;
 };
 
-export const EditorInfo = memo(({ characters, words }: EditorInfoProps) => {
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
-  const [showPanel, setShowPanel] = React.useState<Checked>(false);
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [session, setSession] = React.useState<any>(null);
+export const EditorInfo = memo(
+  ({
+    characters,
+    words,
+    canvasRef,
+    readOnly,
+    setReadOnly,
+  }: EditorInfoProps) => {
+    const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
+    const [showActivityBar, setShowActivityBar] =
+      React.useState<Checked>(false);
+    const [showPanel, setShowPanel] = React.useState<Checked>(false);
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+    const [session, setSession] = React.useState<any>(null);
 
-  React.useEffect(() => {
-    async function setLoginState() {
-      const { user, session } = await getUser();
+    const [eraseMode, setEraseMode] = React.useState(false);
 
-      if (user !== null) {
-        setIsLoggedIn(true);
-        setSession(session);
-      } else {
-        setIsLoggedIn(false);
-        setSession(null);
+    const handleEraserClick = () => {
+      setEraseMode(true);
+      if (canvasRef) canvasRef.current?.eraseMode(true);
+    };
+
+    const handlePenClick = () => {
+      setEraseMode(false);
+      if (canvasRef) canvasRef.current?.eraseMode(false);
+    };
+
+    const handleUndoClick = () => {
+      if (canvasRef) canvasRef.current?.undo();
+    };
+
+    const handleRedoClick = () => {
+      if (canvasRef) canvasRef.current?.redo();
+    };
+
+    const handleClearClick = () => {
+      if (canvasRef) canvasRef.current?.clearCanvas();
+    };
+
+    const handleResetClick = () => {
+      if (canvasRef) canvasRef.current?.resetCanvas();
+    };
+
+    const handleDisableCanvas = () => {
+      if (canvasRef) setReadOnly(!readOnly);
+    };
+
+    React.useEffect(() => {
+      async function setLoginState() {
+        const { user, session } = await getUser();
+
+        if (user !== null) {
+          setIsLoggedIn(true);
+          setSession(session);
+        } else {
+          setIsLoggedIn(false);
+          setSession(null);
+        }
       }
-    }
 
-    setLoginState();
-  }, [isLoggedIn, session]);
+      setLoginState();
+    }, [isLoggedIn, session]);
 
-  return (
-    <div className="flex items-center">
-      <div className="flex flex-col justify-center pr-4 mr-4 text-right border-r border-neutral-200 dark:border-neutral-800">
-        <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-          {words} {words === 1 ? "word" : "words"}
-        </div>
-        <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-          {characters} {characters === 1 ? "character" : "characters"}
-        </div>
-      </div>
-      {/* <div className="flex items-center gap-2 mr-2">
+    return (
+      <div className="flex items-center z-10">
+        {/* <div className="flex flex-col justify-center pr-4 mr-4 text-right border-r border-neutral-200 dark:border-neutral-800">
+          <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+            {words} {words === 1 ? "word" : "words"}
+          </div>
+          <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+            {characters} {characters === 1 ? "character" : "characters"}
+          </div>
+        </div> */}
+        {/* <div className="flex items-center gap-2 mr-2">
         <div
           className={cn("w-2 h-2 rounded-full", {
             "bg-yellow-500 dark:bg-yellow-400": collabState === "connecting",
@@ -129,134 +173,173 @@ export const EditorInfo = memo(({ characters, words }: EditorInfoProps) => {
         </div>
       )} */}
 
-      {isLoggedIn && (
-        <div className="flex">
-          <div className="relative flex flex-row items-center ml-3 ">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-72 p-2">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
+        {/* {isLoggedIn && (
+          <div className="flex">
+            <div className="relative flex flex-row items-center ml-3 ">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-72 p-2">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                      <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Billing</span>
+                      <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                      <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <Keyboard className="mr-2 h-4 w-4" />
+                      <span>Keyboard shortcuts</span>
+                      <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Team</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="flex items-center px-1.5 py-0.5">
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        <span>Invite users</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent className="mr-3 p-2">
+                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                            <Mail className="mr-2 h-4 w-4" />
+                            <span>Email</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            <span>Message</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            <span>More...</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <Plus className="mr-2 h-4 w-4" />
+                      <span>New Team</span>
+                      <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                    <Github className="mr-2 h-4 w-4" />
+                    <span>GitHub</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    <span>Billing</span>
-                    <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                    <LifeBuoy className="mr-2 h-4 w-4" />
+                    <span>Support</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                    <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                  <DropdownMenuItem
+                    className="flex items-center px-1.5 py-0.5"
+                    disabled
+                  >
+                    <Cloud className="mr-2 h-4 w-4" />
+                    <span>API</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                    <Keyboard className="mr-2 h-4 w-4" />
-                    <span>Keyboard shortcuts</span>
-                    <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="flex items-center px-1.5 py-0.5"
+                    onClick={() => {
+                      logout(session);
+                      setSession(null);
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                   </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>Team</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="flex items-center px-1.5 py-0.5">
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      <span>Invite users</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuSubContent className="mr-3 p-2">
-                        <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                          <Mail className="mr-2 h-4 w-4" />
-                          <span>Email</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                          <MessageSquare className="mr-2 h-4 w-4" />
-                          <span>Message</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                          <PlusCircle className="mr-2 h-4 w-4" />
-                          <span>More...</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
-                  <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                    <Plus className="mr-2 h-4 w-4" />
-                    <span>New Team</span>
-                    <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                  <Github className="mr-2 h-4 w-4" />
-                  <span>GitHub</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                  <LifeBuoy className="mr-2 h-4 w-4" />
-                  <span>Support</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="flex items-center px-1.5 py-0.5"
-                  disabled
-                >
-                  <Cloud className="mr-2 h-4 w-4" />
-                  <span>API</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="flex items-center px-1.5 py-0.5"
-                  onClick={() => {
-                    logout(session);
-                    setSession(null);
-                  }}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                  <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {/* {users.map((user: EditorUser) => (
-            <div key={user.clientId} className="-ml-3">
-              <Tooltip title={user.name}>
-                <img
-                  className="w-8 h-8 border border-white rounded-full dark:border-black"
-                  src={`https://api.dicebear.com/7.x/notionists-neutral/svg?seed=${
-                    user.name
-                  }&backgroundColor=${user.color.replace("#", "")}`}
-                  alt="avatar"
-                />
-              </Tooltip>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-          ))} */}
           </div>
+        )}
+        {!isLoggedIn && (
+          <div>
+            <Link href="/login" className="mr-2">
+              <Button variant="outline">Login</Button>
+            </Link>
+            <Link href="/signup">
+              <Button>Sign up</Button>
+            </Link>
+          </div>
+        )} */}
+        <div className="flex flex-row gap-2 items-center pr-4 mr-4 text-right">
+          {/* <div className="d-flex gap-2 align-items-center "> */}
+          <Button
+            type="button"
+            className="btn btn-sm btn-outline-primary"
+            disabled={!eraseMode}
+            onClick={handlePenClick}
+          >
+            Pen
+          </Button>
+          <Button
+            type="button"
+            className="btn btn-sm btn-outline-primary"
+            disabled={eraseMode}
+            onClick={handleEraserClick}
+          >
+            Eraser
+          </Button>
+          <div className="vr" />
+          <Button
+            type="button"
+            className="btn btn-sm btn-outline-primary"
+            onClick={handleUndoClick}
+          >
+            Undo
+          </Button>
+          <Button
+            type="button"
+            className="btn btn-sm btn-outline-primary"
+            onClick={handleRedoClick}
+          >
+            Redo
+          </Button>
+          <Button
+            type="button"
+            className="btn btn-sm btn-outline-primary"
+            onClick={handleClearClick}
+          >
+            Clear
+          </Button>
+          <Button
+            type="button"
+            className="btn btn-sm btn-outline-primary"
+            onClick={handleResetClick}
+          >
+            Reset
+          </Button>
         </div>
-      )}
-      {!isLoggedIn && (
         <div>
-          <Link href="/login" className="mr-2">
-            <Button variant="outline">Login</Button>
-          </Link>
-          <Link href="/signup">
-            <Button>Sign up</Button>
-          </Link>
+          <Button onClick={handleDisableCanvas}>Toggle</Button>
         </div>
-      )}
-    </div>
-  );
-});
+      </div>
+    );
+  },
+);
 
 EditorInfo.displayName = "EditorInfo";
