@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/resizable";
 import { useSidebar } from "@/hooks/useSidebar";
 import { cn } from "@/lib/utils";
+import { ReactSketchCanvas } from "react-sketch-canvas";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
@@ -184,7 +185,14 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
       {leftSidebar.isOpen && (
         <ResizableHandle withHandle className="min-h-svh" />
       )}
-      <ResizablePanel className="relative flex flex-col flex-1 h-full overflow-hidden">
+      <ResizablePanel className="relative flex flex-col flex-1 overflow-hidden">
+        <ReactSketchCanvas
+          width="100%"
+          height={"100%"}
+          canvasColor="transparent"
+          strokeColor="#a855f7"
+          className="absolute z-[1]"
+        />
         <EditorHeader
           characters={characterCount.characters()}
           // collabState={collabState}
