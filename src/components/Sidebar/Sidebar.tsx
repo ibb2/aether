@@ -24,24 +24,28 @@ import {
 } from "@/components/ui/context-menu";
 import { SectionDialog } from "../dialogs/section";
 import useNoteDialogStore from "@/store/note-dialog";
+import { ReactSketchCanvasRef, CanvasPath } from "react-sketch-canvas";
 
 export const Sidebar = memo(
   ({
     editor,
     isOpen,
     onClose,
+    canvasRef,
   }: {
     editor: Editor;
     isOpen?: boolean;
     onClose: () => void;
+    canvasRef: ReactSketchCanvasRef | null;
   }) => {
     const { update } = useEvolu<Database>();
 
     // Zustand stores
-    const { name, data, setNote } = useNoteStore((state) => ({
+    const { name, data, setNote, setInk } = useNoteStore((state) => ({
       name: state.name,
       data: state.data,
       setNote: state.setNote,
+      setInk: state.setInk,
     }));
 
     const [notebooks, sections, notes] = useQueries([
@@ -59,7 +63,8 @@ export const Sidebar = memo(
         .selectFrom("exportedData")
         .select("id")
         .select("jsonData")
-        .select("noteId"),
+        .select("noteId")
+        .select("inkData"),
     );
 
     // Use the query result here
@@ -150,6 +155,8 @@ export const Sidebar = memo(
         (row) => row.noteId === noteId,
       );
       console.log("JSON Data, ", exportedData?.jsonData);
+      console.log("INK Data, ");
+
       if (exportedData) {
         setNote(
           exportedData.jsonData!,
@@ -157,6 +164,9 @@ export const Sidebar = memo(
           noteId,
           exportedData.id,
         );
+        setInk(exportedData.inkData);
+        const ink = exportedData as unknown as CanvasPath[];
+        if (canvasRef && exportedData.inkData) canvasRef.loadPaths(ink);
         editor.commands.setContent(exportedData.jsonData!);
       }
     };
@@ -200,6 +210,7 @@ export const Sidebar = memo(
                       id={notebook.id}
                       title={notebook.title}
                       editor={editor}
+                      canvasRef={canvasRef}
                     />
                   </div>
                 ))}

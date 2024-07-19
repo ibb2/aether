@@ -27,7 +27,11 @@ import ExtensionKit from "@/extensions/extension-kit";
 import { useEvolu, useQuery } from "@evolu/react";
 import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
-import { NonEmptyString50 } from "@/db/schema";
+import {
+  CanvasPathArray,
+  CanvasPathSchema,
+  NonEmptyString50,
+} from "@/db/schema";
 import { useDebounce, useDebouncedCallback } from "use-debounce";
 
 import {
@@ -46,18 +50,21 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
   // State
   const [lastSaveTime, setLastSaveTime] = React.useState(Date.now());
+  const [lastInkedSaveTime, setLastInkedSaveTime] = React.useState(0);
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
   const [readOnly, setReadOnly] = React.useState(false);
+  const [load, onLoad] = React.useState(0);
 
   // Evolu
   const { create, createOrUpdate, update } = useEvolu<Database>();
 
   // NoteStore zustand
-  const { id, name, noteId, data, setNote } = useNoteStore((state) => ({
+  const { id, name, noteId, data, ink, setNote } = useNoteStore((state) => ({
     id: state.id!,
     name: state.name,
     noteId: state.noteId!,
     data: state.data,
+    ink: state.ink,
     setNote: state.setNote,
   }));
 
@@ -74,17 +81,21 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
       .where("id", "=", id)
       .select("id")
       .select("jsonData")
-      .select("noteId"),
+      .select("noteId")
+      .select("inkData"),
   );
 
   // Use the query result here
   const { rows: exportedDataRows } = useQuery(exportedDataQuery);
 
   // Get initial data
-  const getInitialData = (editor: Editor) => {
-    const { id, jsonData, noteId } = exportedDataRows[0];
+  const getInitialData = async (editor: Editor) => {
+    console.log("initial data");
+    const { id, jsonData, noteId, inkData } = exportedDataRows[0];
     setNote(jsonData!, name, noteId!, id);
     editor.commands.setContent(jsonData!);
+    console.log("Retrieved ink ");
+    // await canvasRef.current?.loadPaths(inkData!);
   };
 
   const saveData = React.useCallback(
@@ -104,7 +115,56 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     [id, noteId, update],
   );
 
+  const transformCanvasPaths = (data): CanvasPathSchema[] => {
+    return data.map((path) => ({
+      drawMode: path.drawMode ?? false,
+      startTimestamp: path.startTimestamp ?? 0,
+      endTimestamp: path.endTimestamp ?? 0,
+      paths: path.paths.map((p) => ({ x: p.x, y: p.y })) ?? [],
+      strokeColor: path.strokeColor ?? "",
+      strokeWidth: path.strokeWidth ?? 1,
+    }));
+  };
+
+  const saveInkData = React.useCallback(
+    async (canvasRef: ReactSketchCanvasRef) => {
+      if (canvasRef === null) {
+        return;
+      }
+
+      const prevTime = lastInkedSaveTime;
+      const time = await canvasRef.getSketchingTime();
+      const data = await canvasRef.exportPaths();
+
+      const cleanedData = transformCanvasPaths(data);
+
+      update("exportedData", {
+        id,
+        noteId,
+        inkData: S.decodeSync(CanvasPathArray)(cleanedData),
+      });
+      setLastInkedSaveTime(time);
+      console.log(data);
+    },
+    [id, lastInkedSaveTime, noteId, update],
+  );
+
   const debouncedSave = useDebouncedCallback(saveData, 2000);
+  const debouncedInkSave = useDebouncedCallback(saveInkData, 1000);
+
+  // const loadData = () => {
+  //   const { id } = exportedDataQuery;
+  // };
+
+  React.useEffect(() => {
+    if (load === 0) {
+      // getInitialData(editor);
+      canvasRef.current?.loadPaths(ink);
+      onLoad(1);
+      console.log("Loaded... ", load);
+    }
+    if (canvasRef.current) debouncedInkSave(canvasRef.current);
+  }, [debouncedInkSave, load]);
 
   const customEditor = useEditor({
     extensions: [
@@ -115,6 +175,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     content: data,
     onBeforeCreate({ editor }) {
       // Before the view is created.
+      console.log("Hey?");
     },
     onCreate({ editor }) {
       // The editor is ready.
@@ -181,6 +242,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
             isOpen={leftSidebar.isOpen}
             onClose={leftSidebar.close}
             editor={customEditor!}
+            canvasRef={canvasRef.current}
           />
         </ResizablePanel>
       )}
@@ -196,6 +258,14 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
           canvasColor="transparent"
           strokeColor="#a855f7"
           className="absolute z-[1]"
+          onChange={() => {
+            // Save function in here, handles all points.
+            if (canvasRef.current) {
+              console.log("Updating...");
+              debouncedInkSave(canvasRef.current);
+            }
+          }}
+          withTimestamp
         />
         <EditorHeader
           characters={characterCount.characters()}
@@ -204,7 +274,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
           words={characterCount.words()}
           isSidebarOpen={sidebarOpen}
           toggleSidebar={leftSidebar.toggle}
-          canvasRef={canvasRef}
+          canvasRef={canvasRef.current}
           readOnly={readOnly}
           setReadOnly={setReadOnly}
         />

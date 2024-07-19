@@ -80,28 +80,28 @@ export const EditorInfo = memo(
 
     const handleEraserClick = () => {
       setEraseMode(true);
-      if (canvasRef) canvasRef.current?.eraseMode(true);
+      if (canvasRef) canvasRef.eraseMode(true);
     };
 
     const handlePenClick = () => {
       setEraseMode(false);
-      if (canvasRef) canvasRef.current?.eraseMode(false);
+      if (canvasRef) canvasRef.eraseMode(false);
     };
 
     const handleUndoClick = () => {
-      if (canvasRef) canvasRef.current?.undo();
+      if (canvasRef) canvasRef.undo();
     };
 
     const handleRedoClick = () => {
-      if (canvasRef) canvasRef.current?.redo();
+      if (canvasRef) canvasRef.redo();
     };
 
     const handleClearClick = () => {
-      if (canvasRef) canvasRef.current?.clearCanvas();
+      if (canvasRef) canvasRef.clearCanvas();
     };
 
     const handleResetClick = () => {
-      if (canvasRef) canvasRef.current?.resetCanvas();
+      if (canvasRef) canvasRef.resetCanvas();
     };
 
     const handleDisableCanvas = () => {

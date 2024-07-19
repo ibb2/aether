@@ -9,6 +9,7 @@ import {
   table,
   createEvolu,
 } from "@evolu/react";
+import { ReactSketchCanvas, CanvasPath } from "react-sketch-canvas";
 
 // Table Id's'
 export const UserId = id("User");
@@ -33,6 +34,28 @@ export const NonEmptyString50 = String.pipe(
   S.brand("NonEmptyString50"),
 );
 export type NonEmptyString50 = typeof NonEmptyString50.Type;
+
+// Define CanvasPath Schema
+// Chat GPT
+// Define CanvasPath Schema
+export const PathSchema = S.Struct({
+  x: S.Number,
+  y: S.Number,
+});
+
+export const CanvasPathSchema = S.Struct({
+  drawMode: S.Boolean,
+  endTimestamp: S.Number,
+  paths: S.Array(PathSchema),
+  startTimestamp: S.Number,
+  strokeColor: S.String,
+  strokeWidth: S.Number,
+});
+export type CanvasPathSchema = typeof CanvasPathSchema.Type;
+
+// Define CanvasPathArray Schema
+export const CanvasPathArray = S.Array(CanvasPathSchema);
+export type CanvasPathArray = typeof CanvasPathArray.Type;
 
 export const NotesId = S.Array(String);
 
@@ -89,6 +112,7 @@ export const ExportedDatasTable = table({
   jsonExportedName: S.NullOr(NonEmptyString50),
   jsonData: S.Struct({}),
   yjsExportedName: S.NullOr(NonEmptyString50),
+  inkData: S.NullOr(CanvasPathArray),
   // yjsExportedData: S.Uint8Array,
 });
 export type ExportedDatasTable = typeof ExportedDatasTable.Type;

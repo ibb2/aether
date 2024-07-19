@@ -52,6 +52,7 @@ import {
 } from "../ui/select";
 import { initialContent } from "@/lib/data/initialContent";
 import { Button } from "../ui/Button";
+import { ReactSketchCanvasRef, CanvasRef } from "react-sketch-canvas";
 
 interface TreeMenuProps {
   id: any;
@@ -59,9 +60,17 @@ interface TreeMenuProps {
   data: any;
   level: number;
   editor: Editor;
+  canvasRef: ReactSketchCanvasRef | null;
 }
 
-const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
+const TreeMenu = ({
+  id,
+  title,
+  data,
+  level,
+  editor,
+  canvasRef,
+}: TreeMenuProps) => {
   const [show, setShow] = React.useState(false);
   const [dialog1Open, setDialog1Open] = React.useState(false);
   const [dialog2Open, setDialog2Open] = React.useState(false);
@@ -147,7 +156,8 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
       .selectFrom("exportedData")
       .select("id")
       .select("jsonData")
-      .select("noteId"),
+      .select("noteId")
+      .select("inkData"),
   );
 
   // Use the query result here
@@ -161,6 +171,8 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
   const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
     const exportedData = exportedDataRows.find((row) => row.noteId === noteId);
     console.log("JSON Data, ", exportedData?.jsonData);
+    console.log("INK Data, ", exportedData?.inkData);
+
     if (exportedData) {
       setNote(
         exportedData.jsonData!,
@@ -168,6 +180,16 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
         noteId,
         exportedData.id,
       );
+      const ink = exportedData.inkData as unknown as CanvasPath[];
+      console.log("ink ", ink);
+      if (canvasRef && exportedData.inkData) {
+        canvasRef.resetCanvas();
+        canvasRef.loadPaths(ink);
+      }
+      if (canvasRef && exportedData.inkData === null) {
+        canvasRef.resetCanvas();
+        // console.log("clear");
+      }
       editor.commands.setContent(exportedData.jsonData!);
     }
   };
@@ -355,6 +377,7 @@ const TreeMenu = ({ id, title, data, level, editor }: TreeMenuProps) => {
                     data={section}
                     level={level + 1}
                     editor={editor}
+                    canvasRef={canvasRef}
                   />
                 )}
               </>
