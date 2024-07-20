@@ -28,15 +28,21 @@ import {
 import {
   Cloud,
   CreditCard,
+  Eraser,
   Github,
   Keyboard,
   LifeBuoy,
   LogOut,
   Mail,
   MessageSquare,
+  Pen,
   Plus,
   PlusCircle,
+  Redo,
+  RefreshCcw,
   Settings,
+  Trash,
+  Undo,
   User,
   UserPlus,
   Users,
@@ -125,7 +131,7 @@ export const EditorInfo = memo(
     }, [isLoggedIn, session]);
 
     return (
-      <div className="flex items-center z-10">
+      <div className="flex justify-between items-center z-10">
         {/* <div className="flex flex-col justify-center pr-4 mr-4 text-right border-r border-neutral-200 dark:border-neutral-800">
           <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
             {words} {words === 1 ? "word" : "words"}
@@ -289,49 +295,31 @@ export const EditorInfo = memo(
         <div className="flex flex-row gap-2 items-center pr-4 mr-4 text-right">
           {/* <div className="d-flex gap-2 align-items-center "> */}
           <Button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            disabled={!eraseMode}
+            variant={eraseMode ? "outline" : "default"}
+            size="icon"
             onClick={handlePenClick}
           >
-            Pen
+            <Pen />
           </Button>
           <Button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            disabled={eraseMode}
+            variant={!eraseMode ? "outline" : "default"}
+            size="icon"
             onClick={handleEraserClick}
           >
-            Eraser
+            <Eraser />
           </Button>
           <div className="vr" />
-          <Button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            onClick={handleUndoClick}
-          >
-            Undo
+          <Button variant="outline" size="icon" onClick={handleUndoClick}>
+            <Undo />
           </Button>
-          <Button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            onClick={handleRedoClick}
-          >
-            Redo
+          <Button variant="outline" size="icon" onClick={handleRedoClick}>
+            <Redo />
           </Button>
-          <Button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            onClick={handleClearClick}
-          >
-            Clear
+          <Button variant="outline" size="icon" onClick={handleClearClick}>
+            <Trash />
           </Button>
-          <Button
-            type="button"
-            className="btn btn-sm btn-outline-primary"
-            onClick={handleResetClick}
-          >
-            Reset
+          <Button variant="outline" size="icon" onClick={handleResetClick}>
+            <RefreshCcw />
           </Button>
         </div>
         <div>

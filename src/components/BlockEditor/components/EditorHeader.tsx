@@ -29,8 +29,8 @@ export const EditorHeader = ({
   setReadOnly,
 }: EditorHeaderProps) => {
   return (
-    <div className="flex flex-row items-center justify-between flex-none py-2 pl-6 pr-3 text-black bg-white border-neutral-200 dark:bg-inherit dark:text-white dark:border-neutral-800 z-10">
-      <div className="flex flex-row gap-x-1.5 items-center">
+    <div className="grid grid-flow-col auto-cols-auto flex-none py-2 pl-6 pr-3 text-black bg-white border-neutral-200 dark:bg-inherit dark:text-white dark:border-neutral-800 z-10">
+      <div className="items-center">
         <div className="flex items-center gap-x-1.5">
           <Toolbar.Button
             tooltip={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
