@@ -54,6 +54,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
   const [readOnly, setReadOnly] = React.useState(false);
   const [load, onLoad] = React.useState(0);
+  const [zIndex, setZIndex] = React.useState(0);
 
   // Evolu
   const { create, createOrUpdate, update } = useEvolu<Database>();
@@ -230,6 +231,18 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     //   "w-80 border-r border-r-neutral-200 dark:border-r-neutral-800",
   );
 
+  const reactSketchCanvasClass = cn(
+    "absolute border-0",
+    readOnly && "z-0",
+    !readOnly && "z-1",
+  );
+
+  const editorClass = cn(
+    "flex-1 overflow-y-auto",
+    readOnly && "z-1",
+    !readOnly && "-z-10",
+  );
+
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -257,7 +270,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
           height={"100%"}
           canvasColor="transparent"
           strokeColor="#fff"
-          className="absolute z-[1]"
+          className={reactSketchCanvasClass}
           onChange={() => {
             // Save function in here, handles all points.
             if (canvasRef.current) {
@@ -281,7 +294,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         <EditorContent
           editor={customEditor}
           ref={editorRef}
-          className="flex-1 overflow-y-auto"
+          className={editorClass}
         />
         <ContentItemMenu editor={customEditor!} />
         <LinkMenu editor={customEditor!} appendTo={menuContainerRef} />
