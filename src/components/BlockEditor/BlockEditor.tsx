@@ -256,7 +256,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
           width="100%"
           height={"100%"}
           canvasColor="transparent"
-          strokeColor="#a855f7"
+          strokeColor="#fff"
           className="absolute z-[1]"
           onChange={() => {
             // Save function in here, handles all points.
