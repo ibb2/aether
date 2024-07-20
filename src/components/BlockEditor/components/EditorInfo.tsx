@@ -34,6 +34,7 @@ import {
   LifeBuoy,
   LogOut,
   Mail,
+  Menu,
   MessageSquare,
   Pen,
   Plus,
@@ -41,11 +42,14 @@ import {
   Redo,
   RefreshCcw,
   Settings,
+  ToggleLeft,
+  ToggleRight,
   Trash,
   Undo,
   User,
   UserPlus,
   Users,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -81,6 +85,7 @@ export const EditorInfo = memo(
     const [showPanel, setShowPanel] = React.useState<Checked>(false);
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
     const [session, setSession] = React.useState<any>(null);
+    const [open, onOpen] = React.useState(false);
 
     const [eraseMode, setEraseMode] = React.useState(false);
 
@@ -111,7 +116,9 @@ export const EditorInfo = memo(
     };
 
     const handleDisableCanvas = () => {
-      if (canvasRef) setReadOnly(!readOnly);
+      if (canvasRef) {
+        setReadOnly(!readOnly);
+      }
     };
 
     React.useEffect(() => {
@@ -130,8 +137,14 @@ export const EditorInfo = memo(
       setLoginState();
     }, [isLoggedIn, session]);
 
+    const customClass = cn(
+      "flex z-10",
+      open && "justify-between",
+      !open && "justify-end",
+    );
+
     return (
-      <div className="flex justify-between items-center z-10">
+      <div className={customClass}>
         {/* <div className="flex flex-col justify-center pr-4 mr-4 text-right border-r border-neutral-200 dark:border-neutral-800">
           <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
             {words} {words === 1 ? "word" : "words"}
@@ -292,38 +305,50 @@ export const EditorInfo = memo(
             </Link>
           </div>
         )} */}
-        <div className="flex flex-row gap-2 items-center pr-4 mr-4 text-right">
-          {/* <div className="d-flex gap-2 align-items-center "> */}
-          <Button
-            variant={eraseMode ? "outline" : "default"}
-            size="icon"
-            onClick={handlePenClick}
-          >
-            <Pen />
+        {open && (
+          <div className="flex flex-row gap-2 justify-between pr-4 mr-4 text-right duration-300 transition-all">
+            {/* <div className="d-flex gap-2 align-items-center "> */}
+            <Button
+              variant={eraseMode ? "outline" : "default"}
+              size="icon"
+              onClick={handlePenClick}
+            >
+              <Pen />
+            </Button>
+            <Button
+              variant={!eraseMode ? "outline" : "default"}
+              size="icon"
+              onClick={handleEraserClick}
+            >
+              <Eraser />
+            </Button>
+            <div className="vr" />
+            <Button variant="outline" size="icon" onClick={handleUndoClick}>
+              <Undo />
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleRedoClick}>
+              <Redo />
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleClearClick}>
+              <Trash />
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleResetClick}>
+              <RefreshCcw />
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={handleDisableCanvas}
+              size="icon"
+              className="mr-2"
+            >
+              {readOnly ? <ToggleRight /> : <ToggleLeft />}
+            </Button>
+          </div>
+        )}
+        <div className="justify-self-end">
+          <Button size="icon" variant="outline" onClick={() => onOpen(!open)}>
+            {open ? <X /> : <Menu />}
           </Button>
-          <Button
-            variant={!eraseMode ? "outline" : "default"}
-            size="icon"
-            onClick={handleEraserClick}
-          >
-            <Eraser />
-          </Button>
-          <div className="vr" />
-          <Button variant="outline" size="icon" onClick={handleUndoClick}>
-            <Undo />
-          </Button>
-          <Button variant="outline" size="icon" onClick={handleRedoClick}>
-            <Redo />
-          </Button>
-          <Button variant="outline" size="icon" onClick={handleClearClick}>
-            <Trash />
-          </Button>
-          <Button variant="outline" size="icon" onClick={handleResetClick}>
-            <RefreshCcw />
-          </Button>
-        </div>
-        <div>
-          <Button onClick={handleDisableCanvas}>Toggle</Button>
         </div>
       </div>
     );
