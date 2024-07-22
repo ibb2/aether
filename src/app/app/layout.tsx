@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/resizable";
 import useSidebarStore from "@/store/sidebar";
 import { ImperativePanelHandle } from "react-resizable-panels";
+import useStateStore from "@/store/state";
 
 export default function AppLayout({
   children, // will be a page or nested layout
@@ -34,6 +35,15 @@ export default function AppLayout({
       setOpen: state.setOpen,
       adjustSize: state.adjustSize,
       setRef: state.setRef,
+    }),
+  );
+
+  const { editor, canvasRef, setCanvasRef, setEditor } = useStateStore(
+    (state) => ({
+      editor: state.editor,
+      canvasRef: state.canvasRef,
+      setCanvasRef: state.setRef,
+      setEditor: state.setEditor,
     }),
   );
 
@@ -61,8 +71,8 @@ export default function AppLayout({
               <Sidebar
                 isOpen={open}
                 onClose={setOpen}
-                // editor={new Editor()}
-                // canvasRef={canvasRef.current}
+                editor={editor!}
+                canvasRef={canvasRef.current}
               />
             </nav>
           </ResizablePanel>

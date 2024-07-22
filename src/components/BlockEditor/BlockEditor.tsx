@@ -4,7 +4,7 @@ import * as S from "@effect/schema/Schema";
 
 import { EditorContent, PureEditorContent, useEditor } from "@tiptap/react";
 import { Editor } from "@tiptap/core";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 import { LinkMenu } from "@/components/menus";
 
@@ -43,6 +43,7 @@ import { useSidebar } from "@/hooks/useSidebar";
 import { cn } from "@/lib/utils";
 import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
 import useSidebarStore from "@/store/sidebar";
+import useStateStore from "@/store/state";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
@@ -71,7 +72,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     setNote: state.setNote,
   }));
 
-  // Store
   const { open, size, ref, setOpen, adjustSize, setRef } = useSidebarStore(
     (state) => ({
       open: state.open,
@@ -82,6 +82,14 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
       setRef: state.setRef,
     }),
   );
+
+  const { customerEditor, stateCanvasRef, setCanvasRef, setEditor } =
+    useStateStore((state) => ({
+      customerEditor: state.editor,
+      stateCanvasRef: state.canvasRef,
+      setCanvasRef: state.setRef,
+      setEditor: state.setEditor,
+    }));
 
   const { users, characterCount, collabState } = useBlockEditor({
     ydoc,
@@ -179,7 +187,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
       console.log("Loaded... ", load);
     }
     if (canvasRef.current) debouncedInkSave(canvasRef.current);
-  }, [debouncedInkSave, load]);
+  }, [debouncedInkSave, load, ink]);
 
   const customEditor = useEditor({
     extensions: [
@@ -226,6 +234,11 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
   });
 
+  React.useEffect(() => {
+    if (customEditor) setEditor(customEditor);
+    setCanvasRef(canvasRef);
+  }, [customEditor, setEditor, setCanvasRef]);
+
   const displayedUsers = users.slice(0, 3);
 
   const providerValue = useMemo(() => {
@@ -258,9 +271,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   );
 
   const collapsePanel = () => {
-    console.log("Collapsing...");
     if (ref === null) return;
-    console.log(ref.current);
     const panel = ref.current;
     if (panel) {
       if (!panel.isCollapsed()) {

@@ -59,8 +59,8 @@ interface TreeMenuProps {
   title: any;
   data: any;
   level: number;
-  // editor: Editor;
-  // canvasRef: ReactSketchCanvasRef | null;
+  editor: Editor;
+  canvasRef: ReactSketchCanvasRef | null;
 }
 
 const TreeMenu = ({
@@ -68,8 +68,8 @@ const TreeMenu = ({
   title,
   data,
   level,
-  // editor,
-  // canvasRef,
+  editor,
+  canvasRef,
 }: TreeMenuProps) => {
   const [show, setShow] = React.useState(false);
   const [dialog1Open, setDialog1Open] = React.useState(false);
@@ -168,31 +168,31 @@ const TreeMenu = ({
   };
 
   // Update selectNote to use the query results
-  // const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
-  //   const exportedData = exportedDataRows.find((row) => row.noteId === noteId);
-  //   console.log("JSON Data, ", exportedData?.jsonData);
-  //   console.log("INK Data, ", exportedData?.inkData);
+  const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
+    const exportedData = exportedDataRows.find((row) => row.noteId === noteId);
+    console.log("JSON Data, ", exportedData?.jsonData);
+    console.log("INK Data, ", exportedData?.inkData);
 
-  //   if (exportedData) {
-  //     setNote(
-  //       exportedData.jsonData!,
-  //       S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
-  //       noteId,
-  //       exportedData.id,
-  //     );
-  //     const ink = exportedData.inkData as unknown as CanvasPath[];
-  //     console.log("ink ", ink);
-  //     if (canvasRef && exportedData.inkData) {
-  //       canvasRef.resetCanvas();
-  //       canvasRef.loadPaths(ink);
-  //     }
-  //     if (canvasRef && exportedData.inkData === null) {
-  //       canvasRef.resetCanvas();
-  //       // console.log("clear");
-  //     }
-  //     editor.commands.setContent(exportedData.jsonData!);
-  //   }
-  // };
+    if (exportedData) {
+      setNote(
+        exportedData.jsonData!,
+        S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
+        noteId,
+        exportedData.id,
+      );
+      const ink = exportedData.inkData as unknown as CanvasPath[];
+      console.log("ink ", ink);
+      if (canvasRef && exportedData.inkData) {
+        canvasRef.resetCanvas();
+        canvasRef.loadPaths(ink);
+      }
+      if (canvasRef && exportedData.inkData === null) {
+        canvasRef.resetCanvas();
+        // console.log("clear");
+      }
+      editor.commands.setContent(exportedData.jsonData!);
+    }
+  };
 
   const className = cn(
     "flex flex-row items-center py-2 rounded-lg hover:bg-muted w-full cursor-pointer",
@@ -376,8 +376,8 @@ const TreeMenu = ({
                     title={title}
                     data={section}
                     level={level + 1}
-                    // editor={editor}
-                    // canvasRef={canvasRef}
+                    editor={editor}
+                    canvasRef={canvasRef}
                   />
                 )}
               </>
@@ -387,9 +387,9 @@ const TreeMenu = ({
             <div
               key={note.id}
               className="px-4 rounded-md hover:bg-muted w-full"
-              // onClick={() => {
-              //   selectNote(note.id);
-              // }}
+              onClick={() => {
+                selectNote(note.id);
+              }}
               style={{ paddingLeft: level > 0 ? level * 30 : level * 40 }}
             >
               <NoteDialog notebookId={id} notebookTitle={title} section={null}>

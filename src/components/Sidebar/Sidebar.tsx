@@ -28,19 +28,19 @@ import { ReactSketchCanvasRef, CanvasPath } from "react-sketch-canvas";
 
 export const Sidebar = memo(
   ({
-    // editor,
+    editor,
     isOpen,
     onClose,
-    // canvasRef,
+    canvasRef,
   }: {
-    // editor: Editor;
+    editor: Editor;
     isOpen?: boolean;
     onClose: () => void;
-    // canvasRef: ReactSketchCanvasRef | null;
+    canvasRef: ReactSketchCanvasRef | null;
   }) => {
     const { update } = useEvolu<Database>();
 
-    // Zustand stores
+    // Stores (Zustand)
     const { name, data, setNote, setInk } = useNoteStore((state) => ({
       name: state.name,
       data: state.data,
@@ -209,8 +209,8 @@ export const Sidebar = memo(
                       level={1}
                       id={notebook.id}
                       title={notebook.title}
-                      // editor={editor}
-                      // canvasRef={canvasRef}
+                      editor={editor}
+                      canvasRef={canvasRef}
                     />
                   </div>
                 ))}
