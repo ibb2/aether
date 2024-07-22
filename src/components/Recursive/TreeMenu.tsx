@@ -74,6 +74,8 @@ const TreeMenu = ({
   const [show, setShow] = React.useState(false);
   const [dialog1Open, setDialog1Open] = React.useState(false);
   const [dialog2Open, setDialog2Open] = React.useState(false);
+  const [notebookDialogOpen, setNotebookDialogOpen] = React.useState(false);
+  const [notebookDialog2Open, setNotebookDialog2Open] = React.useState(false);
 
   const { update } = useEvolu<Database>();
   const [notes, sections] = useQueries([notesQuery, sectionsQuery]);
@@ -122,26 +124,50 @@ const TreeMenu = ({
   const [section, setSection] = React.useState(isSection ? data.id : null);
 
   const handler = () => {
+    // const { id: noteId } = create("notes", {
+    //   title: S.decodeSync(NonEmptyString1000)(noteName),
+    //   notebookId: selectedNotebook,
+    //   sectionId: section,
+    // });
+
+    // const newNotesId =
+    //   section.notesId != null ? [...section.notesId, noteId] : [noteId];
+    console.log("Section ", section);
+
+    // update("sections", { id: section.id, notesId: newNotesId });
+
+    // const { id: exportedDataId } = create("exportedData", {
+    //   noteId,
+    //   jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
+    //   jsonData: initialContent,
+    // });
+
+    // console.log("Exported Data for note created: ", exportedDataId);
+  };
+
+  const notebookDialogHandler = () => {
+    // For creating sections
+
+    const { id: sectionId } = create("sections", {
+      title: S.decodeSync(NonEmptyString1000)(sectionName),
+      notebookId: selectedNotebook,
+    });
+
+    console.log("Section ", selectedNotebook);
+  };
+
+  const notebookDialog2Handler = () => {
     const { id: noteId } = create("notes", {
       title: S.decodeSync(NonEmptyString1000)(noteName),
       notebookId: selectedNotebook,
-      sectionId: section,
     });
-
-    const newNotesId =
-      section.notesId != null ? [...section.notesId, noteId] : [noteId];
-
-    update("sections", { id: section.id, notesId: newNotesId });
 
     const { id: exportedDataId } = create("exportedData", {
       noteId,
       jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
       jsonData: initialContent,
     });
-
-    console.log("Exported Data for note created: ", exportedDataId);
   };
-
   // Zustand stores
   const setNote = useNoteStore((state) => state.setNote);
 
@@ -215,118 +241,217 @@ const TreeMenu = ({
           {hasChildren &&
             (show ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
         </div>
-        <Dialog>
-          <ContextMenu>
-            <ContextMenuTrigger asChild>
-              <div
-                className="items-center gap-3 rounded-lg text-muted-foreground hover:text-primary"
-                onClick={(e) => {
-                  e.preventDefault();
-                }}
-              >
-                {/* <Home className="h-4 w-4" /> */}
-                {data.title}
-              </div>
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              <DialogTrigger asChild>
-                <ContextMenuItem
-                  onSelect={(e) => {
-                    setDialog2Open(false);
-                    setDialog1Open(true);
+        {!isSection && level === 1 ? (
+          <Dialog>
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <div
+                  className="items-center gap-3 rounded-lg text-muted-foreground hover:text-primary"
+                  onClick={(e) => {
                     e.preventDefault();
                   }}
                 >
-                  <span>New Section (folder)</span>
-                </ContextMenuItem>
-              </DialogTrigger>
-              <DialogTrigger asChild>
-                <ContextMenuItem
-                  onSelect={(e) => {
-                    setDialog1Open(false);
-                    setDialog2Open(true);
-                    e.preventDefault();
-                  }}
-                >
-                  <span>New Note</span>
-                </ContextMenuItem>
-              </DialogTrigger>
-            </ContextMenuContent>
-            {dialog1Open && (
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>New Section</DialogTitle>
-                  <DialogDescription>
-                    Organise your toughts and ideas.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    type="text"
-                    id="name"
-                    placeholder="new section"
-                    onChange={(e) => setSectionName(e.target.value)}
-                  />
+                  {/* <Home className="h-4 w-4" /> */}
+                  {data.title}
                 </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="secondary">Cancel</Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button
-                      type="submit"
-                      onClick={() => dialog1handler(data, data.id)}
-                    >
-                      Create
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            )}
-            {dialog2Open && (
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>New note</DialogTitle>
-                  <DialogDescription>A clean slate.</DialogDescription>
-                </DialogHeader>
-                <div className="grid w-full max-w-sm items-center gap-1.5 pt-2.5">
-                  <div className="py-2">
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <DialogTrigger asChild>
+                  <ContextMenuItem
+                    onSelect={(e) => {
+                      setNotebookDialog2Open(false);
+                      setNotebookDialogOpen(true);
+                      e.preventDefault();
+                    }}
+                  >
+                    <span>New Section (folder)</span>
+                  </ContextMenuItem>
+                </DialogTrigger>
+                <DialogTrigger asChild>
+                  <ContextMenuItem
+                    onSelect={(e) => {
+                      setNotebookDialogOpen(false);
+                      setNotebookDialog2Open(true);
+                      e.preventDefault();
+                    }}
+                  >
+                    <span>New Note</span>
+                  </ContextMenuItem>
+                </DialogTrigger>
+              </ContextMenuContent>
+              {notebookDialogOpen && (
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>New Section</DialogTitle>
+                    <DialogDescription>
+                      Organise your toughts and ideas.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
                     <Label htmlFor="name">Name</Label>
                     <Input
                       type="text"
                       id="name"
-                      placeholder="new note"
-                      onChange={(e) => setNoteName(e.target.value)}
+                      placeholder="new section"
+                      onChange={(e) => setSectionName(e.target.value)}
                     />
                   </div>
-                  {!isSection ? (
-                    <div className="w-full pb-2">
-                      <Label htmlFor="notebooks">Notebooks</Label>
-                      <Select
-                        value={selectedNotebook}
-                        onValueChange={(value) => {
-                          setSection(S.decodeSync(SectionId)(value));
-                          console.info("Changed value", value);
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder={rows[0].title} />
-                        </SelectTrigger>
-                        <SelectContent id="notebooks" className="w-full">
-                          {rows.map((notebook, index) => (
-                            <SelectItem
-                              value={notebook.id}
-                              key={index}
-                              className="w-full"
-                            >
-                              {notebook.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button type="submit" onClick={notebookDialogHandler}>
+                        Create
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              )}
+              {notebookDialog2Open && (
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>New note</DialogTitle>
+                    <DialogDescription>A clean slate.</DialogDescription>
+                  </DialogHeader>
+                  <div className="grid w-full max-w-sm items-center gap-1.5 pt-2.5">
+                    <div className="py-2">
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        type="text"
+                        id="name"
+                        placeholder="new note"
+                        onChange={(e) => setNoteName(e.target.value)}
+                      />
                     </div>
-                  ) : (
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button type="submit" onClick={notebookDialog2Handler}>
+                        Create
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              )}
+            </ContextMenu>
+          </Dialog>
+        ) : (
+          <Dialog>
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <div
+                  className="items-center gap-3 rounded-lg text-muted-foreground hover:text-primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  {/* <Home className="h-4 w-4" /> */}
+                  {data.title}
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <DialogTrigger asChild>
+                  <ContextMenuItem
+                    onSelect={(e) => {
+                      setDialog2Open(false);
+                      setDialog1Open(true);
+                      e.preventDefault();
+                    }}
+                  >
+                    <span>New Section (folder)</span>
+                  </ContextMenuItem>
+                </DialogTrigger>
+                <DialogTrigger asChild>
+                  <ContextMenuItem
+                    onSelect={(e) => {
+                      setDialog1Open(false);
+                      setDialog2Open(true);
+                      e.preventDefault();
+                    }}
+                  >
+                    <span>New Note</span>
+                  </ContextMenuItem>
+                </DialogTrigger>
+              </ContextMenuContent>
+              {dialog1Open && (
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>New Section</DialogTitle>
+                    <DialogDescription>
+                      Organise your toughts and ideas.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      type="text"
+                      id="name"
+                      placeholder="new section"
+                      onChange={(e) => setSectionName(e.target.value)}
+                    />
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        type="submit"
+                        onClick={() => dialog1handler(data, data.id)}
+                      >
+                        Create
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              )}
+              {dialog2Open && (
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>New note</DialogTitle>
+                    <DialogDescription>A clean slate.</DialogDescription>
+                  </DialogHeader>
+                  <div className="grid w-full max-w-sm items-center gap-1.5 pt-2.5">
+                    <div className="py-2">
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        type="text"
+                        id="name"
+                        placeholder="new note"
+                        onChange={(e) => setNoteName(e.target.value)}
+                      />
+                    </div>
+                    {/* {!isSection ? (
+                      <div className="w-full pb-2">
+                        <Label htmlFor="notebooks">Notebooks</Label>
+                        <Select
+                          value={selectedNotebook}
+                          onValueChange={(value) => {
+                            setSection(S.decodeSync(SectionId)(value));
+                            console.info("Changed value", value);
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder={rows[0].title} />
+                          </SelectTrigger>
+                          <SelectContent id="notebooks" className="w-full">
+                            {rows.map((notebook, index) => (
+                              <SelectItem
+                                value={notebook.id}
+                                key={index}
+                                className="w-full"
+                              >
+                                {notebook.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ) : ( */}
                     <div className="w-full pb-2">
                       <Label htmlFor="notebooks">Section</Label>
                       <Select
@@ -346,22 +471,23 @@ const TreeMenu = ({
                         </SelectContent>
                       </Select>
                     </div>
-                  )}
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="secondary">Cancel</Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button type="submit" onClick={handler}>
-                      Create
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            )}
-          </ContextMenu>
-        </Dialog>
+                    {/* )} */}
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button type="submit" onClick={handler}>
+                        Create
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              )}
+            </ContextMenu>
+          </Dialog>
+        )}
       </div>
       {show && (
         <>
