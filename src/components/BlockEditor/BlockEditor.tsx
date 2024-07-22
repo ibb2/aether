@@ -42,6 +42,7 @@ import {
 import { useSidebar } from "@/hooks/useSidebar";
 import { cn } from "@/lib/utils";
 import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
+import useSidebarStore from "@/store/sidebar";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
@@ -55,11 +56,12 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const [readOnly, setReadOnly] = React.useState(false);
   const [load, onLoad] = React.useState(0);
   const [zIndex, setZIndex] = React.useState(0);
+  const [sidebarSize, setSidebarSize] = React.useState(0);
 
   // Evolu
   const { create, createOrUpdate, update } = useEvolu<Database>();
 
-  // NoteStore zustand
+  // Zustand Stores
   const { id, name, noteId, data, ink, setNote } = useNoteStore((state) => ({
     id: state.id!,
     name: state.name,
@@ -68,6 +70,18 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     ink: state.ink,
     setNote: state.setNote,
   }));
+
+  // Store
+  const { open, size, ref, setOpen, adjustSize, setRef } = useSidebarStore(
+    (state) => ({
+      open: state.open,
+      size: state.size,
+      ref: state.ref,
+      setOpen: state.setOpen,
+      adjustSize: state.adjustSize,
+      setRef: state.setRef,
+    }),
+  );
 
   const { users, characterCount, collabState } = useBlockEditor({
     ydoc,
@@ -232,79 +246,77 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   );
 
   const reactSketchCanvasClass = cn(
-    "absolute border-0",
+    "absolute",
     readOnly && "z-0",
     !readOnly && "z-1",
   );
 
   const editorClass = cn(
-    "flex-1 overflow-y-auto",
+    "w-full overflow-y-auto border-0",
     readOnly && "z-1",
     !readOnly && "-z-10",
   );
 
+  const collapsePanel = () => {
+    console.log("Collapsing...");
+    if (ref === null) return;
+    console.log(ref.current);
+    const panel = ref.current;
+    if (panel) {
+      if (!panel.isCollapsed()) {
+        setSidebarSize(panel.getSize());
+        panel.collapse();
+      } else {
+        panel.expand(sidebarSize);
+      }
+    }
+  };
+
   return (
-    <ResizablePanelGroup
-      direction="horizontal"
-      className="flex h-full align-self self-start"
-      ref={menuContainerRef}
-    >
-      {leftSidebar.isOpen && (
-        <ResizablePanel defaultSize={20} className={windowClassName}>
-          <Sidebar
-            isOpen={leftSidebar.isOpen}
-            onClose={leftSidebar.close}
-            editor={customEditor!}
-            canvasRef={canvasRef.current}
-          />
-        </ResizablePanel>
-      )}
-      {leftSidebar.isOpen && (
-        <ResizableHandle withHandle className="min-h-svh" />
-      )}
-      <ResizablePanel className="relative flex flex-col flex-1 overflow-hidden">
-        <ReactSketchCanvas
-          ref={canvasRef}
-          readOnly={readOnly}
-          width="100%"
-          height={"100%"}
-          canvasColor="transparent"
-          strokeColor="#fff"
-          className={reactSketchCanvasClass}
-          onChange={() => {
-            // Save function in here, handles all points.
-            if (canvasRef.current) {
-              console.log("Updating...");
-              debouncedInkSave(canvasRef.current);
-            }
-          }}
-          withTimestamp
-        />
-        <EditorHeader
-          characters={characterCount.characters()}
-          // collabState={collabState}
-          // users={displayedUsers}
-          words={characterCount.words()}
-          isSidebarOpen={sidebarOpen}
-          toggleSidebar={leftSidebar.toggle}
-          canvasRef={canvasRef.current}
-          readOnly={readOnly}
-          setReadOnly={setReadOnly}
-        />
-        <EditorContent
-          editor={customEditor}
-          ref={editorRef}
-          className={editorClass}
-        />
-        <ContentItemMenu editor={customEditor!} />
-        <LinkMenu editor={customEditor!} appendTo={menuContainerRef} />
-        <TextMenu editor={customEditor!} />
-        <ColumnsMenu editor={customEditor!} appendTo={menuContainerRef} />
-        <TableRowMenu editor={customEditor!} appendTo={menuContainerRef} />
-        <TableColumnMenu editor={customEditor!} appendTo={menuContainerRef} />
-        <ImageBlockMenu editor={customEditor!} appendTo={menuContainerRef} />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+    // <div className="flex h-full align-self self-start">
+    <div className="flex flex-col relative w-auto h-full border-0 overflow-hidden">
+      <EditorHeader
+        characters={characterCount.characters()}
+        // collabState={collabState}
+        // users={displayedUsers}
+        words={characterCount.words()}
+        isSidebarOpen={open}
+        toggleSidebar={collapsePanel}
+        canvasRef={canvasRef.current}
+        readOnly={readOnly}
+        setReadOnly={setReadOnly}
+      />
+      <ReactSketchCanvas
+        ref={canvasRef}
+        readOnly={readOnly}
+        // width={"inherit"}
+        height="100%"
+        style={{ border: 0 }}
+        canvasColor="transparent"
+        strokeColor={"red"}
+        className={reactSketchCanvasClass}
+        onChange={() => {
+          // Save function in here, handles all points.
+          if (canvasRef.current) {
+            console.log("Updating...");
+            debouncedInkSave(canvasRef.current);
+          }
+        }}
+        withTimestamp
+      />
+      <EditorContent
+        editor={customEditor}
+        ref={editorRef}
+        className={editorClass}
+      />
+      <ContentItemMenu editor={customEditor!} />
+      <LinkMenu editor={customEditor!} appendTo={menuContainerRef} />
+      <TextMenu editor={customEditor!} />
+      <ColumnsMenu editor={customEditor!} appendTo={menuContainerRef} />
+      <TableRowMenu editor={customEditor!} appendTo={menuContainerRef} />
+      <TableColumnMenu editor={customEditor!} appendTo={menuContainerRef} />
+      <ImageBlockMenu editor={customEditor!} appendTo={menuContainerRef} />
+    </div>
   );
 };
 

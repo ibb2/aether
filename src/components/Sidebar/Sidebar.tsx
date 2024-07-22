@@ -8,7 +8,7 @@ import { useEvolu, useQueries, useQuery, String } from "@evolu/react";
 import { notebooksQuery, notesQuery, sectionsQuery } from "@/db/queries";
 import { NoteDialog } from "../dialogs/note";
 import { Button } from "../ui/Button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, SquarePen, Trash2 } from "lucide-react";
 import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
 import { Brand } from "effect/Brand";
@@ -28,15 +28,15 @@ import { ReactSketchCanvasRef, CanvasPath } from "react-sketch-canvas";
 
 export const Sidebar = memo(
   ({
-    editor,
+    // editor,
     isOpen,
     onClose,
-    canvasRef,
+    // canvasRef,
   }: {
-    editor: Editor;
+    // editor: Editor;
     isOpen?: boolean;
     onClose: () => void;
-    canvasRef: ReactSketchCanvasRef | null;
+    // canvasRef: ReactSketchCanvasRef | null;
   }) => {
     const { update } = useEvolu<Database>();
 
@@ -150,31 +150,31 @@ export const Sidebar = memo(
     };
 
     // Update selectNote to use the query results
-    const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
-      const exportedData = exportedDataRows.find(
-        (row) => row.noteId === noteId,
-      );
-      console.log("JSON Data, ", exportedData?.jsonData);
-      console.log("INK Data, ");
+    // const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
+    //   const exportedData = exportedDataRows.find(
+    //     (row) => row.noteId === noteId,
+    //   );
+    //   console.log("JSON Data, ", exportedData?.jsonData);
+    //   console.log("INK Data, ");
 
-      if (exportedData) {
-        setNote(
-          exportedData.jsonData!,
-          S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
-          noteId,
-          exportedData.id,
-        );
-        setInk(exportedData.inkData);
-        const ink = exportedData as unknown as CanvasPath[];
-        if (canvasRef && exportedData.inkData) canvasRef.loadPaths(ink);
-        editor.commands.setContent(exportedData.jsonData!);
-      }
-    };
+    //   if (exportedData) {
+    //     setNote(
+    //       exportedData.jsonData!,
+    //       S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
+    //       noteId,
+    //       exportedData.id,
+    //     );
+    //     setInk(exportedData.inkData);
+    //     const ink = exportedData as unknown as CanvasPath[];
+    //     if (canvasRef && exportedData.inkData) canvasRef.loadPaths(ink);
+    //     editor.commands.setContent(exportedData.jsonData!);
+    //   }
+    // };
 
     return (
       <div className={windowClassName}>
         <div className="w-full min-h-svh overflow-hidden">
-          <div className="w-full h-full p-5 overflow-auto min-h-svh">
+          <div className="w-full h-full px-5 pb-5 overflow-auto min-h-svh">
             <div className="flex h-14 items-center border-b mb-3">
               <Link
                 href="/"
@@ -194,7 +194,7 @@ export const Sidebar = memo(
                   size="icon"
                   className="ml-auto h-8 w-8"
                 >
-                  <Plus className="h-4 w-4" />
+                  <SquarePen className="h-4 w-4" />
                   <span className="sr-only">Add new notebook</span>
                 </Button>
               </NotebookDialog>
@@ -209,8 +209,8 @@ export const Sidebar = memo(
                       level={1}
                       id={notebook.id}
                       title={notebook.title}
-                      editor={editor}
-                      canvasRef={canvasRef}
+                      // editor={editor}
+                      // canvasRef={canvasRef}
                     />
                   </div>
                 ))}

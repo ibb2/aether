@@ -18,14 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="min-h-svh">
-      <body
-        className={
-          (inter.className,
-          "flex min-h-svh content-center items-center justify-center")
-        }
-      >
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

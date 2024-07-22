@@ -11,7 +11,7 @@ import { hash } from "@node-rs/argon2";
 import { eq, lt, gte, ne } from "drizzle-orm";
 import { useForm } from "react-hook-form";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
-import { formSchema } from "@/app/(auth)/signup/page";
+import { formSchema } from "@/app/app/(auth)/signup/page";
 import { Schema } from "zod";
 
 export type FormState = {
