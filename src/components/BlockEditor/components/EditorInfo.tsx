@@ -390,7 +390,9 @@ export const EditorInfo = memo(
                     </DropdownMenuItem> */}
                     <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                      <Link href="/settings">
+                        <span>Settings</span>
+                      </Link>
                       <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                     </DropdownMenuItem>
                     {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
