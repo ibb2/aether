@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { EvoluProvider } from "@evolu/react";
 import { evolu } from "@/db/db";
+import posthog from "posthog-js";
+import PostHogPageView from "./PostHogPageView";
+import { PHProvider } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,13 +21,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="min-h-svh">
-      <body
-        className={
-          (inter.className, "flex min-h-svh items-center justify-center")
-        }
-      >
-        {children}
-      </body>
+      <PHProvider>
+        <body
+          className={
+            (inter.className, "flex min-h-svh items-center justify-center")
+          }
+        >
+          <PostHogPageView />
+          {children}
+        </body>
+      </PHProvider>
     </html>
   );
 }
