@@ -32,6 +32,7 @@ import {
   Github,
   Keyboard,
   LifeBuoy,
+  LogIn,
   LogOut,
   Mail,
   Menu,
@@ -345,10 +346,128 @@ export const EditorInfo = memo(
             </Button>
           </div>
         )}
-        <div className="justify-self-end">
+        <div className="flex flex-row justify-self-end">
           <Button size="icon" variant="outline" onClick={() => onOpen(!open)}>
             {open ? <X /> : <Menu />}
           </Button>
+          <div className="flex">
+            <div className="relative flex flex-row items-center ml-3 ">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar>
+                    {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-72 p-2">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <LogIn className="mr-2 h-4 w-4" />
+                      <Link href="/login">Login</Link>
+                    </DropdownMenuItem>
+                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <LogIn className="mr-2 h-4 w-4" />
+                      <Link href="/signup">Sign up</Link>
+                    </DropdownMenuItem> */}
+                  </DropdownMenuGroup>
+                  <DropdownMenuGroup>
+                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5 cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                      <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                    </DropdownMenuItem> */}
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                      <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Billing</span>
+                      <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                    </DropdownMenuItem> */}
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                      <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <Keyboard className="mr-2 h-4 w-4" />
+                      <span>Keyboard shortcuts</span>
+                      <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+                    </DropdownMenuItem> */}
+                  </DropdownMenuGroup>
+                  {/* <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Team</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="flex items-center px-1.5 py-0.5">
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        <span>Invite users</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent className="mr-3 p-2">
+                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                            <Mail className="mr-2 h-4 w-4" />
+                            <span>Email</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            <span>Message</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            <span>More...</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                      <Plus className="mr-2 h-4 w-4" />
+                      <span>New Team</span>
+                      <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                    <Github className="mr-2 h-4 w-4" />
+                    <span>GitHub</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                    <LifeBuoy className="mr-2 h-4 w-4" />
+                    <span>Support</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="flex items-center px-1.5 py-0.5"
+                    disabled
+                  >
+                    <Cloud className="mr-2 h-4 w-4" />
+                    <span>API</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator /> */}
+                  {isLoggedIn && (
+                    <DropdownMenuItem
+                      className="flex items-center px-1.5 py-0.5"
+                      onClick={() => {
+                        logout(session);
+                        setSession(null);
+                      }}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
         </div>
       </div>
     );
