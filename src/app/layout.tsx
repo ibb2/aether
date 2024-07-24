@@ -6,6 +6,7 @@ import { evolu } from "@/db/db";
 import posthog from "posthog-js";
 import PostHogPageView from "./PostHogPageView";
 import { PHProvider } from "./providers";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,17 +21,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="min-h-svh">
-      <PHProvider>
-        <body
-          className={
-            (inter.className, "flex min-h-svh items-center justify-center")
-          }
-        >
-          <PostHogPageView />
-          {children}
-        </body>
-      </PHProvider>
+    <html lang="en" className="min-h-svh" suppressHydrationWarning>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <PHProvider>
+          <body
+            className={
+              (inter.className, "flex min-h-svh items-center justify-center")
+            }
+          >
+            <PostHogPageView />
+            {children}
+          </body>
+        </PHProvider>
+      </ThemeProvider>
     </html>
   );
 }
