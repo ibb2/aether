@@ -9,7 +9,14 @@ import React from "react";
 import { evolu } from "@/db/db";
 import { cn } from "@/lib/utils";
 import { Check, Clipboard } from "lucide-react";
-import { Mnemonic, Owner, useEvolu, useOwner } from "@evolu/react";
+import {
+  Mnemonic,
+  Owner,
+  parseMnemonic,
+  useEvolu,
+  useOwner,
+} from "@evolu/react";
+import { Effect, Exit } from "effect";
 
 export default function CopySecret() {
   const evolu = useEvolu();
@@ -40,7 +47,16 @@ export default function CopySecret() {
 
   const updateMnemonic = () => {
     console.log("Mnemonic", mnemonic);
-    evolu.restoreOwner(mnemonic as Mnemonic, { reload: false });
+    parseMnemonic(mnemonic)
+      .pipe(Effect.runPromiseExit)
+      .then(
+        Exit.match({
+          onFailure: () => {},
+          onSuccess: (m) => {
+            evolu.restoreOwner(m);
+          },
+        }),
+      );
   };
 
   return (

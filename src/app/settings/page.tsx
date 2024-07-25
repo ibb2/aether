@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CircleUser, Menu, Package2, Search } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleUser,
+  Heading1,
+  Menu,
+  Package2,
+  Search,
+} from "lucide-react";
 
 import {
   Card,
@@ -37,6 +44,11 @@ import { evolu } from "@/db/db";
 export default function Settings() {
   const router = useRouter();
 
+  const nuke = () => {
+    evolu.resetOwner({ reload: true });
+    // router.push("/app");
+  };
+
   return (
     <EvoluProvider value={evolu}>
       <div className="flex min-h-screen w-full flex-col">
@@ -68,7 +80,7 @@ export default function Settings() {
                   <CardTitle>Account</CardTitle>
                   <CardDescription>Account related settings.</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="grid gap-10">
                   <div className="flex flex-col gap-4">
                     <Label htmlFor="mnemonic">Mnemonic:</Label>
                     <CopySecret />
@@ -82,6 +94,17 @@ export default function Settings() {
                         NOT SHARE.
                       </label>
                     </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <h1>Danger</h1>
+                    <Label htmlFor="mnemonic">Delete:</Label>
+                    <Button
+                      variant="destructive"
+                      className="max-w-max"
+                      onClick={nuke}
+                    >
+                      Delete Data
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
