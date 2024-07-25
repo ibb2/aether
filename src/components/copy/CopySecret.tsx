@@ -9,9 +9,11 @@ import React from "react";
 import { evolu } from "@/db/db";
 import { cn } from "@/lib/utils";
 import { Check, Clipboard } from "lucide-react";
-import { Owner, useOwner } from "@evolu/react";
+import { Mnemonic, Owner, useEvolu, useOwner } from "@evolu/react";
 
 export default function CopySecret() {
+  const evolu = useEvolu();
+
   const [mnemonic, setMnemonic] = React.useState("");
   const [copied, onCopied] = React.useState(false);
   const [blurred, onBlurred] = React.useState(true);
@@ -36,14 +38,27 @@ export default function CopySecret() {
     }, 1000);
   };
 
+  const updateMnemonic = () => {
+    console.log("Mnemonic", mnemonic);
+    evolu.restoreOwner(mnemonic as Mnemonic, { reload: false });
+  };
+
   return (
     <div className="w-full max-w-2xl space-y-4">
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
-          <Input value={mnemonic} readOnly />
+          <Input
+            // value={mnemonic}
+            readOnly
+            defaultValue={mnemonic}
+            onChange={(e) => setMnemonic(e.target.value)}
+          />
           <Button onClick={copyToClipboard} className="max-w-15">
             {copied ? <Check className="text-white" /> : <Clipboard />}
           </Button>
+          {/* <Button variant="secondary" onClick={updateMnemonic}>
+            update
+          </Button> */}
           {/* {copied && <span className="text-green-400">Copied</span>} */}
         </div>
       </div>
