@@ -26,6 +26,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  ArrowLeft,
+  ArrowLeftFromLine,
+  ArrowRight,
+  ArrowRightToLine,
   Cloud,
   CreditCard,
   Eraser,
@@ -36,6 +40,7 @@ import {
   LogOut,
   Mail,
   Menu,
+  MenuSquare,
   MessageSquare,
   Pen,
   Plus,
@@ -87,6 +92,15 @@ export const EditorInfo = memo(
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
     const [session, setSession] = React.useState<any>(null);
     const [open, onOpen] = React.useState(false);
+    const [animate, onAnimate] = React.useState(false);
+
+    const openSettings = () => {
+      onAnimate(true);
+      console.log(animate);
+      setTimeout(() => {
+        onAnimate(false);
+      }, 1000);
+    };
 
     const [eraseMode, setEraseMode] = React.useState(false);
 
@@ -347,26 +361,34 @@ export const EditorInfo = memo(
           </div>
         )}
         <div className="flex flex-row justify-self-end">
-          <Button size="icon" variant="outline" onClick={() => onOpen(!open)}>
-            {open ? <X /> : <Menu />}
+          <Button size="icon" variant="ghost" onClick={() => onOpen(!open)}>
+            {open ? <ArrowRightToLine /> : <ArrowLeftFromLine />}
           </Button>
           <div className="flex">
             <div className="relative flex flex-row items-center ml-3 ">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar>
-                    {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
+                  {/* <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
+                  </Avatar> */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => openSettings()}
+                    className={cn(animate && "animate-spin")}
+                  >
+                    <Settings />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72 p-2">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <LogIn className="mr-2 h-4 w-4" />
                       <Link href="/login">Login</Link>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <LogIn className="mr-2 h-4 w-4" />
                       <Link href="/signup">Sign up</Link>
@@ -378,11 +400,11 @@ export const EditorInfo = memo(
                       <span>Settings</span>
                       <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                     </DropdownMenuItem> */}
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                       <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Billing</span>
