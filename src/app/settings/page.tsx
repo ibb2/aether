@@ -43,7 +43,7 @@ export default function Settings() {
         <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
           <div
             className="mx-auto flex flex-row items-center w-full max-w-6xl gap-4"
-            onClick={() => router.back()}
+            onClick={() => router.push("/app")}
           >
             <ArrowLeft />
             <h1 className="text-3xl font-semibold">Settings</h1>
@@ -60,7 +60,7 @@ export default function Settings() {
             <Link href="#">Integrations</Link>
             <Link href="#">Support</Link>
             <Link href="#">Organizations</Link> */}
-              <Link href="/settings/advanced">Advanced</Link>
+              {/* <Link href="/settings/advanced">Advanced</Link> */}
             </nav>
             <div className="grid gap-6">
               <Card x-chunk="dashboard-04-chunk-1">
