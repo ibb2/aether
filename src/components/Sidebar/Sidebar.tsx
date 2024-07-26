@@ -8,7 +8,14 @@ import { useEvolu, useQueries, useQuery, String } from "@evolu/react";
 import { notebooksQuery, notesQuery, sectionsQuery } from "@/db/queries";
 import { NoteDialog } from "../dialogs/note";
 import { Button } from "../ui/Button";
-import { Plus, SquarePen, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ChevronDown,
+  MoveDown,
+  Plus,
+  SquarePen,
+  Trash2,
+} from "lucide-react";
 import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
 import { Brand } from "effect/Brand";
@@ -178,7 +185,7 @@ export const Sidebar = memo(
             <div className="flex h-14 items-center border-b mb-3">
               <Link
                 href="/"
-                className="flex items-center gap-2 px-2 font-semibold"
+                className="flex items-center gap-2 font-semibold"
                 onClick={(e) => e.preventDefault()}
               >
                 {/* <Package2 className="h-6 w-6" /> */}
@@ -202,18 +209,27 @@ export const Sidebar = memo(
 
             <div className="flex-1">
               <nav className="grid items-start text-sm font-medium">
-                {treeData.map((notebook) => (
-                  <div key={notebook.id}>
-                    <TreeMenu
-                      data={notebook}
-                      level={1}
-                      id={notebook.id}
-                      title={notebook.title}
-                      editor={editor}
-                      canvasRef={canvasRef}
-                    />
-                  </div>
-                ))}
+                <Button
+                  variant="ghost"
+                  className="text-zinc-400 text-sm justify-between"
+                >
+                  <span>NOTEBOOKS</span>
+                  <ChevronDown />
+                </Button>
+                <div>
+                  {treeData.map((notebook) => (
+                    <div key={notebook.id}>
+                      <TreeMenu
+                        data={notebook}
+                        level={1}
+                        id={notebook.id}
+                        title={notebook.title}
+                        editor={editor}
+                        canvasRef={canvasRef}
+                      />
+                    </div>
+                  ))}
+                </div>
               </nav>
             </div>
           </div>
