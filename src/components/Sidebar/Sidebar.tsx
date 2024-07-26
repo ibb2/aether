@@ -32,6 +32,7 @@ import {
 import { SectionDialog } from "../dialogs/section";
 import useNoteDialogStore from "@/store/note-dialog";
 import { ReactSketchCanvasRef, CanvasPath } from "react-sketch-canvas";
+import { Tree } from "react-arborist";
 
 export const Sidebar = memo(
   ({
@@ -45,16 +46,6 @@ export const Sidebar = memo(
     onClose: () => void;
     canvasRef: ReactSketchCanvasRef | null;
   }) => {
-    const { update } = useEvolu<Database>();
-
-    // Stores (Zustand)
-    const { name, data, setNote, setInk } = useNoteStore((state) => ({
-      name: state.name,
-      data: state.data,
-      setNote: state.setNote,
-      setInk: state.setInk,
-    }));
-
     const [notebooks, sections, notes] = useQueries([
       notebooksQuery,
       sectionsQuery,
@@ -62,81 +53,80 @@ export const Sidebar = memo(
     ]);
 
     // State
-    const [treeData, setTreeData] = React.useState<any>([]);
-
-    // Move the exportedDataQuery outside of selectNote
-    const exportedDataQuery = evolu.createQuery((db) =>
-      db
-        .selectFrom("exportedData")
-        .select("id")
-        .select("jsonData")
-        .select("noteId")
-        .select("inkData"),
-    );
-
-    // Use the query result here
-    const { rows: exportedDataRows } = useQuery(exportedDataQuery);
+    const [treeData, setTreeData] = React.useState();
 
     // Make treeview data
+    const convertToTreeStructure = (data) => {
+      const allItems = [...data.notebooks, ...data.sections, ...data.notes];
+
+      const findChildren = (parentId) => {
+        return allItems
+          .filter(
+            (item) =>
+              item.parentId === parentId ||
+              (item.notebookId === parentId && item.sectionId === null),
+          )
+          .map(processItem)
+          .filter(Boolean);
+      };
+
+      const processItem = (item) => {
+        const children = findChildren(item.id);
+        const result = {
+          id: item.id,
+          name: item.name || "[Unnamed]",
+          type: item.type,
+        };
+
+        if (children.length > 0) {
+          result.children = children;
+        }
+
+        return result;
+      };
+
+      return data.notebooks.map(processItem);
+    };
+
+    const transformData = React.useCallback((notebooks, sections, notes) => {
+      const normalizedData = {
+        notebooks: notebooks.rows.map((notebook) => ({
+          id: notebook.id,
+          name: notebook.title,
+          type: "notebook",
+          children: [],
+        })),
+        sections: sections.rows.map((section) => ({
+          id: section.id,
+          name: section.title,
+          type: "section",
+          notebookId: section.notebookId,
+          parentId: section.notebookId || null,
+          children: [],
+        })),
+        notes: notes.rows.map((note) => ({
+          id: note.id,
+          name: note.title,
+          type: "note",
+          notebookId: note.notebookId,
+          sectionId: note.sectionId,
+          parentId: note.sectionId || note.notebookId,
+        })),
+      };
+
+      const treeStructure = convertToTreeStructure(normalizedData);
+      return treeStructure;
+    }, []); // Empty dependency array as convertToTreeStructure is defined inside the component
 
     React.useEffect(() => {
       const getData = async () => {
         const transformedData = transformData(notebooks, sections, notes);
         setTreeData(transformedData);
+        // console.log("State", treeData);
       };
 
       getData();
-    }, [notebooks, sections, notes]);
-
-    const transformData = (notebooks, sections, notes) => {
-      const sectionMap = new Map();
-      sections.rows.forEach((section) => {
-        if (!(section.parentId !== null)) {
-          sectionMap.set(section.id, { ...section, sections: [], notes: [] });
-        }
-      });
-
-      const sectionMapAll = new Map();
-      sections.rows.forEach((section) => {
-        sectionMapAll.set(section.id, { ...section, sections: [], notes: [] });
-      });
-
-      notes.rows.forEach((note) => {
-        if (!note.isDeleted) {
-          const section = sectionMapAll.get(note.sectionId);
-          const rootSection = sectionMap.get(note.sectionId);
-          if (section) section.notes.push(note);
-          if (rootSection) rootSection.notes.push(note);
-        }
-      });
-
-      sections.rows.forEach((section) => {
-        if (section.parentId) {
-          const parentSection = sectionMap.get(section.parentId);
-          if (parentSection) {
-            parentSection.sections.push(sectionMapAll.get(section.id));
-          }
-        }
-      });
-
-      return notebooks.rows.map((notebook) => ({
-        ...notebook,
-        sections: sections.rows
-          .filter(
-            (section) =>
-              section.notebookId === notebook.id &&
-              !section.parentSectionId &&
-              !section.isDeleted,
-          )
-          .map((section) => sectionMap.get(section.id)),
-        notes: notes.rows.filter(
-          (note) =>
-            note.notebookId === notebook.id &&
-            !note.sectionId &&
-            !note.isDeleted,
-        ),
-      }));
-    };
+    }, [notebooks, sections, notes, transformData]);
 
     const handlePotentialClose = useCallback(() => {
       if (window.innerWidth < 1024) {
@@ -151,32 +141,6 @@ export const Sidebar = memo(
       !isOpen && "border-r-transparent",
       isOpen && "w-full",
     );
-
-    const deleteNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
-      update("notes", { id: noteId, isDeleted: true });
-    };
-
-    // Update selectNote to use the query results
-    // const selectNote = (noteId: string & Brand<"Id"> & Brand<"Note">) => {
-    //   const exportedData = exportedDataRows.find(
-    //     (row) => row.noteId === noteId,
-    //   );
-    //   console.log("JSON Data, ", exportedData?.jsonData);
-    //   console.log("INK Data, ");
-
-    //   if (exportedData) {
-    //     setNote(
-    //       exportedData.jsonData!,
-    //       S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
-    //       noteId,
-    //       exportedData.id,
-    //     );
-    //     setInk(exportedData.inkData);
-    //     const ink = exportedData as unknown as CanvasPath[];
-    //     if (canvasRef && exportedData.inkData) canvasRef.loadPaths(ink);
-    //     editor.commands.setContent(exportedData.jsonData!);
-    //   }
-    // };
 
     return (
       <div className={windowClassName}>
@@ -217,7 +181,8 @@ export const Sidebar = memo(
                   <ChevronDown />
                 </Button>
                 <div>
-                  {treeData.map((notebook) => (
+                  <Tree initialData={treeData} />
+                  {/* {treeData.map((notebook) => (
                     <div key={notebook.id}>
                       <TreeMenu
                         data={notebook}
@@ -228,7 +193,7 @@ export const Sidebar = memo(
                         canvasRef={canvasRef}
                       />
                     </div>
-                  ))}
+                  ))} */}
                 </div>
               </nav>
             </div>
