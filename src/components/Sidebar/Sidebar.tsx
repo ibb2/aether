@@ -33,6 +33,7 @@ import { SectionDialog } from "../dialogs/section";
 import useNoteDialogStore from "@/store/note-dialog";
 import { ReactSketchCanvasRef, CanvasPath } from "react-sketch-canvas";
 import { Tree } from "react-arborist";
+import Node from "@/components/Sidebar/Arborist";
 
 export const Sidebar = memo(
   ({
@@ -181,7 +182,7 @@ export const Sidebar = memo(
                   <ChevronDown />
                 </Button>
                 <div>
-                  <Tree initialData={treeData} />
+                  <Tree initialData={treeData}>{Node}</Tree>
                   {/* {treeData.map((notebook) => (
                     <div key={notebook.id}>
                       <TreeMenu
