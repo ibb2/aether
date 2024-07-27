@@ -38,6 +38,7 @@ import {
   StaticTreeDataProvider,
   UncontrolledTreeEnvironment,
 } from "react-complex-tree";
+import "react-complex-tree/lib/style-modern.css";
 
 export const Sidebar = memo(
   ({
@@ -122,6 +123,8 @@ export const Sidebar = memo(
         })),
       };
 
+      console.log(normalizedData);
+
       const treeStructure = convertToTreeStructure(normalizedData);
       return treeStructure;
     }, []); // Empty dependency array as convertToTreeStructure is defined inside the component
@@ -189,9 +192,26 @@ export const Sidebar = memo(
                   <ChevronDown />
                 </Button>
                 <div>
-                  <Tree ref={treeRef} initialData={treeData}>
+                  <Tree ref={treeRef} initialData={treeData} rowHeight={40}>
                     {Node}
                   </Tree>
+                  {/* <UncontrolledTreeEnvironment
+                    dataProvider={
+                      new StaticTreeDataProvider(
+                        longTree.items,
+                        (item, data) => ({ ...item, data }),
+                      )
+                    }
+                    getItemTitle={(item) => item.data}
+                    viewState={{}}
+                  >
+                    <Tree
+                      treeId="tree-1"
+                      rootItem="root"
+                      treeLabel="Tree Example"
+                    />
+                  </UncontrolledTreeEnvironment> */}
+
                   {/* <Tree initialData={treeData} /> */}
 
                   {/* {treeData.map((notebook) => (

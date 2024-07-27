@@ -19,6 +19,7 @@ import React from "react";
 import { useQuery } from "@evolu/react";
 import useNoteStore from "@/store/note";
 import useStateStore from "@/store/state";
+import { Button } from "../ui/Button";
 
 const Node = ({ node, style, dragHandle, tree }) => {
   /* This node instance can do many things. See the API reference. */
@@ -76,14 +77,18 @@ const Node = ({ node, style, dragHandle, tree }) => {
   };
   return (
     <div
-      className={cn("node-container", "flex justify-between hover:bg-zinc-100")}
+      className={cn(
+        "node-container",
+        "flex justify-between mt-14 hover:bg-zinc-100",
+      )}
       style={style}
       ref={dragHandle}
       onClick={() => {
         if (node.isLeaf) selectNote();
       }}
     >
-      <div
+      <Button
+        variant="ghost"
         className={cn(
           "node-content",
           "flex gap-x-2 items-center",
@@ -120,7 +125,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
             <p>{node.data.name}</p>
           )}
         </p>
-      </div>
+      </Button>
       <div className={cn("file-actions", "invisible hover:visible")}>
         <div className={cn("folderFileActions")}>
           <button onClick={() => node.edit()} title="Rename...">
