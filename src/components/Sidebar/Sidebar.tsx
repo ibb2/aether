@@ -34,6 +34,10 @@ import useNoteDialogStore from "@/store/note-dialog";
 import { ReactSketchCanvasRef, CanvasPath } from "react-sketch-canvas";
 import { Tree } from "react-arborist";
 import Node from "@/components/Sidebar/Arborist";
+import {
+  StaticTreeDataProvider,
+  UncontrolledTreeEnvironment,
+} from "react-complex-tree";
 
 export const Sidebar = memo(
   ({
@@ -47,6 +51,9 @@ export const Sidebar = memo(
     onClose: () => void;
     canvasRef: ReactSketchCanvasRef | null;
   }) => {
+    // referees
+    const treeRef = React.useRef(null);
+
     const [notebooks, sections, notes] = useQueries([
       notebooksQuery,
       sectionsQuery,
@@ -182,7 +189,11 @@ export const Sidebar = memo(
                   <ChevronDown />
                 </Button>
                 <div>
-                  <Tree initialData={treeData}>{Node}</Tree>
+                  <Tree ref={treeRef} initialData={treeData}>
+                    {Node}
+                  </Tree>
+                  {/* <Tree initialData={treeData} /> */}
+
                   {/* {treeData.map((notebook) => (
                     <div key={notebook.id}>
                       <TreeMenu
