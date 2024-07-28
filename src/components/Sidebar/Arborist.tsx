@@ -23,6 +23,7 @@ import { Button } from "../ui/Button";
 
 const Node = ({ node, style, dragHandle, tree }) => {
   /* This node instance can do many things. See the API reference. */
+  // console.log("node ", node);
 
   // Store
   const setNote = useNoteStore((state) => state.setNote);
@@ -84,7 +85,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
       style={style}
       ref={dragHandle}
       onClick={() => {
-        if (node.isLeaf) {
+        if (node.isLeaf && !(node.data.type === "section")) {
           selectNote();
         } else {
           node.isInternal && node.toggle();
@@ -105,8 +106,8 @@ const Node = ({ node, style, dragHandle, tree }) => {
               <NotebookTabs />
             </>
           )}
-          {node.isLeaf && node.level > 0 && <File />}
-          {!node.isLeaf && node.level > 0 && (
+          {node.data.type === "note" && <File />}
+          {node.data.type === "section" && (
             <>{node.isOpen ? <FolderOpen /> : <FolderClosed />}</>
           )}
         </div>
