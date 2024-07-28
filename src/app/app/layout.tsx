@@ -16,6 +16,7 @@ import {
 import useSidebarStore from "@/store/sidebar";
 import { ImperativePanelHandle } from "react-resizable-panels";
 import useStateStore from "@/store/state";
+import useResizeObserver from "use-resize-observer";
 
 export default function AppLayout({
   children, // will be a page or nested layout
@@ -26,12 +27,19 @@ export default function AppLayout({
   const menuContainerRef = React.useRef(null);
   const panelRef = React.useRef<ImperativePanelHandle>(null);
 
+  // Const
+  const MULTIPLE = 10.42553191;
+
+  // State
+  const [width, setWidth] = React.useState(
+    panelRef.current?.getSize() ?? 20 * MULTIPLE,
+  );
+
   // Store
-  const { open, size, ref, setOpen, adjustSize, setRef } = useSidebarStore(
+  const { open, size, setOpen, adjustSize, setRef } = useSidebarStore(
     (state) => ({
       open: state.open,
       size: state.size,
-      ref: state.ref,
       setOpen: state.setOpen,
       adjustSize: state.adjustSize,
       setRef: state.setRef,
@@ -64,17 +72,18 @@ export default function AppLayout({
             defaultSize={20}
             collapsible
             maxSize={50}
-            onResize={(s) => adjustSize(s)}
+            onResize={(s) => {
+              adjustSize(s);
+              setWidth(s * MULTIPLE);
+            }}
             ref={panelRef}
           >
-            <nav>
-              <Sidebar
-                isOpen={open}
-                onClose={setOpen}
-                editor={editor!}
-                canvasRef={canvasRef.current}
-              />
-            </nav>
+            <Sidebar
+              isOpen={open}
+              onClose={setOpen}
+              editor={editor!}
+              canvasRef={canvasRef.current}
+            />
           </ResizablePanel>
         )}
         <ResizableHandle withHandle />

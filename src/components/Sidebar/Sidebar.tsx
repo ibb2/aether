@@ -39,6 +39,7 @@ import {
   UncontrolledTreeEnvironment,
 } from "react-complex-tree";
 import "react-complex-tree/lib/style-modern.css";
+import useResizeObserver from "use-resize-observer";
 
 export const Sidebar = memo(
   ({
@@ -46,14 +47,21 @@ export const Sidebar = memo(
     isOpen,
     onClose,
     canvasRef,
+    // width,
   }: {
     editor: Editor;
     isOpen?: boolean;
     onClose: () => void;
     canvasRef: ReactSketchCanvasRef | null;
+    // width: number;
   }) => {
     // referees
     const treeRef = React.useRef(null);
+
+    // Use resize obserer
+    const { ref, width, height } = useResizeObserver<HTMLDivElement>();
+
+    console.log(width);
 
     const [notebooks, sections, notes] = useQueries([
       notebooksQuery,
@@ -154,9 +162,9 @@ export const Sidebar = memo(
     );
 
     return (
-      <div className={windowClassName}>
+      <div className={cn(windowClassName, "px-5")} ref={ref}>
         <div className="w-full min-h-svh overflow-hidden">
-          <div className="w-full h-full px-5 pb-5 overflow-auto min-h-svh">
+          <div className="w-full h-full pb-5 overflow-auto min-h-svh">
             <div className="flex h-14 items-center border-b mb-3">
               <Link
                 href="/"
@@ -182,53 +190,25 @@ export const Sidebar = memo(
               </NotebookDialog>
             </div>
 
-            <div className="flex-1">
-              <nav className="grid items-start text-sm font-medium">
-                <Button
-                  variant="ghost"
-                  className="text-zinc-400 text-sm justify-between"
-                >
-                  <span>NOTEBOOKS</span>
-                  <ChevronDown />
-                </Button>
-                <div>
-                  <Tree ref={treeRef} initialData={treeData} rowHeight={40}>
-                    {Node}
-                  </Tree>
-                  {/* <UncontrolledTreeEnvironment
-                    dataProvider={
-                      new StaticTreeDataProvider(
-                        longTree.items,
-                        (item, data) => ({ ...item, data }),
-                      )
-                    }
-                    getItemTitle={(item) => item.data}
-                    viewState={{}}
-                  >
-                    <Tree
-                      treeId="tree-1"
-                      rootItem="root"
-                      treeLabel="Tree Example"
-                    />
-                  </UncontrolledTreeEnvironment> */}
-
-                  {/* <Tree initialData={treeData} /> */}
-
-                  {/* {treeData.map((notebook) => (
-                    <div key={notebook.id}>
-                      <TreeMenu
-                        data={notebook}
-                        level={1}
-                        id={notebook.id}
-                        title={notebook.title}
-                        editor={editor}
-                        canvasRef={canvasRef}
-                      />
-                    </div>
-                  ))} */}
-                </div>
-              </nav>
-            </div>
+            <nav className="grid items-start text-sm font-medium border-2 border-zinc-50 rounded-md">
+              <Button
+                variant="ghost"
+                className="mb-2 text-zinc-400 text-sm justify-between"
+                onClick={() => treeRef.current?.open()}
+              >
+                <span>NOTEBOOKS</span>
+                <ChevronDown />
+              </Button>
+              <Tree
+                width={width}
+                ref={treeRef}
+                initialData={treeData}
+                rowHeight={40}
+                openByDefault={false}
+              >
+                {Node}
+              </Tree>
+            </nav>
           </div>
         </div>
       </div>

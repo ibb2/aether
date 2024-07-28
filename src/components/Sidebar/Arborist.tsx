@@ -79,27 +79,29 @@ const Node = ({ node, style, dragHandle, tree }) => {
     <div
       className={cn(
         "node-container",
-        "flex justify-between mt-14 hover:bg-zinc-100",
+        "flex py-2 w-full justify-between hover:bg-zinc-100",
       )}
       style={style}
       ref={dragHandle}
       onClick={() => {
-        if (node.isLeaf) selectNote();
+        if (node.isLeaf) {
+          selectNote();
+        } else {
+          node.isInternal && node.toggle();
+        }
       }}
     >
-      <Button
-        variant="ghost"
+      <p
         className={cn(
           "node-content",
           "flex gap-x-2 items-center",
-          node.level > 0 && "ml-6",
+          // node.level > 0 && "ml-6",
         )}
-        onClick={() => node.isInternal && node.toggle()}
+        // onClick={() => node.isInternal && node.toggle()}
       >
         <div className="flex">
           {!node.isLeaf && node.level === 0 && (
             <>
-              {node.isOpen ? <ChevronDown /> : <ChevronRight />}
               <NotebookTabs />
             </>
           )}
@@ -125,17 +127,20 @@ const Node = ({ node, style, dragHandle, tree }) => {
             <p>{node.data.name}</p>
           )}
         </p>
-      </Button>
-      <div className={cn("file-actions", "invisible hover:visible")}>
-        <div className={cn("folderFileActions")}>
-          <button onClick={() => node.edit()} title="Rename...">
-            <Pencil />
-          </button>
-          <button onClick={() => tree.delete(node.id)} title="Delete">
-            <X />
-          </button>
+      </p>
+      {!node.isLeaf && node.level === 0 && (
+        <div className={cn("file-actions")}>
+          <div className={cn("folderFileActions")}>
+            {node.isOpen ? <ChevronDown /> : <ChevronRight />}
+            {/* <button onClick={() => node.edit()} title="Rename...">
+              <Pencil />
+            </button>
+            <button onClick={() => tree.delete(node.id)} title="Delete">
+              <X />
+            </button> */}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
