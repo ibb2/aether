@@ -190,15 +190,10 @@ export const Sidebar = memo(
               </NotebookDialog>
             </div>
 
-            <nav className="grid items-start text-sm font-medium border-2 border-zinc-50 rounded-md">
-              <Button
-                variant="ghost"
-                className="mb-2 text-zinc-400 text-sm justify-between"
-                onClick={() => treeRef.current?.open()}
-              >
-                <span>NOTEBOOKS</span>
-                <ChevronDown />
-              </Button>
+            <nav className="grid items-start text-sm font-medium">
+              <span className="mb-2 text-zinc-400 text-sm justify-between">
+                NOTEBOOKS
+              </span>
               <Tree
                 width={width}
                 ref={treeRef}
