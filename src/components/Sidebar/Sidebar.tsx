@@ -61,8 +61,6 @@ export const Sidebar = memo(
     // Use resize obserer
     const { ref, width, height } = useResizeObserver<HTMLDivElement>();
 
-    console.log(width);
-
     const [notebooks, sections, notes] = useQueries([
       notebooksQuery,
       sectionsQuery,
@@ -130,8 +128,6 @@ export const Sidebar = memo(
           parentId: note.sectionId || note.notebookId,
         })),
       };
-
-      console.log(normalizedData);
 
       const treeStructure = convertToTreeStructure(normalizedData);
       return treeStructure;

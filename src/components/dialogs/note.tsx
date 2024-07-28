@@ -92,7 +92,7 @@ export const NoteDialog = ({
           <DialogTitle>New note</DialogTitle>
           <DialogDescription>A clean slate.</DialogDescription>
         </DialogHeader>
-        <div className="grid w-full max-w-sm items-center gap-1.5 pt-2.5">
+        <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
           <div className="py-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -103,7 +103,7 @@ export const NoteDialog = ({
             />
           </div>
           {section == null ? (
-            <div className="w-full pb-2">
+            <div className="w-full">
               <Label htmlFor="notebooks">Notebooks</Label>
               <Select
                 value={selectedNotebook}
