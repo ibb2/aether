@@ -91,6 +91,7 @@ export const Sidebar = memo(
           id: item.id,
           name: item.name || "[Unnamed]",
           type: item.type,
+          notebookId: item.notebookId,
         };
 
         if (children.length > 0) {

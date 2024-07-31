@@ -61,7 +61,6 @@ const Node = ({ node, style, dragHandle, tree }) => {
   }));
 
   // Evolu
-
   const exportedDataQuery = React.useCallback(
     () =>
       evolu.createQuery((db) =>
@@ -127,17 +126,18 @@ const Node = ({ node, style, dragHandle, tree }) => {
   const newSection = () => {
     // For creating sections
 
-    // From notebook
     if (tree.prevNode === null) {
+      // Create a new section from notebook
       const { id: sectionId } = create("sections", {
         title: S.decodeSync(NonEmptyString1000)(sectionName),
         notebookId: S.decodeSync(NotebookId)(node.id),
       });
     } else {
+      // Create a new section from a section
       const { id: sectionId } = create("sections", {
         title: S.decodeSync(NonEmptyString1000)(sectionName),
         parentId: S.decodeSync(SectionId)(tree.prevNode.id),
-        notebookId: S.decodeSync(NotebookId)(node.id),
+        notebookId: S.decodeSync(NotebookId)(node.prevNode.data.notebookId),
       });
 
       const prevChildrenIds = tree.prevNode.data.children
@@ -153,41 +153,39 @@ const Node = ({ node, style, dragHandle, tree }) => {
     // console.log(tree.firstNode());
   };
 
-  const newNoteFromSection = () => {
-    // For creating sections
+  const newNote = () => {
+    // For creating note
 
-    const { id: sectionId } = create("sections", {
-      title: S.decodeSync(NonEmptyString1000)(sectionName),
-      notebookId: selectedNotebook,
-    });
+    if (tree.prevNode === null) {
+      // from a notebook (root)
+      const { id: noteId } = create("notes", {
+        title: S.decodeSync(NonEmptyString1000)(noteName),
+        notebookId: S.decodeSync(NotebookId)(node.id),
+      });
+    } else {
+      // from a section (folder)
+      const { id: noteId } = create("notes", {
+        title: S.decodeSync(NonEmptyString1000)(noteName),
+        notebookId: S.decodeSync(NotebookId)(
+          tree.prevNode.data.children[0].notebookId,
+        ),
+        sectionId: S.decodeSync(SectionId)(tree.prevNode.id),
+      });
 
-    console.log("Section ", selectedNotebook);
-  };
+      const prevChildrenIds = tree.prevNode.data.children
+        .filter((node) => node.type === "note")
+        .map((node) => node.id);
 
-  const newSectionFromNotebook = () => {
-    const { id: noteId } = create("notes", {
-      title: S.decodeSync(NonEmptyString1000)(noteName),
-      notebookId: selectedNotebook,
-    });
+      const { id: updatedSectionId } = update("sections", {
+        id: S.decodeSync(SectionId)(tree.prevNode.id),
+        notebookId: S.decodeSync(NotebookId)(
+          tree.prevNode.data.children[0].notebookId,
+        ),
+        notesId: [...prevChildrenIds, noteId],
+      });
+    }
 
-    const { id: exportedDataId } = create("exportedData", {
-      noteId,
-      jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
-      jsonData: initialContent,
-    });
-  };
-
-  const newNoteFromNotebook = () => {
-    const { id: noteId } = create("notes", {
-      title: S.decodeSync(NonEmptyString1000)(noteName),
-      notebookId: selectedNotebook,
-    });
-
-    const { id: exportedDataId } = create("exportedData", {
-      noteId,
-      jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
-      jsonData: initialContent,
-    });
+    console.log(tree.prevNode);
   };
 
   return (
@@ -342,23 +340,31 @@ const Node = ({ node, style, dragHandle, tree }) => {
               <DialogTitle>New note</DialogTitle>
               <DialogDescription>A clean slate.</DialogDescription>
             </DialogHeader>
-            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                type="text"
-                id="name"
-                placeholder="new note"
-                // onChange={(e) => setNoteName(e.target.value)}
-              />
+            <div className="grid w-full max-w-sm items-center gap-1.5 pt-2.5">
+              <div className="py-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="new note"
+                  onChange={(e) => setNoteName(e.target.value)}
+                  ref={inputRef}
+                />
+              </div>
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="secondary">Cancel</Button>
+                <Button variant="secondary" onClick={() => onNoteDialog(false)}>
+                  Cancel
+                </Button>
               </DialogClose>
               <DialogClose asChild>
                 <Button
                   type="submit"
-                  // onClick={notebookDialog2Handler}
+                  onClick={() => {
+                    newNote();
+                    onNoteDialog(false);
+                  }}
                 >
                   Create
                 </Button>
