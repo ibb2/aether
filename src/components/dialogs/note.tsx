@@ -68,7 +68,7 @@ export const NoteDialog = ({
 
   const [selectedNotebook, setSelectedNotebook] = React.useState(notebookId);
 
-  const handler = () => {
+  const create = () => {
     const { id: noteId } = create("notes", {
       title: S.decodeSync(NonEmptyString1000)(noteName),
       notebookId: selectedNotebook,
@@ -84,86 +84,35 @@ export const NoteDialog = ({
   };
 
   return (
-    <Dialog>
-      {children}
-      {/* <DialogTrigger asChild>{children}</DialogTrigger> */}
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent
+        className="sm:max-w-[425px]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <DialogHeader>
-          <DialogTitle>New note</DialogTitle>
-          <DialogDescription>A clean slate.</DialogDescription>
+          <DialogTitle>New Section</DialogTitle>
+          <DialogDescription>
+            Organize your thoughts and ideas.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
-          <div className="py-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              type="text"
-              id="name"
-              placeholder="new note"
-              onChange={(e) => setNoteName(e.target.value)}
-            />
-          </div>
-          {section == null ? (
-            <div className="w-full">
-              <Label htmlFor="notebooks">Notebooks</Label>
-              <Select
-                value={selectedNotebook}
-                onValueChange={(value) => {
-                  setSelectedNotebook(S.decodeSync(NotebookId)(value));
-                  console.info("Changed value", value);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={rows[0].title} />
-                </SelectTrigger>
-                <SelectContent id="notebooks" className="w-full">
-                  {rows.map((notebook, index) => (
-                    <SelectItem
-                      value={notebook.id}
-                      key={index}
-                      className="w-full"
-                    >
-                      {notebook.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <div className="w-full pb-2">
-              <Select
-                value={section}
-                onValueChange={(value) => {
-                  setSelectedNotebook(S.decodeSync(NotebookId)(value));
-                  console.info("Changed value", value);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={rows[0].title} />
-                </SelectTrigger>
-                <SelectContent id="notebooks" className="w-full">
-                  {rows.map((notebook, index) => (
-                    <SelectItem
-                      value={notebook.id}
-                      key={index}
-                      className="w-full"
-                    >
-                      {notebook.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <Label htmlFor="name">Name</Label>
+          <Input
+            type="text"
+            id="name"
+            placeholder="new section"
+            value={noteName}
+            onChange={(e) => setNoteName(e.target.value)}
+          />
         </div>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button type="submit" onClick={handler}>
-              Create
-            </Button>
-          </DialogClose>
+          <Button variant="secondary" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button type="submit" onClick={create}>
+            Create
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

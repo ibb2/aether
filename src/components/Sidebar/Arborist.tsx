@@ -13,10 +13,10 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { NonEmptyString50, NoteId } from "@/db/schema";
+import { NonEmptyString50, NotebookId, NoteId, SectionId } from "@/db/schema";
 import { Database, evolu } from "@/db/db";
 import React from "react";
-import { useEvolu, useQuery } from "@evolu/react";
+import { NonEmptyString1000, useEvolu, useQuery } from "@evolu/react";
 import useNoteStore from "@/store/note";
 import useStateStore from "@/store/state";
 import { Button } from "../ui/Button";
@@ -77,7 +77,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
 
   const { rows: exportedDataRows } = useQuery(exportedDataQuery());
 
-  const { create } = useEvolu<Database>();
+  const { create, update } = useEvolu<Database>();
 
   const handleDialogOpen = (dialogType: string) => {
     if (dialogType === "section") {
@@ -124,16 +124,35 @@ const Node = ({ node, style, dragHandle, tree }) => {
     }
   };
 
-  const newSectionFromSection = () => {
+  const newSection = () => {
     // For creating sections
 
-    const { id: sectionId } = create("sections", {
-      title: S.decodeSync(NonEmptyString1000)(sectionName),
-      notebookId: selectedNotebook,
-    });
+    // From notebook
+    if (tree.prevNode === null) {
+      const { id: sectionId } = create("sections", {
+        title: S.decodeSync(NonEmptyString1000)(sectionName),
+        notebookId: S.decodeSync(NotebookId)(node.id),
+      });
+    } else {
+      const { id: sectionId } = create("sections", {
+        title: S.decodeSync(NonEmptyString1000)(sectionName),
+        parentId: S.decodeSync(SectionId)(tree.prevNode.id),
+        notebookId: S.decodeSync(NotebookId)(node.id),
+      });
 
-    console.log("Section ", selectedNotebook);
+      const prevChildrenIds = tree.prevNode.data.children
+        .filter((node) => node.type === "section")
+        .map((node) => node.id);
+
+      const { id: updatedSectionId } = update("sections", {
+        id: S.decodeSync(SectionId)(tree.prevNode.id),
+        childrenId: [...prevChildrenIds, sectionId],
+      });
+    }
+    // console.log(tree.prevNode);
+    // console.log(tree.firstNode());
   };
+
   const newNoteFromSection = () => {
     // For creating sections
 
@@ -303,7 +322,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
                 <Button
                   type="submit"
                   onClick={() => {
-                    newSectionFromSection();
+                    newSection();
                     onSectionDialog(false);
                   }}
                 >
@@ -323,16 +342,14 @@ const Node = ({ node, style, dragHandle, tree }) => {
               <DialogTitle>New note</DialogTitle>
               <DialogDescription>A clean slate.</DialogDescription>
             </DialogHeader>
-            <div className="grid w-full max-w-sm items-center gap-1.5 pt-2.5">
-              <div className="py-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  type="text"
-                  id="name"
-                  placeholder="new note"
-                  // onChange={(e) => setNoteName(e.target.value)}
-                />
-              </div>
+            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                type="text"
+                id="name"
+                placeholder="new note"
+                // onChange={(e) => setNoteName(e.target.value)}
+              />
             </div>
             <DialogFooter>
               <DialogClose asChild>
