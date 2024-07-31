@@ -49,6 +49,9 @@ const Node = ({ node, style, dragHandle, tree }) => {
   const [sectionName, setSectionName] = React.useState("");
   const [noteName, setNoteName] = React.useState("");
 
+  // References
+  const inputRef = React.useRef(null);
+
   // Store
   const setNote = useNoteStore((state) => state.setNote);
 
@@ -75,6 +78,22 @@ const Node = ({ node, style, dragHandle, tree }) => {
   const { rows: exportedDataRows } = useQuery(exportedDataQuery());
 
   const { create } = useEvolu<Database>();
+
+  const handleDialogOpen = (dialogType: string) => {
+    if (dialogType === "section") {
+      onSectionDialog(true);
+      onNoteDialog(false);
+    } else {
+      onSectionDialog(false);
+      onNoteDialog(true);
+    }
+    // Use a timeout to ensure the dialog is rendered before focusing
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0);
+  };
 
   // console.log(node.is)
   // Update selectNote to use the query results
@@ -153,7 +172,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
   };
 
   return (
-    <Dialog>
+    <Dialog modal={true}>
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div
@@ -227,8 +246,9 @@ const Node = ({ node, style, dragHandle, tree }) => {
           <DialogTrigger asChild>
             <ContextMenuItem
               onSelect={(e) => {
-                onNoteDialog(false);
-                onSectionDialog(true);
+                // onNoteDialog(false);
+                // onSectionDialog(true);
+                handleDialogOpen("section");
                 e.preventDefault();
               }}
             >
@@ -238,8 +258,9 @@ const Node = ({ node, style, dragHandle, tree }) => {
           <DialogTrigger asChild>
             <ContextMenuItem
               onSelect={(e) => {
-                onSectionDialog(false);
-                onNoteDialog(true);
+                handleDialogOpen("note");
+                // onSectionDialog(false);
+                // onNoteDialog(true);
                 e.preventDefault();
               }}
             >
@@ -248,11 +269,15 @@ const Node = ({ node, style, dragHandle, tree }) => {
           </DialogTrigger>
         </ContextMenuContent>
         {sectionDialog && (
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent
+            className="sm:max-w-[425px]"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
             <DialogHeader>
               <DialogTitle>New Section</DialogTitle>
               <DialogDescription>
-                Organise your toughts and ideas.
+                Organise your thoughts and ideas.
               </DialogDescription>
             </DialogHeader>
             <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
@@ -262,16 +287,25 @@ const Node = ({ node, style, dragHandle, tree }) => {
                 id="name"
                 placeholder="new section"
                 onChange={(e) => setSectionName(e.target.value)}
+                ref={inputRef}
               />
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="secondary">Cancel</Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => onSectionDialog(false)}
+                >
+                  Cancel
+                </Button>
               </DialogClose>
               <DialogClose asChild>
                 <Button
                   type="submit"
-                  // onClick={notebookDialogHandler}
+                  onClick={() => {
+                    newSectionFromSection();
+                    onSectionDialog(false);
+                  }}
                 >
                   Create
                 </Button>
@@ -280,7 +314,11 @@ const Node = ({ node, style, dragHandle, tree }) => {
           </DialogContent>
         )}
         {noteDialog && (
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent
+            className="sm:max-w-[425px]"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
             <DialogHeader>
               <DialogTitle>New note</DialogTitle>
               <DialogDescription>A clean slate.</DialogDescription>
