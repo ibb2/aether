@@ -73,52 +73,60 @@ export const Sidebar = memo(
     // Make treeview data
     const convertToTreeStructure = (data) => {
       const allItems = [...data.notebooks, ...data.sections, ...data.notes];
+      const itemMap = new Map(
+        allItems.map((item) => [item.id, { ...item, children: [] }]),
+      );
 
-      const findChildren = (parentId) => {
-        return allItems
-          .filter(
-            (item) =>
+      const findChildren = (parentId, notebookId) => {
+        return allItems.filter((item) => {
+          if (item.type === "note") {
+            return (
+              item.sectionId === parentId ||
+              (item.notebookId === parentId && !item.sectionId)
+            );
+          } else {
+            return (
               item.parentId === parentId ||
-              (item.notebookId === parentId && item.sectionId === null),
-          )
-          .map(processItem)
-          .filter(Boolean);
+              (item.notebookId === notebookId && !item.parentId)
+            );
+          }
+        });
       };
 
       const processItem = (item) => {
-        const children = findChildren(item.id);
+        const children = findChildren(item.id, item.id).map(processItem);
         const result = {
           id: item.id,
-          name: item.name || "[Unnamed]",
+          name: item.name || item.title || "[Unnamed]",
           type: item.type,
           notebookId: item.notebookId,
+          parentId: item.parentId,
         };
-
         if (children.length > 0) {
           result.children = children;
         }
-
         return result;
       };
 
-      return data.notebooks.map(processItem);
+      // Process only notebooks at the top level
+      const tree = data.notebooks.map(processItem);
+
+      return tree;
     };
 
-    const transformData = React.useCallback((notebooks, sections, notes) => {
+    const transformData = (notebooks, sections, notes) => {
       const normalizedData = {
         notebooks: notebooks.rows.map((notebook) => ({
           id: notebook.id,
           name: notebook.title,
           type: "notebook",
-          children: [],
         })),
         sections: sections.rows.map((section) => ({
           id: section.id,
           name: section.title,
           type: "section",
           notebookId: section.notebookId,
-          parentId: section.notebookId || null,
-          children: [],
+          parentId: section.parentId,
         })),
         notes: notes.rows.map((note) => ({
           id: note.id,
@@ -126,23 +134,21 @@ export const Sidebar = memo(
           type: "note",
           notebookId: note.notebookId,
           sectionId: note.sectionId,
-          parentId: note.sectionId || note.notebookId,
         })),
       };
 
-      const treeStructure = convertToTreeStructure(normalizedData);
-      return treeStructure;
-    }, []); // Empty dependency array as convertToTreeStructure is defined inside the component
+      return normalizedData;
+    };
 
     React.useEffect(() => {
       const getData = async () => {
         const transformedData = transformData(notebooks, sections, notes);
-        setTreeData(transformedData);
-        // console.log("State", treeData);
+        const treeStructure = convertToTreeStructure(transformedData);
+        setTreeData(treeStructure);
       };
 
       getData();
-    }, [notebooks, sections, notes, transformData]);
+    }, [notebooks, sections, notes]);
 
     const handlePotentialClose = useCallback(() => {
       if (window.innerWidth < 1024) {

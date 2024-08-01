@@ -84,7 +84,7 @@ export type NotebooksTable = typeof NotebooksTable.Type;
 export const SectionsTable = table({
   id: SectionId,
   title: NonEmptyString1000,
-  notebookId: NotebookId,
+  notebookId: S.NullOr(NotebookId),
   notesId: S.NullOr(S.Array(NoteId)),
   userId: S.NullOr(UserId),
   parentId: S.NullOr(SectionId),

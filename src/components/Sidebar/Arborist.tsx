@@ -16,7 +16,7 @@ import {
 import { NonEmptyString50, NotebookId, NoteId, SectionId } from "@/db/schema";
 import { Database, evolu } from "@/db/db";
 import React from "react";
-import { NonEmptyString1000, useEvolu, useQuery } from "@evolu/react";
+import { NonEmptyString1000, String, useEvolu, useQuery } from "@evolu/react";
 import useNoteStore from "@/store/note";
 import useStateStore from "@/store/state";
 import { Button } from "../ui/Button";
@@ -24,6 +24,7 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import {
@@ -38,6 +39,7 @@ import {
 } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { initialContent } from "@/lib/data/initialContent";
 
 const Node = ({ node, style, dragHandle, tree }) => {
   /* This node instance can do many things. See the API reference. */
@@ -126,37 +128,58 @@ const Node = ({ node, style, dragHandle, tree }) => {
   const newSection = () => {
     // For creating sections
 
-    if (tree.prevNode === null) {
+    if (node.level === 0) {
       // Create a new section from notebook
       const { id: sectionId } = create("sections", {
         title: S.decodeSync(NonEmptyString1000)(sectionName),
         notebookId: S.decodeSync(NotebookId)(node.id),
+        isFolder: true,
+        isSection: true,
       });
     } else {
       // Create a new section from a section
+      console.log(tree.prevNode);
+      console.log(node.id);
+      console.log(S.decodeSync(SectionId)(node.id));
+      console.log("hey", node.data);
+
       const { id: sectionId } = create("sections", {
         title: S.decodeSync(NonEmptyString1000)(sectionName),
-        parentId: S.decodeSync(SectionId)(tree.prevNode.id),
-        notebookId: S.decodeSync(NotebookId)(node.prevNode.data.notebookId),
+        parentId: S.decodeSync(SectionId)(node.id),
+        notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
+        isFolder: true,
+        isSection: true,
       });
 
-      const prevChildrenIds = tree.prevNode.data.children
-        .filter((node) => node.type === "section")
-        .map((node) => node.id);
+      // Update the parent section to include the new child section
+      const parentSection = tree.get(node.id);
+      if (parentSection) {
+        const updatedChildren = [
+          ...(parentSection.data.children || []),
+          { id: sectionId, type: "section" },
+        ];
+        update("sections", {
+          id: S.decodeSync(SectionId)(node.id),
+          childrenId: updatedChildren.map((child) => child.id),
+        });
 
-      const { id: updatedSectionId } = update("sections", {
-        id: S.decodeSync(SectionId)(tree.prevNode.id),
-        childrenId: [...prevChildrenIds, sectionId],
-      });
+        // Update the tree structure
+        tree.edit(node.id, {
+          ...parentSection.data,
+          children: updatedChildren,
+        });
+      }
     }
-    // console.log(tree.prevNode);
-    // console.log(tree.firstNode());
+
+    // Clear the input and close the dialog
+    setSectionName("");
+    onSectionDialog(false);
   };
 
   const newNote = () => {
     // For creating note
 
-    if (tree.prevNode === null) {
+    if (node.level === 0) {
       // from a notebook (root)
       const { id: noteId } = create("notes", {
         title: S.decodeSync(NonEmptyString1000)(noteName),
@@ -166,26 +189,42 @@ const Node = ({ node, style, dragHandle, tree }) => {
       // from a section (folder)
       const { id: noteId } = create("notes", {
         title: S.decodeSync(NonEmptyString1000)(noteName),
-        notebookId: S.decodeSync(NotebookId)(
-          tree.prevNode.data.children[0].notebookId,
-        ),
-        sectionId: S.decodeSync(SectionId)(tree.prevNode.id),
+        notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
+        sectionId: S.decodeSync(SectionId)(node.id),
       });
 
-      const prevChildrenIds = tree.prevNode.data.children
+      const prevChildrenIds = node.data.children
         .filter((node) => node.type === "note")
-        .map((node) => node.id);
+        .map((node) => S.decodeSync(NoteId)(node.id));
 
-      const { id: updatedSectionId } = update("sections", {
-        id: S.decodeSync(SectionId)(tree.prevNode.id),
-        notebookId: S.decodeSync(NotebookId)(
-          tree.prevNode.data.children[0].notebookId,
-        ),
+      update("sections", {
+        id: S.decodeSync(SectionId)(node.id),
+        notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
         notesId: [...prevChildrenIds, noteId],
+      });
+
+      create("exportedData", {
+        noteId,
+        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
+        jsonData: initialContent,
       });
     }
 
     console.log(tree.prevNode);
+  };
+
+  const deleteNode = () => {
+    if (node.level !== 0) {
+      if (node.data.type === "section") {
+        update("sections", {
+          id: S.decodeSync(SectionId)(node.id),
+          isDeleted: true,
+        });
+      }
+      if (node.data.type === "note") {
+        update("notes", { id: S.decodeSync(NoteId)(node.id), isDeleted: true });
+      }
+    }
   };
 
   return (
@@ -216,7 +255,9 @@ const Node = ({ node, style, dragHandle, tree }) => {
               // onClick={() => node.isInternal && node.toggle()}
             >
               <div className="flex">
-                {!node.isLeaf && node.level === 0 && (
+                {tree.root.children
+                  .map((node) => node.id)
+                  .includes(node.id) && (
                   <>
                     <NotebookTabs />
                   </>
@@ -263,8 +304,6 @@ const Node = ({ node, style, dragHandle, tree }) => {
           <DialogTrigger asChild>
             <ContextMenuItem
               onSelect={(e) => {
-                // onNoteDialog(false);
-                // onSectionDialog(true);
                 handleDialogOpen("section");
                 e.preventDefault();
               }}
@@ -276,12 +315,21 @@ const Node = ({ node, style, dragHandle, tree }) => {
             <ContextMenuItem
               onSelect={(e) => {
                 handleDialogOpen("note");
-                // onSectionDialog(false);
-                // onNoteDialog(true);
                 e.preventDefault();
               }}
             >
               <span>New Note</span>
+            </ContextMenuItem>
+          </DialogTrigger>
+          <ContextMenuSeparator />
+          <DialogTrigger asChild>
+            <ContextMenuItem
+              onSelect={(e) => {
+                deleteNode();
+                e.preventDefault();
+              }}
+            >
+              <span>Delete</span>
             </ContextMenuItem>
           </DialogTrigger>
         </ContextMenuContent>
