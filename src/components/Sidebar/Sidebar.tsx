@@ -70,6 +70,13 @@ export const Sidebar = memo(
     // State
     const [treeData, setTreeData] = React.useState();
 
+    // React Arborist
+    /* Handle the data modifications outside the tree component */
+    const onCreate = ({ parentId, index, type }) => {};
+    const onRename = ({ id, name }) => {};
+    const onMove = ({ dragIds, parentId, index }) => {};
+    const onDelete = ({ ids }) => {};
+
     // Make treeview data
     const convertToTreeStructure = (data) => {
       const allItems = [...data.notebooks, ...data.sections, ...data.notes];
@@ -200,9 +207,14 @@ export const Sidebar = memo(
               <Tree
                 width={width}
                 ref={treeRef}
-                initialData={treeData}
+                // initialData={treeData}
+                data={treeData}
                 rowHeight={40}
                 openByDefault={false}
+                onCreate={onCreate}
+                onRename={onRename}
+                onMove={onMove}
+                onDelete={onDelete}
               >
                 {Node}
               </Tree>
