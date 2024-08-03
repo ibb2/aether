@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ArrowLeft, EyeOff, User } from "lucide-react";
+import { ArrowLeft, Brush, EyeOff, User } from "lucide-react";
 import Link from "next/link";
 import "react-complex-tree/lib/style-modern.css";
 import { Button } from "../ui/Button";
@@ -38,6 +38,16 @@ export const SettingsSidebar = () => {
                 <Link href="#" className="w-full gap-2">
                   <User />
                   Account
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start items-center"
+                asChild
+              >
+                <Link href="#" className="w-full gap-2">
+                  <Brush />
+                  Personalisation
                 </Link>
               </Button>
               <Button
