@@ -10,12 +10,16 @@ import { NoteDialog } from "../dialogs/note";
 import { Button } from "../ui/Button";
 import {
   ArrowDown,
+  ArrowLeft,
   ChevronDown,
+  ChevronLeft,
+  EyeOff,
   MoveDown,
   Plus,
   Settings,
   SquarePen,
   Trash2,
+  User,
 } from "lucide-react";
 import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
@@ -42,7 +46,7 @@ import {
 import "react-complex-tree/lib/style-modern.css";
 import useResizeObserver from "use-resize-observer";
 
-export const Sidebar = memo(
+export const SettingsSidebar = memo(
   ({
     editor,
     isOpen,
@@ -179,60 +183,37 @@ export const Sidebar = memo(
             <div>
               <div className="flex h-14 items-center border-b mb-3">
                 <Link
-                  href="/"
+                  href="/app"
                   className="flex items-center gap-2 font-semibold"
                   onClick={(e) => e.preventDefault()}
                 >
-                  {/* <Package2 className="h-6 w-6" /> */}
-                  <span>Aether notes</span>
+                  <ArrowLeft className="h-6 w-6" />
+                  <span>Settings</span>
                 </Link>
-                {/* <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
-                <Bell className="h-4 w-4" />
-                <span className="sr-only">Toggle notifications</span>
-              </Button> */}
-                <NotebookDialog>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="ml-auto h-8 w-8"
-                  >
-                    <SquarePen className="h-4 w-4" />
-                    <span className="sr-only">Add new notebook</span>
-                  </Button>
-                </NotebookDialog>
               </div>
 
-              <nav className="grid items-start text-sm font-medium">
-                <span className="mb-2 text-zinc-400 text-sm justify-between">
-                  NOTEBOOKS
-                </span>
-                <Tree
-                  width={width}
-                  ref={treeRef}
-                  // initialData={treeData}
-                  data={treeData}
-                  rowHeight={40}
-                  openByDefault={false}
-                  onCreate={onCreate}
-                  onRename={onRename}
-                  onMove={onMove}
-                  onDelete={onDelete}
-                >
-                  {Node}
-                </Tree>
-              </nav>
-            </div>
-            <div>
-              <Link href={"/settings"}>
+              <nav className="grid items-start font-medium">
                 <Button
-                  variant="secondary"
-                  size="sm"
-                  className="mb-2 text-zinc-400 text-sm w-full text-left justify-start gap-x-2"
+                  variant="ghost"
+                  className="w-full justify-start items-center"
+                  asChild
                 >
-                  <Settings />
-                  Settings
+                  <Link href="#" className="w-full gap-2">
+                    <User />
+                    Account
+                  </Link>
                 </Button>
-              </Link>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start items-center"
+                  asChild
+                >
+                  <Link href="#" className="w-full gap-2">
+                    <EyeOff />
+                    Privacy
+                  </Link>
+                </Button>
+              </nav>
             </div>
           </div>
         </div>
@@ -241,4 +222,4 @@ export const Sidebar = memo(
   },
 );
 
-Sidebar.displayName = "TableOfContentSidepanel";
+SettingsSidebar.displayName = "SettingsTableOfContentSidepanel";

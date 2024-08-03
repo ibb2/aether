@@ -69,7 +69,12 @@ export default function CopySecret() {
             defaultValue={mnemonic}
             onChange={(e) => setMnemonic(e.target.value)}
           />
-          <Button onClick={copyToClipboard} className="max-w-15">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={copyToClipboard}
+            className="max-w-15"
+          >
             {copied ? <Check className="text-white" /> : <Clipboard />}
           </Button>
           {/* <Button variant="secondary" onClick={updateMnemonic}>
