@@ -185,6 +185,12 @@ const Node = ({ node, style, dragHandle, tree }) => {
         title: S.decodeSync(NonEmptyString1000)(noteName),
         notebookId: S.decodeSync(NotebookId)(node.id),
       });
+
+      create("exportedData", {
+        noteId,
+        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
+        jsonData: initialContent,
+      });
     } else {
       // from a section (folder)
       const { id: noteId } = create("notes", {
@@ -199,7 +205,6 @@ const Node = ({ node, style, dragHandle, tree }) => {
 
       update("sections", {
         id: S.decodeSync(SectionId)(node.id),
-        notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
         notesId: [...prevChildrenIds, noteId],
       });
 
@@ -239,7 +244,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
             style={style}
             ref={dragHandle}
             onClick={() => {
-              if (node.isLeaf && !(node.data.type === "section")) {
+              if (node.isLeaf && node.data.type === "note") {
                 selectNote();
               } else {
                 node.isInternal && node.toggle();
