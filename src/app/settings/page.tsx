@@ -44,6 +44,26 @@ import { evolu } from "@/db/db";
 export default function Settings() {
   const router = useRouter();
 
+  const [saving, setSaving] = React.useState(false);
+
+  const uint8ArrayToBlob = (uint8Array: Uint8Array) => {
+    // SQLite files should use 'application/x-sqlite3' MIME type
+    return new Blob([uint8Array], { type: "application/x-sqlite3" });
+  };
+
+  const download = async () => {
+    const data = await evolu.exportDatabase();
+    const blob = uint8ArrayToBlob(data);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = "aether.sqlite3";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   const nuke = () => {
     evolu.resetOwner({ reload: true });
     // router.push("/app");
@@ -92,6 +112,26 @@ export default function Settings() {
                       >
                         This is what allows you to sync your encrypted notes, DO
                         NOT SHARE.
+                      </label>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <h1>Danger</h1>
+                    <Label htmlFor="mnemonic">Export:</Label>
+                    <Button
+                      // variant="primary"
+                      className="max-w-max"
+                      onClick={download}
+                    >
+                      Export Database
+                    </Button>
+                    <div className="flex items-center space-x-2">
+                      {/* <Checkbox id="include" defaultChecked /> */}
+                      <label
+                        htmlFor="include"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Downloads the entire database.
                       </label>
                     </div>
                   </div>
