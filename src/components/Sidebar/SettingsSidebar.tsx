@@ -185,7 +185,6 @@ export const SettingsSidebar = memo(
                 <Link
                   href="/app"
                   className="flex items-center gap-2 font-semibold"
-                  onClick={(e) => e.preventDefault()}
                 >
                   <ArrowLeft className="h-6 w-6" />
                   <span>Settings</span>
