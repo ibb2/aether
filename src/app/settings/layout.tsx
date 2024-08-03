@@ -26,74 +26,19 @@ export default function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Refs
-  const menuContainerRef = React.useRef(null);
-  const panelRef = React.useRef<ImperativePanelHandle>(null);
-
-  const router = useRouter();
-
-  // Const
-  const MULTIPLE = 10.42553191;
-
-  // State
-  const [width, setWidth] = React.useState(
-    panelRef.current?.getSize() ?? 20 * MULTIPLE,
-  );
-
-  // Store
-  const { open, size, setOpen, adjustSize, setRef } = useSidebarStore(
-    (state) => ({
-      open: state.open,
-      size: state.size,
-      setOpen: state.setOpen,
-      adjustSize: state.adjustSize,
-      setRef: state.setRef,
-    }),
-  );
-
-  const { editor, canvasRef, setCanvasRef, setEditor } = useStateStore(
-    (state) => ({
-      editor: state.editor,
-      canvasRef: state.canvasRef,
-      setCanvasRef: state.setRef,
-      setEditor: state.setEditor,
-    }),
-  );
-
-  React.useEffect(() => {
-    setRef(panelRef);
-  }, [panelRef, setRef]);
-
   return (
     <EvoluProvider value={evolu}>
       <ResizablePanelGroup
         direction="horizontal"
         className="flex h-full align-self self-start"
-        ref={menuContainerRef}
       >
         {/* Include shared UI here e.g. a header or sidebar */}
-        {open && (
-          <ResizablePanel
-            defaultSize={20}
-            collapsible
-            maxSize={50}
-            onResize={(s) => {
-              adjustSize(s);
-              setWidth(s * MULTIPLE);
-            }}
-            ref={panelRef}
-          >
-            <SettingsSidebar
-              isOpen={open}
-              onClose={setOpen}
-              editor={editor!}
-              canvasRef={canvasRef.current}
-            />
-          </ResizablePanel>
-        )}
+        <ResizablePanel defaultSize={20} collapsible={false} maxSize={50}>
+          <SettingsSidebar />
+        </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel className="flex-1">
-          <section className="h-full">{children}</section>
+        <ResizablePanel className="flex-1" defaultSize={80}>
+          <div className="h-full">{children}</div>
         </ResizablePanel>
       </ResizablePanelGroup>
     </EvoluProvider>
