@@ -48,6 +48,7 @@ import {
   Redo,
   RefreshCcw,
   Settings,
+  Settings2,
   ToggleLeft,
   ToggleRight,
   Trash,
@@ -64,6 +65,9 @@ import { validateRequest } from "@/lib/auth/validateRequests";
 import { getUser } from "@/actions/auth/validate";
 import { logout } from "@/actions/auth/logout";
 import { ReactSketchCanvasRef } from "react-sketch-canvas";
+import { evolu } from "@/db/db";
+import { useQueries } from "@evolu/react";
+import useNoteStore from "@/store/note";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -93,6 +97,22 @@ export const EditorInfo = memo(
     const [session, setSession] = React.useState<any>(null);
     const [open, onOpen] = React.useState(false);
     const [animate, onAnimate] = React.useState(false);
+
+    const isInkEnabled = useNoteStore((state) => state.isInkEnabled);
+    const toggleInking = useNoteStore((state) => state.setInkStatus);
+
+    // const noteSettingsQuery = React.useCallback(
+    //   () => evolu.createQuery((db) => db.selectFrom("noteSettings").selectAll()),
+    //   [],
+    // );
+
+    // const [noteSettings] = useQueries([
+    //   noteSettingsQuery(),
+    // ])
+
+    // const disableInkForNote = () => {
+    //   const noteSetting = noteSettings.rows.find((row) => row.noteId === noteId);
+    // }
 
     const openSettings = () => {
       onAnimate(true);
@@ -132,9 +152,14 @@ export const EditorInfo = memo(
 
     const handleDisableCanvas = () => {
       if (canvasRef) {
-        setReadOnly(!readOnly);
+        toggleInking();
+        // setReadOnly(!isInkEnabled);
       }
     };
+
+    React.useEffect(() => {
+      setReadOnly(!isInkEnabled);
+    }, [isInkEnabled, setReadOnly]);
 
     React.useEffect(() => {
       async function setLoginState() {
@@ -356,7 +381,7 @@ export const EditorInfo = memo(
               size="icon"
               className="mr-2"
             >
-              {readOnly ? <ToggleRight /> : <ToggleLeft />}
+              {isInkEnabled ? <ToggleRight /> : <ToggleLeft />}
             </Button>
           </div>
         )}
@@ -378,34 +403,41 @@ export const EditorInfo = memo(
                     onClick={() => openSettings()}
                     className={cn(animate && "animate-spin")}
                   >
-                    <Settings />
+                    <Settings2 />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-72 p-2">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuContent className="p-2">
+                  <DropdownMenuLabel>Page Settings</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                  <DropdownMenuItem
+                    onClick={handleDisableCanvas}
+                    className="flex items-center justify-between px-2"
+                  >
+                    Ink
+                    {isInkEnabled ? <ToggleRight /> : <ToggleLeft />}
+                  </DropdownMenuItem>
+                  {/* <DropdownMenuGroup>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <LogIn className="mr-2 h-4 w-4" />
                       <Link href="/login">Login</Link>
-                    </DropdownMenuItem> */}
-                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <LogIn className="mr-2 h-4 w-4" />
                       <Link href="/signup">Sign up</Link>
-                    </DropdownMenuItem> */}
-                  </DropdownMenuGroup>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup> */}
                   <DropdownMenuGroup>
                     {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5 cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                       <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem> */}
-                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                       <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem> */}
-                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Billing</span>
                       <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>

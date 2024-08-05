@@ -16,7 +16,14 @@ import {
 import { NonEmptyString50, NotebookId, NoteId, SectionId } from "@/db/schema";
 import { Database, evolu } from "@/db/db";
 import React from "react";
-import { NonEmptyString1000, String, useEvolu, useQuery } from "@evolu/react";
+import {
+  cast,
+  NonEmptyString1000,
+  String,
+  useEvolu,
+  useQueries,
+  useQuery,
+} from "@evolu/react";
 import useNoteStore from "@/store/note";
 import useStateStore from "@/store/state";
 import { Button } from "../ui/Button";
@@ -57,6 +64,14 @@ const Node = ({ node, style, dragHandle, tree }) => {
   // Store
   const setNote = useNoteStore((state) => state.setNote);
 
+  const { isInkEnabled, isPageSplit, setInkStatus, setPageSplit } =
+    useNoteStore((state) => ({
+      isInkEnabled: state.isInkEnabled,
+      isPageSplit: state.isPageSplit,
+      setInkStatus: state.setInkStatus,
+      setPageSplit: state.setPageSplit,
+    }));
+
   const { editor, canvasRef } = useStateStore((state) => ({
     editor: state.editor,
     canvasRef: state.canvasRef.current,
@@ -75,8 +90,15 @@ const Node = ({ node, style, dragHandle, tree }) => {
       ),
     [],
   );
+  const noteSettingsQuery = React.useCallback(
+    () => evolu.createQuery((db) => db.selectFrom("noteSettings").selectAll()),
+    [],
+  );
 
-  const { rows: exportedDataRows } = useQuery(exportedDataQuery());
+  const [exportedDataRows, noteSettings] = useQueries([
+    exportedDataQuery(),
+    noteSettingsQuery(),
+  ]);
 
   const { create, update } = useEvolu<Database>();
 
@@ -100,7 +122,10 @@ const Node = ({ node, style, dragHandle, tree }) => {
   // Update selectNote to use the query results
   const selectNote = () => {
     const noteId = S.decodeSync(NoteId)(node.id);
-    const exportedData = exportedDataRows.find((row) => row.noteId === noteId);
+    const exportedData = exportedDataRows.rows.find(
+      (row) => row.noteId === noteId,
+    );
+    const noteSetting = noteSettings.rows.find((row) => row.noteId === noteId);
     console.log("JSON Data, ", exportedData?.jsonData);
     console.log("INK Data, ", exportedData?.inkData);
 
@@ -111,6 +136,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
         noteId,
         exportedData.id,
       );
+
       const ink = exportedData.inkData as unknown as CanvasPath[];
 
       if (canvasRef && exportedData.inkData) {
@@ -179,6 +205,8 @@ const Node = ({ node, style, dragHandle, tree }) => {
   const newNote = () => {
     // For creating note
 
+    let newNote: NoteId;
+
     if (node.level === 0) {
       // from a notebook (root)
       const { id: noteId } = create("notes", {
@@ -186,11 +214,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
         notebookId: S.decodeSync(NotebookId)(node.id),
       });
 
-      create("exportedData", {
-        noteId,
-        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
-        jsonData: initialContent,
-      });
+      newNote = noteId;
     } else {
       // from a section (folder)
       const { id: noteId } = create("notes", {
@@ -208,12 +232,21 @@ const Node = ({ node, style, dragHandle, tree }) => {
         notesId: [...prevChildrenIds, noteId],
       });
 
-      create("exportedData", {
-        noteId,
-        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
-        jsonData: initialContent,
-      });
+      newNote = noteId;
     }
+
+    create("exportedData", {
+      noteId: newNote,
+      jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
+      jsonData: initialContent,
+    });
+
+    create("noteSettings", {
+      noteId: newNote,
+      pageType: 1,
+      isInkEnabled: cast(true),
+      isSplitPage: cast(false),
+    });
 
     console.log(tree.prevNode);
   };

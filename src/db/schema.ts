@@ -24,6 +24,9 @@ export type SectionId = typeof SectionId.Type;
 export const NoteId = id("Note");
 export type NoteId = typeof NoteId.Type;
 
+export const NoteSettingId = id("NoteSetting");
+export type NoteSettingId = typeof NoteSettingId.Type;
+
 export const ExportedDataId = id("ExportedData");
 export type ExportedDataId = typeof ExportedDataId.Type;
 
@@ -60,6 +63,13 @@ export type CanvasPathArray = typeof CanvasPathArray.Type;
 export const NotesId = S.Array(String);
 
 export const SectionsId = S.Array(SectionId);
+
+// Enum for page types
+enum PageType {
+  "Default" = 1,
+  "Dotted",
+  "Grid",
+}
 
 // Tables
 export const UsersTable = table({
@@ -105,6 +115,15 @@ export const NotesTable = table({
   isNote: S.NullOr(SqliteBoolean),
 });
 export type NotesTable = typeof NotesTable.Type;
+
+export const NotesSettingsTable = table({
+  id: NoteSettingId,
+  noteId: NoteId,
+  pageType: S.Enums(PageType),
+  isInkEnabled: SqliteBoolean,
+  isPageSplit: SqliteBoolean,
+});
+export type NotesSettingsTable = typeof NotesSettingsTable.Type;
 
 export const ExportedDatasTable = table({
   id: ExportedDataId,

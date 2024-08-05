@@ -7,6 +7,8 @@ interface NoteState {
   name: string;
   data: {} | null;
   ink: any | null;
+  isInkEnabled: boolean;
+  isPageSplit: boolean;
   setNote: (
     data: {},
     name: string,
@@ -14,6 +16,8 @@ interface NoteState {
     id: string & Brand<"Id"> & Brand<"ExportedData">,
   ) => void;
   setInk: (data: any) => void;
+  setInkStatus: () => void;
+  setPageSplit: () => void;
 }
 
 const useNoteStore = create<NoteState>()((set) => ({
@@ -22,6 +26,8 @@ const useNoteStore = create<NoteState>()((set) => ({
   noteId: null,
   data: null,
   ink: null,
+  isInkEnabled: false,
+  isPageSplit: false,
   setNote: (
     data: {},
     name: string,
@@ -31,6 +37,14 @@ const useNoteStore = create<NoteState>()((set) => ({
   setInk: (data: any) =>
     set(() => ({
       ink: data,
+    })),
+  setInkStatus: () =>
+    set((state) => ({
+      isInkEnabled: !state.isInkEnabled,
+    })),
+  setPageSplit: () =>
+    set((state) => ({
+      isPageSplit: !state.isPageSplit,
     })),
 }));
 

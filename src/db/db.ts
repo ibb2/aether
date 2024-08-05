@@ -16,6 +16,8 @@ import {
   ExportedDatasTable,
   NonEmptyString50,
   NotebooksTable,
+  NoteSettingId,
+  NotesSettingsTable,
   NotesTable,
   SectionsTable,
   UsersTable,
@@ -30,6 +32,7 @@ const Database = database({
   notebooks: NotebooksTable,
   sections: SectionsTable,
   notes: NotesTable,
+  noteSettings: NotesSettingsTable,
   exportedData: ExportedDatasTable,
 });
 export type Database = typeof Database.Type;

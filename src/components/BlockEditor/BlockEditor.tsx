@@ -283,6 +283,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     }
   };
 
+  console.log("readonly", readOnly);
+
   return (
     // <div className="flex h-full align-self self-start">
     <div className="flex flex-col relative w-auto h-full border-0 overflow-hidden">
