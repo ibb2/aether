@@ -75,6 +75,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.32.0",
+    "framer-motion": "^11.3.22",
     "iframe-resizer": "^4.4.4",
     "jsonwebtoken": "^9.0.2",
     "lazy-brush": "^2.0.1",
