@@ -6,6 +6,7 @@
 import Link from "next/link";
 import { Button } from "./ui/Button";
 import { JSX, SVGProps } from "react";
+import { ChevronRight } from "lucide-react";
 
 export function TopNavbar() {
   return (
@@ -22,7 +23,14 @@ export function TopNavbar() {
               className="font-medium flex items-center text-sm transition-colors hover:underline"
               prefetch={false}
             >
-              Home
+              Features
+            </Link>
+            <Link
+              href="#"
+              className="font-medium flex items-center text-sm transition-colors hover:underline"
+              prefetch={false}
+            >
+              Pricing
             </Link>
             <Link
               href="#"
@@ -36,21 +44,16 @@ export function TopNavbar() {
               className="font-medium flex items-center text-sm transition-colors hover:underline"
               prefetch={false}
             >
-              Services
-            </Link>
-            <Link
-              href="#"
-              className="font-medium flex items-center text-sm transition-colors hover:underline"
-              prefetch={false}
-            >
               Contact
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm">
+            {/* <Button variant="outline" size="sm">
               Sign in
+            </Button> */}
+            <Button size="sm">
+              Get Started <ChevronRight />
             </Button>
-            <Button size="sm">Sign up</Button>
           </div>
         </div>
       </div>
