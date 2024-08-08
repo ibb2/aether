@@ -1,3 +1,5 @@
+import { BentoFeatures } from "@/components/landing/FeatureOne";
+import { Action } from "@/components/landing/FeatureTwo";
 import Hero from "@/components/landing/hero";
 import HeroImage from "@/components/landing/image";
 import BoxReveal from "@/components/magicui/box-reveal";
@@ -7,15 +9,17 @@ import { cn } from "@/lib/utils";
 
 export default function Homepage() {
   return (
-    <div className="flex flex-col items-center justify-center pt-16">
+    <div className="flex flex-col items-center justify-center py-16">
       <TopNavbar />
       <DotPattern
         className={cn(
-          "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+          "[mask-image:radial-gradient(700px_circle_at_center,white,transparent)]",
         )}
       />
       <Hero />
       <HeroImage />
+      <BentoFeatures />
+      <Action />
     </div>
   );
 }

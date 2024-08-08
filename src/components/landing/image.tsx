@@ -1,3 +1,5 @@
+"use client";
+
 import BoxReveal from "@/components/magicui/box-reveal";
 import DotPattern from "@/components/magicui/dot-pattern";
 import { TopNavbar } from "@/components/top-navbar";
@@ -17,12 +19,12 @@ import {
 import { AspectRatio } from "../ui/aspect-ratio";
 
 export default function HeroImage() {
-  // const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="flex relative h-lvh w-[80rem] items-center justify-center mt-16">
       <Image
-        src="/hero/app-light.jpeg"
+        src={theme === "light" ? "/hero/app-light.jpeg" : "/hero/app.jpeg"}
         alt="image"
         fill
         className="object-contain object-left-top absolute rounded-lg inset-0 "
