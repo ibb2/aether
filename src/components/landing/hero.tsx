@@ -3,10 +3,11 @@ import DotPattern from "@/components/magicui/dot-pattern";
 import { TopNavbar } from "@/components/top-navbar";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import HeroImage from "./image";
 
 export default function Hero() {
   return (
-    <div className="h-full w-full max-w-[32rem] items-center justify-center overflow-hidden pt-8">
+    <div className="h-full w-full max-w-[32rem] items-center justify-center overflow-hidden pt-16">
       <BoxReveal boxColor={"#5046e6"} duration={0.5}>
         <p className="text-[3.5rem] font-semibold">
           Magic UI<span className="text-[#5046e6]">.</span>
