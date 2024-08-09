@@ -26,7 +26,7 @@ export function TopNavbar() {
               Features
             </Link>
             <Link
-              href="#"
+              href="/pricing"
               className="font-medium flex items-center text-sm transition-colors hover:underline"
               prefetch={false}
             >
