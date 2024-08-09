@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import HeroImage from "./image";
 import { useTheme } from "next-themes";
 import TypingAnimation from "../magicui/typing-animation";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -45,7 +46,9 @@ export default function Hero() {
       </BoxReveal>
 
       <BoxReveal boxColor={"#5046e6"} duration={0.5}>
-        <Button className="mt-[1.6rem] bg-[#5046e6]">Get Started</Button>
+        <Button className="mt-[1.6rem] bg-[#5046e6]" asChild>
+          <Link href="/app">Get Started</Link>
+        </Button>
       </BoxReveal>
     </div>
   );

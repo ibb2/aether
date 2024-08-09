@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import TypingAnimation from "../magicui/typing-animation";
 import { Button } from "../ui/Button";
+import Link from "next/link";
 
 const features = [
   {
@@ -72,7 +73,9 @@ export async function Action() {
         Unleash your creativity, secure your data, and work seamlessly across
         all your devices
       </p>
-      <Button className="w-72 mt-8">Get started now.</Button>
+      <Button className="w-72 mt-8">
+        <Link href="/app">Get started now.</Link>
+      </Button>
     </div>
   );
 }
