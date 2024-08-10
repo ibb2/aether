@@ -15,7 +15,7 @@ export function TopNavbar() {
         <div className="flex justify-between h-14 items-center">
           <Link href="/" className="flex items-center" prefetch={false}>
             <Cloud className="h-6 w-6" />
-            <span className="sr-only">Aether</span>
+            <span className="pl-2">Aether</span>
           </Link>
           <nav className="hidden md:flex gap-4">
             <Link
@@ -48,9 +48,9 @@ export function TopNavbar() {
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            {/* <Button variant="outline" size="sm">
-              Sign in
-            </Button> */}
+            <Button variant="outline" size="sm">
+              Go to app
+            </Button>
             <Button size="sm" asChild>
               <Link href="/app">
                 Get Started <ChevronRight />
