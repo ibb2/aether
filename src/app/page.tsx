@@ -5,9 +5,7 @@ import HeroImage from "@/components/landing/image";
 import BoxReveal from "@/components/magicui/box-reveal";
 import DotPattern from "@/components/magicui/dot-pattern";
 import { TopNavbar } from "@/components/top-navbar";
-import { evolu } from "@/db/db";
 import { cn } from "@/lib/utils";
-import { EvoluProvider } from "@evolu/react";
 
 export default function Homepage() {
   return (
