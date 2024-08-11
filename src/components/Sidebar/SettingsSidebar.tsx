@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Brush, EyeOff, User } from "lucide-react";
 import Link from "next/link";
-import "react-complex-tree/lib/style-modern.css";
 import { Button } from "../ui/Button";
 
 export const SettingsSidebar = () => {

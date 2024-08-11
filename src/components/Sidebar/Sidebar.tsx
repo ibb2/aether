@@ -1,45 +1,16 @@
-import * as S from "@effect/schema/Schema";
 import { cn } from "@/lib/utils";
 import { memo, useCallback } from "react";
 import { Editor } from "@tiptap/react";
-import { TableOfContents } from "../TableOfContents";
 import { NotebookDialog } from "../dialogs/notebook";
-import { useEvolu, useQueries, useQuery, String } from "@evolu/react";
+import { useQueries } from "@evolu/react";
 import { notebooksQuery, notesQuery, sectionsQuery } from "@/db/queries";
-import { NoteDialog } from "../dialogs/note";
 import { Button } from "../ui/Button";
-import {
-  ArrowDown,
-  ChevronDown,
-  MoveDown,
-  Plus,
-  Settings,
-  SquarePen,
-  Trash2,
-} from "lucide-react";
-import { evolu, type Database } from "@/db/db";
-import useNoteStore from "@/store/note";
-import { Brand } from "effect/Brand";
-import { NonEmptyString50, NoteId } from "@/db/schema";
+import { Settings, SquarePen } from "lucide-react";
 import React from "react";
 import Link from "next/link";
-import TreeMenu from "../Recursive/TreeMenu";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import { SectionDialog } from "../dialogs/section";
-import useNoteDialogStore from "@/store/note-dialog";
-import { ReactSketchCanvasRef, CanvasPath } from "react-sketch-canvas";
+import { ReactSketchCanvasRef } from "react-sketch-canvas";
 import { Tree } from "react-arborist";
 import Node from "@/components/Sidebar/Arborist";
-import {
-  StaticTreeDataProvider,
-  UncontrolledTreeEnvironment,
-} from "react-complex-tree";
-import "react-complex-tree/lib/style-modern.css";
 import useResizeObserver from "use-resize-observer";
 
 export const Sidebar = memo(

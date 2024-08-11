@@ -60,10 +60,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import { lucia } from "@/lib/auth";
-import { validateRequest } from "@/lib/auth/validateRequests";
-import { getUser } from "@/actions/auth/validate";
-import { logout } from "@/actions/auth/logout";
 import { ReactSketchCanvasRef } from "react-sketch-canvas";
 import { evolu } from "@/db/db";
 import { useQueries } from "@evolu/react";
@@ -93,7 +89,6 @@ export const EditorInfo = memo(
     const [showActivityBar, setShowActivityBar] =
       React.useState<Checked>(false);
     const [showPanel, setShowPanel] = React.useState<Checked>(false);
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
     const [session, setSession] = React.useState<any>(null);
     const [open, onOpen] = React.useState(false);
     const [animate, onAnimate] = React.useState(false);
@@ -161,22 +156,6 @@ export const EditorInfo = memo(
       setReadOnly(!isInkEnabled);
     }, [isInkEnabled, setReadOnly]);
 
-    React.useEffect(() => {
-      async function setLoginState() {
-        const { user, session } = await getUser();
-
-        if (user !== null) {
-          setIsLoggedIn(true);
-          setSession(session);
-        } else {
-          setIsLoggedIn(false);
-          setSession(null);
-        }
-      }
-
-      setLoginState();
-    }, [isLoggedIn, session]);
-
     const customClass = cn(
       "flex z-10",
       open && "justify-between",
@@ -232,119 +211,6 @@ export const EditorInfo = memo(
         </div>
       )} */}
 
-        {/* {isLoggedIn && (
-          <div className="flex">
-            <div className="relative flex flex-row items-center ml-3 ">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-72 p-2">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                      <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      <span>Billing</span>
-                      <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                      <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                      <Keyboard className="mr-2 h-4 w-4" />
-                      <span>Keyboard shortcuts</span>
-                      <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                      <Users className="mr-2 h-4 w-4" />
-                      <span>Team</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="flex items-center px-1.5 py-0.5">
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        <span>Invite users</span>
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent className="mr-3 p-2">
-                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                            <Mail className="mr-2 h-4 w-4" />
-                            <span>Email</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                            <MessageSquare className="mr-2 h-4 w-4" />
-                            <span>Message</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            <span>More...</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                      <Plus className="mr-2 h-4 w-4" />
-                      <span>New Team</span>
-                      <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                    <Github className="mr-2 h-4 w-4" />
-                    <span>GitHub</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                    <LifeBuoy className="mr-2 h-4 w-4" />
-                    <span>Support</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex items-center px-1.5 py-0.5"
-                    disabled
-                  >
-                    <Cloud className="mr-2 h-4 w-4" />
-                    <span>API</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="flex items-center px-1.5 py-0.5"
-                    onClick={() => {
-                      logout(session);
-                      setSession(null);
-                    }}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        )}
-        {!isLoggedIn && (
-          <div>
-            <Link href="/login" className="mr-2">
-              <Button variant="outline">Login</Button>
-            </Link>
-            <Link href="/signup">
-              <Button>Sign up</Button>
-            </Link>
-          </div>
-        )} */}
         {open && (
           <div className="flex flex-row gap-2 justify-between pr-4 mr-4 text-right duration-300 transition-all">
             {/* <div className="d-flex gap-2 align-items-center "> */}
@@ -507,19 +373,6 @@ export const EditorInfo = memo(
                     <span>API</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator /> */}
-                  {isLoggedIn && (
-                    <DropdownMenuItem
-                      className="flex items-center px-1.5 py-0.5"
-                      onClick={() => {
-                        logout(session);
-                        setSession(null);
-                      }}
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
