@@ -272,7 +272,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
           <div
             className={cn(
               "node-container",
-              "flex py-2 w-full justify-between rounded-md hover:bg-zinc-100",
+              "flex py-2 w-full justify-between rounded-md hover:bg-slate-100 dark:hover:bg-slate-900",
             )}
             style={style}
             ref={dragHandle}
