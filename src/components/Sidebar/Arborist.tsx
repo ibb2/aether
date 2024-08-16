@@ -47,6 +47,15 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { initialContent } from "@/lib/data/initialContent";
+import { ComboboxDemo } from "../dialogs/Combobox/sections";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { sectionsQuery } from "@/db/queries";
 
 const Node = ({ node, style, dragHandle, tree }) => {
   /* This node instance can do many things. See the API reference. */
@@ -95,10 +104,13 @@ const Node = ({ node, style, dragHandle, tree }) => {
     [],
   );
 
-  const [exportedDataRows, noteSettings] = useQueries([
+  const [exportedDataRows, noteSettings, sections] = useQueries([
     exportedDataQuery(),
     noteSettingsQuery(),
+    sectionsQuery,
   ]);
+
+  const [selectedSection, setSelectedSection] = React.useState(node.id);
 
   const { create, update } = useEvolu<Database>();
 
@@ -220,7 +232,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
       const { id: noteId } = create("notes", {
         title: S.decodeSync(NonEmptyString1000)(noteName),
         notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
-        sectionId: S.decodeSync(SectionId)(node.id),
+        sectionId: S.decodeSync(SectionId)(selectedSection),
       });
 
       const prevChildrenIds = node.data.children
@@ -228,7 +240,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
         .map((node) => S.decodeSync(NoteId)(node.id));
 
       update("sections", {
-        id: S.decodeSync(SectionId)(node.id),
+        id: S.decodeSync(SectionId)(selectedSection),
         notesId: [...prevChildrenIds, noteId],
       });
 
@@ -266,7 +278,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
   };
 
   return (
-    <Dialog modal={true}>
+    <Dialog>
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div
@@ -438,6 +450,32 @@ const Node = ({ node, style, dragHandle, tree }) => {
                 />
               </div>
             </div>
+            {node.level > 0 && (
+              <div className="grid w-full max-w-sm items-center gap-1.5 pt-2.5">
+                <Select
+                  value={S.decodeSync(String)(selectedSection)}
+                  onValueChange={(value) => {
+                    setSelectedSection(S.decodeSync(SectionId)(value));
+                    console.info("Changed value", value);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={sections.rows[0].title} />
+                  </SelectTrigger>
+                  <SelectContent id="notebooks" className="w-full">
+                    {sections.rows.map((section, index) => (
+                      <SelectItem
+                        value={section.id}
+                        key={index}
+                        className="w-full"
+                      >
+                        {section.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="secondary" onClick={() => onNoteDialog(false)}>
