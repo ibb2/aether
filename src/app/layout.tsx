@@ -30,8 +30,10 @@ export default function RootLayout({
               (inter.className, "flex min-h-svh items-center justify-center")
             }
           >
-            <PostHogPageView />
-            {children}
+            <Suspense>
+              <PostHogPageView />
+              {children}
+            </Suspense>
           </body>
         </PHProvider>
       </ThemeProvider>
