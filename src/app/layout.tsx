@@ -23,20 +23,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="min-h-svh" suppressHydrationWarning>
-      <Suspense>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <PHProvider>
-            <body
-              className={
-                (inter.className, "flex min-h-svh items-center justify-center")
-              }
-            >
-              <PostHogPageView />
-              {children}
-            </body>
-          </PHProvider>
-        </ThemeProvider>
-      </Suspense>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <PHProvider>
+          <body
+            className={
+              (inter.className, "flex min-h-svh items-center justify-center")
+            }
+          >
+            <PostHogPageView />
+            {children}
+          </body>
+        </PHProvider>
+      </ThemeProvider>
     </html>
   );
 }

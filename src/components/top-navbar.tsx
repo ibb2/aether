@@ -51,7 +51,7 @@ export function TopNavbar() {
             {/* <Button variant="outline" size="sm">
               Sign in
             </Button> */}
-            <Button size="sm" asChild>
+            <Button asChild>
               <Link href="/app">
                 Get Started <ChevronRight />
               </Link>
