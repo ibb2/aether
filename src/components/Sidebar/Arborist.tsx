@@ -142,12 +142,12 @@ const Node = ({ node, style, dragHandle, tree }) => {
     console.log("INK Data, ", exportedData?.inkData);
 
     if (exportedData) {
-      setNote(
-        exportedData.jsonData!,
-        S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
-        noteId,
-        exportedData.id,
-      );
+      // setNote(
+      //   exportedData.jsonData!,
+      //   S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
+      //   noteId,
+      //   exportedData.id,
+      // );
 
       const ink = exportedData.inkData as unknown as CanvasPath[];
 
@@ -257,7 +257,7 @@ const Node = ({ node, style, dragHandle, tree }) => {
       noteId: newNote,
       pageType: 1,
       isInkEnabled: cast(true),
-      isSplitPage: cast(false),
+      isPageSplit: cast(false),
     });
 
     console.log(tree.prevNode);
@@ -484,7 +484,6 @@ const Node = ({ node, style, dragHandle, tree }) => {
               </DialogClose>
               <DialogClose asChild>
                 <Button
-                  type="submit"
                   onClick={() => {
                     newNote();
                     onNoteDialog(false);
