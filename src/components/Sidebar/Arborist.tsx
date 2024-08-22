@@ -142,12 +142,12 @@ const Node = ({ node, style, dragHandle, tree }) => {
     console.log("INK Data, ", exportedData?.inkData);
 
     if (exportedData) {
-      // setNote(
-      //   exportedData.jsonData!,
-      //   S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
-      //   noteId,
-      //   exportedData.id,
-      // );
+      setNote(
+        exportedData.jsonData!,
+        S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
+        noteId,
+        exportedData.id,
+      );
 
       const ink = exportedData.inkData as unknown as CanvasPath[];
 
