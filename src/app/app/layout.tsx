@@ -63,7 +63,7 @@ export default function AppLayout({
     <EvoluProvider value={evolu}>
       <ResizablePanelGroup
         direction="horizontal"
-        className="flex h-full align-self self-start"
+        className="flex fixed h-full align-self self-start"
         ref={menuContainerRef}
       >
         {/* Include shared UI here e.g. a header or sidebar */}
