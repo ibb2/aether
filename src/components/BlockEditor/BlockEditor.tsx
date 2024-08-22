@@ -4,7 +4,7 @@ import * as S from "@effect/schema/Schema";
 
 import { EditorContent, PureEditorContent, useEditor } from "@tiptap/react";
 import { Editor } from "@tiptap/core";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { LinkMenu } from "@/components/menus";
 
@@ -44,6 +44,7 @@ import { cn } from "@/lib/utils";
 import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
 import useSidebarStore from "@/store/sidebar";
 import useStateStore from "@/store/state";
+import { useTheme } from "next-themes";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
@@ -58,6 +59,9 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const [load, onLoad] = React.useState(0);
   const [zIndex, setZIndex] = React.useState(0);
   const [sidebarSize, setSidebarSize] = React.useState(0);
+
+  // Themes
+  const { theme, setTheme } = useTheme();
 
   // Evolu
   const { create, createOrUpdate, update } = useEvolu<Database>();
@@ -245,9 +249,30 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     return {};
   }, []);
 
-  if (!editor) {
-    return null;
-  }
+  React.useEffect(() => {
+    const changeExistingStrokeColor = async () => {
+      if (canvasRef.current) {
+        // Get current paths
+        const paths = await canvasRef.current.exportPaths();
+
+        // Modify the color of all paths
+        const updatedPaths = paths.map((path) => ({
+          ...path,
+          strokeColor: theme === "light" ? "black" : "white",
+        }));
+
+        // Clear the canvas
+        await canvasRef.current.clearCanvas();
+
+        // Load the modified paths
+        await canvasRef.current.loadPaths(updatedPaths);
+
+        // Update the current stroke color for new strokes
+        // setStrokeColor(newColor);
+      }
+    };
+    changeExistingStrokeColor();
+  }, [theme]);
 
   const windowClassName = cn(
     // "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
@@ -283,7 +308,9 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     }
   };
 
-  console.log("readonly", readOnly);
+  if (!editor) {
+    return null;
+  }
 
   return (
     // <div className="flex h-full align-self self-start">
@@ -306,7 +333,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         height="100%"
         style={{ border: 0 }}
         canvasColor="transparent"
-        strokeColor={"red"}
+        strokeColor={theme === "light" ? "black" : "white"}
         className={reactSketchCanvasClass}
         onChange={() => {
           // Save function in here, handles all points.
