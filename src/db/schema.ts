@@ -21,6 +21,9 @@ export type NotebookId = typeof NotebookId.Type;
 export const SectionId = id("Section");
 export type SectionId = typeof SectionId.Type;
 
+export const FragmentId = id("Fragment");
+export type FragmentId = typeof FragmentId.Type;
+
 export const NoteId = id("Note");
 export type NoteId = typeof NoteId.Type;
 
@@ -104,6 +107,13 @@ export const SectionsTable = table({
   isFolder: S.NullOr(SqliteBoolean),
 });
 export type SectionsTable = typeof SectionsTable.Type;
+
+export const FragmentsTable = table({
+  id: FragmentId,
+  notesId: S.NullOr(S.Array(NoteId)),
+  userId: S.NullOr(UserId),
+});
+export type FragmentsTable = typeof FragmentsTable.Type;
 
 export const NotesTable = table({
   id: NoteId,

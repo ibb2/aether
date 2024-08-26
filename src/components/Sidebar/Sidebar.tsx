@@ -173,24 +173,29 @@ export const Sidebar = memo(
                 </NotebookDialog>
               </div>
 
-              <nav className="grid items-start text-sm font-medium">
-                <span className="mb-2 text-zinc-400 text-sm justify-between">
-                  NOTEBOOKS
-                </span>
-                <Tree
-                  width={width}
-                  ref={treeRef}
-                  // initialData={treeData}
-                  data={treeData}
-                  rowHeight={40}
-                  openByDefault={false}
-                  onCreate={onCreate}
-                  onRename={onRename}
-                  onMove={onMove}
-                  onDelete={onDelete}
-                >
-                  {Node}
-                </Tree>
+              <nav className="grid gap-y-8 items-start text-sm font-medium">
+                <div>
+                  <span className="mb-2 text-zinc-400 text-sm">FRAGMENTS</span>
+                </div>
+                <div>
+                  <span className="mb-2 text-zinc-400 text-sm justify-between">
+                    NOTEBOOKS
+                  </span>
+                  <Tree
+                    width={width}
+                    ref={treeRef}
+                    // initialData={treeData}
+                    data={treeData}
+                    rowHeight={40}
+                    openByDefault={false}
+                    onCreate={onCreate}
+                    onRename={onRename}
+                    onMove={onMove}
+                    onDelete={onDelete}
+                  >
+                    {Node}
+                  </Tree>
+                </div>
               </nav>
             </div>
             <div>
