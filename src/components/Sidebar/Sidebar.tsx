@@ -5,13 +5,48 @@ import { NotebookDialog } from "../dialogs/notebook";
 import { useQueries } from "@evolu/react";
 import { notebooksQuery, notesQuery, sectionsQuery } from "@/db/queries";
 import { Button } from "../ui/Button";
-import { Settings, SquarePen } from "lucide-react";
+import { Diamond, Notebook, Settings, SquarePen } from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import { ReactSketchCanvasRef } from "react-sketch-canvas";
 import { Tree } from "react-arborist";
 import Node from "@/components/Sidebar/Arborist";
 import useResizeObserver from "use-resize-observer";
+import { Popover, PopoverTrigger } from "../ui/popover";
+import { PopoverContent } from "@radix-ui/react-popover";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import {
+  Cloud,
+  CreditCard,
+  Github,
+  Keyboard,
+  LifeBuoy,
+  LogOut,
+  Mail,
+  MessageSquare,
+  Plus,
+  PlusCircle,
+  User,
+  UserPlus,
+  Users,
+} from "lucide-react";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dialog } from "../ui/dialog";
 
 export const Sidebar = memo(
   ({
@@ -171,6 +206,41 @@ export const Sidebar = memo(
                     <span className="sr-only">Add new notebook</span>
                   </Button>
                 </NotebookDialog>
+                <Dialog>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon">
+                        <SquarePen />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-40">
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <NotebookDialog>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="ml-auto h-8 w-8"
+                            >
+                              <Notebook className="mr-2 h-4 w-4" />
+                              <span>New Notebook</span>
+                            </Button>
+                          </NotebookDialog>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Notebook className="mr-2 h-4 w-4" />
+                          <span>New Notebook</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Diamond className="mr-2 h-4 w-4" />
+                          <span>Fragment Note</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Dialog>
+                <NotebookDialog />
+                <FragmentDialog />
               </div>
 
               <nav className="grid gap-y-8 items-start text-sm font-medium">
