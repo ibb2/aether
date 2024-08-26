@@ -14,6 +14,7 @@ import {
 } from "@evolu/react";
 import {
   ExportedDatasTable,
+  FragmentsTable,
   NonEmptyString50,
   NotebooksTable,
   NoteSettingId,
@@ -31,6 +32,7 @@ const Database = database({
   users: UsersTable,
   notebooks: NotebooksTable,
   sections: SectionsTable,
+  fragments: FragmentsTable,
   notes: NotesTable,
   noteSettings: NotesSettingsTable,
   exportedData: ExportedDatasTable,
