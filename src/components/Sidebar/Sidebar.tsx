@@ -1,9 +1,23 @@
+"use client";
+
+import * as S from "@effect/schema/Schema";
+
 import { cn } from "@/lib/utils";
 import { memo, useCallback } from "react";
 import { Editor } from "@tiptap/react";
 import { NotebookDialog } from "../dialogs/notebook";
-import { useQueries } from "@evolu/react";
-import { notebooksQuery, notesQuery, sectionsQuery } from "@/db/queries";
+import {
+  NonEmptyString1000,
+  useEvolu,
+  useQueries,
+  useQuery,
+} from "@evolu/react";
+import {
+  fragmentsQuery,
+  notebooksQuery,
+  notesQuery,
+  sectionsQuery,
+} from "@/db/queries";
 import { Button } from "../ui/Button";
 import { Diamond, Notebook, Settings, SquarePen } from "lucide-react";
 import React from "react";
@@ -33,6 +47,17 @@ import {
 } from "lucide-react";
 
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -46,7 +71,10 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog } from "../ui/dialog";
+import { Database } from "@/db/db";
+import { NonEmptyString50 } from "@/db/schema";
+import { initialContent } from "@/lib/data/initialContent";
+import FragmentNode from "./FragmentNode";
 
 export const Sidebar = memo(
   ({
@@ -64,6 +92,7 @@ export const Sidebar = memo(
   }) => {
     // referees
     const treeRef = React.useRef(null);
+    const fragmentTreeRef = React.useRef(null);
 
     // Use resize obserer
     const { ref, width, height } = useResizeObserver<HTMLDivElement>();
@@ -170,6 +199,35 @@ export const Sidebar = memo(
       }
     }, [onClose]);
 
+    const [notebookName, setNotebookName] = React.useState("");
+    const [notebookOpen, onNotebookOpen] = React.useState(false);
+
+    const [fragmentName, setFragmentName] = React.useState("");
+    const [fragmentOpen, onFragmentOpen] = React.useState(false);
+
+    const { create, createOrUpdate } = useEvolu<Database>();
+
+    const handler = () => {
+      create("notebooks", {
+        title: S.decodeSync(NonEmptyString1000)(notebookName),
+      });
+    };
+
+    const { rows: fragments } = useQuery(fragmentsQuery);
+
+    const createNoteFragment = () => {
+      const { id } = create("notes", {
+        title: S.decodeSync(NonEmptyString1000)(fragmentName),
+        isFragment: true,
+      });
+
+      create("exportedData", {
+        noteId: id,
+        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
+        jsonData: initialContent,
+      });
+    };
+
     const windowClassName = cn(
       "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
       "dark:bg-black lg:dark:bg-black/30",
@@ -183,7 +241,7 @@ export const Sidebar = memo(
         <div className="w-full min-h-svh overflow-hidden">
           <div className="flex flex-col justify-between w-full h-full pb-5 overflow-auto min-h-svh">
             <div>
-              <div className="flex h-14 items-center border-b mb-3">
+              <div className="flex h-14 items-center justify-between border-b mb-3">
                 <Link
                   href="/"
                   className="flex items-center gap-2 font-semibold"
@@ -196,16 +254,6 @@ export const Sidebar = memo(
                 <Bell className="h-4 w-4" />
                 <span className="sr-only">Toggle notifications</span>
               </Button> */}
-                <NotebookDialog>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="ml-auto h-8 w-8"
-                  >
-                    <SquarePen className="h-4 w-4" />
-                    <span className="sr-only">Add new notebook</span>
-                  </Button>
-                </NotebookDialog>
                 <Dialog>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -213,39 +261,116 @@ export const Sidebar = memo(
                         <SquarePen />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-40">
+                    <DropdownMenuContent>
                       <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <NotebookDialog>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="ml-auto h-8 w-8"
-                            >
-                              <Notebook className="mr-2 h-4 w-4" />
-                              <span>New Notebook</span>
-                            </Button>
-                          </NotebookDialog>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Notebook className="mr-2 h-4 w-4" />
-                          <span>New Notebook</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Diamond className="mr-2 h-4 w-4" />
-                          <span>Fragment Note</span>
-                        </DropdownMenuItem>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              onFragmentOpen(false);
+                              onNotebookOpen(true);
+                            }}
+                          >
+                            <Notebook className="mr-2 h-4 w-4" />
+                            <span>New Notebook</span>
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogTrigger>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              onFragmentOpen(true);
+                              onNotebookOpen(false);
+                            }}
+                          >
+                            <Diamond className="mr-2 h-4 w-4" />
+                            <span>Fragment Note</span>
+                          </DropdownMenuItem>
+                        </DialogTrigger>
                       </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                  {notebookOpen && (
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>New notebook</DialogTitle>
+                        <DialogDescription>
+                          Organise your toughts and ideas in a new space.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          type="text"
+                          id="name"
+                          placeholder="new notebook"
+                          onChange={(e) => setNotebookName(e.target.value)}
+                        />
+                      </div>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button variant="secondary">Cancel</Button>
+                        </DialogClose>
+                        <DialogClose asChild>
+                          <Button type="submit" onClick={handler}>
+                            Create
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  )}
+                  {fragmentOpen && (
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Fragment notes</DialogTitle>
+                        <DialogDescription>
+                          Quickly take down your notes.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          type="text"
+                          id="name"
+                          placeholder="loose leaf paper"
+                          onChange={(e) => setFragmentName(e.target.value)}
+                        />
+                      </div>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button variant="secondary">Cancel</Button>
+                        </DialogClose>
+                        <DialogClose asChild>
+                          <Button type="submit" onClick={createNoteFragment}>
+                            Create
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  )}
                 </Dialog>
-                <NotebookDialog />
-                <FragmentDialog />
               </div>
 
               <nav className="grid gap-y-8 items-start text-sm font-medium">
                 <div>
                   <span className="mb-2 text-zinc-400 text-sm">FRAGMENTS</span>
+                  <div>
+                    <Tree
+                      width={width}
+                      ref={fragmentTreeRef}
+                      // initialData={treeData}
+                      height={150}
+                      data={fragments}
+                      rowHeight={40}
+                      openByDefault={false}
+                      onCreate={onCreate}
+                      onRename={onRename}
+                      onMove={onMove}
+                      onDelete={onDelete}
+                      sty
+                      className="h-fit"
+                    >
+                      {FragmentNode}
+                    </Tree>
+                  </div>
                 </div>
                 <div>
                   <span className="mb-2 text-zinc-400 text-sm justify-between">

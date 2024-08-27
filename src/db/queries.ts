@@ -16,6 +16,14 @@ export const sectionsQuery = evolu.createQuery((db) =>
     .selectAll(),
 );
 
+export const fragmentsQuery = evolu.createQuery((db) =>
+  db
+    .selectFrom("notes")
+    .where("isDeleted", "is not", cast(true))
+    .where("isFragment", "is", cast(true))
+    .selectAll(),
+);
+
 export const notesQuery = evolu.createQuery((db) =>
   db.selectFrom("notes").where("isDeleted", "is not", cast(true)).selectAll(),
 );

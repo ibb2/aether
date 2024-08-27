@@ -118,8 +118,9 @@ export type FragmentsTable = typeof FragmentsTable.Type;
 export const NotesTable = table({
   id: NoteId,
   title: NonEmptyString1000,
-  notebookId: NotebookId,
+  notebookId: S.NullOr(NotebookId),
   sectionId: S.NullOr(SectionId),
+  isFragment: S.NullOr(SqliteBoolean),
   exportedData: S.NullOr(ExportedDataId),
   userId: S.NullOr(UserId),
   isNote: S.NullOr(SqliteBoolean),
@@ -128,10 +129,10 @@ export type NotesTable = typeof NotesTable.Type;
 
 export const NotesSettingsTable = table({
   id: NoteSettingId,
-  noteId: NoteId,
-  pageType: S.Enums(PageType),
-  isInkEnabled: SqliteBoolean,
-  isPageSplit: SqliteBoolean,
+  noteId: S.NullOr(NoteId),
+  pageType: S.NullOr(S.Enums(PageType)),
+  isInkEnabled: S.NullOr(SqliteBoolean),
+  isPageSplit: S.NullOr(SqliteBoolean),
 });
 export type NotesSettingsTable = typeof NotesSettingsTable.Type;
 
