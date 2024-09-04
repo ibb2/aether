@@ -1,6 +1,7 @@
 "use client";
 
 import * as S from "@effect/schema/Schema";
+import { Brand } from "effect/Brand";
 
 import { EditorContent, PureEditorContent, useEditor } from "@tiptap/react";
 import { Editor } from "@tiptap/core";
@@ -24,7 +25,7 @@ import { ContentItemMenu } from "../menus/ContentItemMenu";
 import { initialContent } from "@/lib/data/initialContent";
 import { blankContent } from "@/lib/data/blankContent";
 import ExtensionKit from "@/extensions/extension-kit";
-import { useEvolu, useQuery } from "@evolu/react";
+import { useEvolu, useQueries, useQuery } from "@evolu/react";
 import { evolu, type Database } from "@/db/db";
 import useNoteStore from "@/store/note";
 import {
@@ -45,6 +46,8 @@ import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
 import useSidebarStore from "@/store/sidebar";
 import useStateStore from "@/store/state";
 import { useTheme } from "next-themes";
+import { parse, stringify, toJSON, fromJSON } from "flatted";
+import { settingQuery, settingsExists } from "@/db/queries";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
@@ -59,6 +62,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const [load, onLoad] = React.useState(0);
   const [zIndex, setZIndex] = React.useState(0);
   const [sidebarSize, setSidebarSize] = React.useState(0);
+  const [current, setCurrent] = React.useState<any>();
 
   // Themes
   const { theme, setTheme } = useTheme();
@@ -102,6 +106,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
   const leftSidebar = useSidebar();
 
+  // Evolu
   const exportedDataQuery = evolu.createQuery((db) =>
     db
       .selectFrom("exportedData")
@@ -113,7 +118,10 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   );
 
   // Use the query result here
-  const { rows: exportedDataRows } = useQuery(exportedDataQuery);
+  const [{ rows: exportedDataRows }, { rows: settingsExist }] = useQueries([
+    exportedDataQuery,
+    settingQuery,
+  ]);
 
   // Get initial data
   const getInitialData = async (editor: Editor) => {
@@ -182,6 +190,10 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   // const loadData = () => {
   //   const { id } = exportedDataQuery;
   // };
+  //
+  const lastAccessedPage = (editor: any) => {
+    window.localStorage.setItem("last_accessed_page", editor);
+  };
 
   React.useEffect(() => {
     if (load === 0) {
@@ -202,7 +214,11 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     content: data,
     onBeforeCreate({ editor }) {
       // Before the view is created.
+      const lastAcessedPage = window.localStorage.getItem("last_accessed_page");
+      console.log("last accessed page ", lastAcessedPage);
+      // editor.commands.setContent(lastAcessedPage);
       console.log("Hey?");
+      const settingId = create("settings", {});
     },
     onCreate({ editor }) {
       // The editor is ready.
@@ -221,14 +237,18 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
     onSelectionUpdate({ editor }) {
       // The selection has changed.
-      // console.log("Selection");
     },
     onTransaction({ editor, transaction }) {
       // The editor state has changed.
-      // console.log("Transaction", transaction);
+      console.log("Transaction", transaction);
+      console.log("selection...");
+      setCurrent(editor.getJSON());
+      // console.log("settings", settings);
+      lastAccessedPage(current);
     },
     onFocus({ editor, event }) {
       // The editor is focused.
+      console.log("focus...");
     },
     onBlur({ editor, event }) {
       // The editor isn’t focused anymore.

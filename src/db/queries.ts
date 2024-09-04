@@ -31,3 +31,7 @@ export const notesQuery = evolu.createQuery((db) =>
 export const initialExportedData = evolu.createQuery((db) =>
   db.selectFrom("exportedData").selectAll(),
 );
+
+export const settingQuery = evolu.createQuery((db) =>
+  db.selectFrom("settings").selectAll(),
+);

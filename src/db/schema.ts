@@ -33,6 +33,9 @@ export type NoteSettingId = typeof NoteSettingId.Type;
 export const ExportedDataId = id("ExportedData");
 export type ExportedDataId = typeof ExportedDataId.Type;
 
+export const SettingId = id("Setting");
+export type SettingId = typeof SettingId.Type;
+
 // Custom Datatypes
 export const NonEmptyString50 = String.pipe(
   S.minLength(1),
@@ -146,3 +149,10 @@ export const ExportedDatasTable = table({
   // yjsExportedData: S.Uint8Array,
 });
 export type ExportedDatasTable = typeof ExportedDatasTable.Type;
+
+export const SettingsTable = table({
+  id: SettingId,
+  defaultPage: S.NullOr(S.Struct({})),
+});
+
+export type SettingsTable = typeof SettingsTable.Type;
