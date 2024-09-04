@@ -32,6 +32,7 @@ import {
   CanvasPathArray,
   CanvasPathSchema,
   NonEmptyString50,
+  SettingId,
 } from "@/db/schema";
 import { useDebounce, useDebouncedCallback } from "use-debounce";
 
@@ -118,10 +119,16 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   );
 
   // Use the query result here
-  const [{ rows: exportedDataRows }, { rows: settingsExist }] = useQueries([
+  const [{ rows: exportedDataRows }, settings] = useQueries([
     exportedDataQuery,
     settingQuery,
   ]);
+
+  console.log("settings exist", settings.row);
+  if (settings.row === null) {
+    console.log("empty");
+    create("settings", { title: S.decodeSync(NonEmptyString50)("settings") });
+  }
 
   // Get initial data
   const getInitialData = async (editor: Editor) => {
@@ -214,16 +221,16 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     content: data,
     onBeforeCreate({ editor }) {
       // Before the view is created.
-      const lastAcessedPage = window.localStorage.getItem("last_accessed_page");
-      console.log("last accessed page ", lastAcessedPage);
-      // editor.commands.setContent(lastAcessedPage);
-      console.log("Hey?");
-      const settingId = create("settings", {});
     },
     onCreate({ editor }) {
       // The editor is ready.
 
       if (exportedDataRows[0] !== undefined) getInitialData(editor);
+      if (settings.row !== null) {
+        console.log("settings exist arborist", settings.row);
+        editor.commands.setContent(settings.row.defaultPage);
+      }
+      console.log("on create");
     },
     onUpdate({ editor }) {
       // The content has changed.
@@ -240,11 +247,11 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
     onTransaction({ editor, transaction }) {
       // The editor state has changed.
-      console.log("Transaction", transaction);
-      console.log("selection...");
-      setCurrent(editor.getJSON());
-      // console.log("settings", settings);
-      lastAccessedPage(current);
+      if (settings.row !== null)
+        update("settings", {
+          id: settings.rows[0].id,
+          defaultPage: editor.getJSON(),
+        });
     },
     onFocus({ editor, event }) {
       // The editor is focused.

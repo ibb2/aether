@@ -152,6 +152,7 @@ export type ExportedDatasTable = typeof ExportedDatasTable.Type;
 
 export const SettingsTable = table({
   id: SettingId,
+  title: NonEmptyString50,
   defaultPage: S.NullOr(S.Struct({})),
 });
 

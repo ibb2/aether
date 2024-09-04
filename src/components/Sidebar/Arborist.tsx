@@ -55,7 +55,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { sectionsQuery } from "@/db/queries";
+import { sectionsQuery, settingQuery } from "@/db/queries";
 
 const Node = ({ node, style, dragHandle, tree }) => {
   /* This node instance can do many things. See the API reference. */
@@ -104,10 +104,11 @@ const Node = ({ node, style, dragHandle, tree }) => {
     [],
   );
 
-  const [exportedDataRows, noteSettings, sections] = useQueries([
+  const [exportedDataRows, noteSettings, sections, settings] = useQueries([
     exportedDataQuery(),
     noteSettingsQuery(),
     sectionsQuery,
+    settingQuery,
   ]);
 
   const [selectedSection, setSelectedSection] = React.useState(node.id);
@@ -276,6 +277,45 @@ const Node = ({ node, style, dragHandle, tree }) => {
       }
     }
   };
+
+  const defaultNote = () => {
+    const noteId = S.decodeSync(NoteId)(node.id);
+    const exportedData = exportedDataRows.rows.find(
+      (row) => row.noteId === noteId,
+    );
+    const noteSetting = noteSettings.rows.find((row) => row.noteId === noteId);
+    console.log("JSON Data, ", exportedData?.jsonData);
+    console.log("INK Data, ", exportedData?.inkData);
+
+    if (exportedData) {
+      setNote(
+        exportedData.jsonData!,
+        S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
+        noteId,
+        exportedData.id,
+      );
+
+      const ink = exportedData.inkData as unknown as CanvasPath[];
+
+      if (canvasRef && exportedData.inkData) {
+        canvasRef.resetCanvas();
+        canvasRef.loadPaths(ink);
+      }
+      if (canvasRef && exportedData.inkData === null) {
+        canvasRef.resetCanvas();
+        // console.log("clear");
+      }
+      if (editor) editor.commands.setContent(exportedData.jsonData!);
+    }
+  };
+
+  React.useEffect(() => {
+    if (settings.row !== null) {
+      console.log("settings exist arborist", settings.row);
+      editor?.commands.setContent(settings.row.defaultPage);
+      defaultNote();
+    }
+  }, [editor]);
 
   return (
     <Dialog>
