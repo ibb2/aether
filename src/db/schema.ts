@@ -154,6 +154,8 @@ export const SettingsTable = table({
   id: SettingId,
   title: NonEmptyString50,
   defaultPage: S.NullOr(S.Struct({})),
+  lastAccessedNote: S.NullOr(NoteId) || S.NullOr(FragmentId),
+  defaultPageExport: S.NullOr(ExportedDataId),
 });
 
 export type SettingsTable = typeof SettingsTable.Type;

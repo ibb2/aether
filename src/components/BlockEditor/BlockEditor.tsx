@@ -125,7 +125,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   ]);
 
   console.log("settings exist", settings.row);
-  if (settings.row === null) {
+  if (settings.row === null || settings.row === undefined) {
     console.log("empty");
     create("settings", { title: S.decodeSync(NonEmptyString50)("settings") });
   }
@@ -144,12 +144,14 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     (editor: any) => {
       if (editor) {
         const updatedData = editor.getJSON();
-        update("exportedData", {
+        console.log("id save", id);
+        const updateId = update("exportedData", {
           id,
           noteId,
           jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
           jsonData: updatedData,
         });
+        console.log("update id", updateId);
         console.info("Debouncing...");
         setLastSaveTime(Date.now());
       }
@@ -227,8 +229,13 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
       if (exportedDataRows[0] !== undefined) getInitialData(editor);
       if (settings.row !== null) {
-        console.log("settings exist arborist", settings.row);
         editor.commands.setContent(settings.row.defaultPage);
+        setNote(
+          settings.row.defaultPage!,
+          S.decodeSync(NonEmptyString50)(settings.row.lastAccessedNote!),
+          settings.row.lastAccessedNote!,
+          settings.row.defaultPageExport!,
+        );
       }
       console.log("on create");
     },
@@ -247,11 +254,15 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
     onTransaction({ editor, transaction }) {
       // The editor state has changed.
-      if (settings.row !== null)
+      if (id !== null) {
+        console.log("note id", noteId);
         update("settings", {
           id: settings.rows[0].id,
           defaultPage: editor.getJSON(),
+          lastAccessedNote: noteId,
+          defaultPageExport: id,
         });
+      }
     },
     onFocus({ editor, event }) {
       // The editor is focused.

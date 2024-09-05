@@ -56,6 +56,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { sectionsQuery, settingQuery } from "@/db/queries";
+import { Brand } from "effect/Brand";
 
 const Node = ({ node, style, dragHandle, tree }) => {
   /* This node instance can do many things. See the API reference. */
@@ -278,10 +279,13 @@ const Node = ({ node, style, dragHandle, tree }) => {
     }
   };
 
-  const defaultNote = () => {
-    const noteId = S.decodeSync(NoteId)(node.id);
+  const defaultNote = (
+    noteId: (string & Brand<"Id"> & Brand<"Note">) | null,
+    exportedDataId: (string & Brand<"Id"> & Brand<"ExportedData">) | null,
+  ) => {
+    // const noteId = S.decodeSync(NoteId)(node.id);
     const exportedData = exportedDataRows.rows.find(
-      (row) => row.noteId === noteId,
+      (row) => row.noteId === noteId!,
     );
     const noteSetting = noteSettings.rows.find((row) => row.noteId === noteId);
     console.log("JSON Data, ", exportedData?.jsonData);
@@ -290,8 +294,8 @@ const Node = ({ node, style, dragHandle, tree }) => {
     if (exportedData) {
       setNote(
         exportedData.jsonData!,
-        S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
-        noteId,
+        S.decodeSync(NonEmptyString50)(exportedData.noteId ?? "default"),
+        noteId!,
         exportedData.id,
       );
 
@@ -311,9 +315,11 @@ const Node = ({ node, style, dragHandle, tree }) => {
 
   React.useEffect(() => {
     if (settings.row !== null) {
+      const noteId = settings.row.lastAccessedNote;
+      const exportedDataId = settings.row.defaultPageExport;
       console.log("settings exist arborist", settings.row);
       editor?.commands.setContent(settings.row.defaultPage);
-      defaultNote();
+      defaultNote(noteId, exportedDataId);
     }
   }, [editor]);
 
