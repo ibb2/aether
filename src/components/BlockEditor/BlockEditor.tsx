@@ -229,12 +229,20 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
       if (exportedDataRows[0] !== undefined) getInitialData(editor);
       if (settings.row !== null) {
+        console.log("not null", settings.row);
         editor.commands.setContent(settings.row.defaultPage);
-        setNote(
-          settings.row.defaultPage!,
-          S.decodeSync(NonEmptyString50)(settings.row.lastAccessedNote!),
-          settings.row.lastAccessedNote!,
-          settings.row.defaultPageExport!,
+        if (settings.row.lastAccessedNote !== null) {
+          setNote(
+            settings.row.defaultPage!,
+            S.decodeSync(NonEmptyString50)(settings.row.lastAccessedNote!),
+            settings.row.lastAccessedNote!,
+            settings.row.defaultPageExport!,
+          );
+        }
+        console.log(
+          "Length",
+          settings.row.lastAccessedNote,
+          settings.row.lastAccessedNote?.length,
         );
       }
       console.log("on create");
