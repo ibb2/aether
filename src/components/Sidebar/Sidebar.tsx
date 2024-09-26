@@ -270,7 +270,7 @@ export const Sidebar = memo(
       <div className={cn(windowClassName, "px-5")} ref={ref}>
         <div className="w-full min-h-svh overflow-hidden">
           <div className="flex flex-col justify-between w-full h-full pb-5 overflow-auto min-h-svh">
-            <div className="flex flex-col gap-y-14">
+            <div className="flex flex-col gap-y-6">
               <div className="flex h-14 items-center justify-between">
                 <Link
                   href="/"
@@ -278,7 +278,7 @@ export const Sidebar = memo(
                   onClick={(e) => e.preventDefault()}
                 >
                   {/* <Package2 className="h-6 w-6" /> */}
-                  <span>Aether notes</span>
+                  <h1 className="text-lg">Aether notes</h1>
                 </Link>
                 {/* <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
                 <Bell className="h-4 w-4" />
@@ -287,9 +287,7 @@ export const Sidebar = memo(
                 <Dialog>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="icon">
-                        <SquarePen />
-                      </Button>
+                      <SquarePen className="cursor-pointer" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuGroup>
@@ -378,19 +376,19 @@ export const Sidebar = memo(
                   )}
                 </Dialog>
               </div>
-              <nav className="flex flex-col items-start text-sm font-medium">
-                <div>
+              <nav className="flex flex-col items-start w-full text-sm font-medium gap-y-4">
+                <div className="w-full">
                   <span className="mb-2 text-zinc-400 text-sm">FRAGMENTS</span>
                   <div
-                    className="max-h-fit"
+                    className="max-h-fit w-full"
                     style={{ height: "!important auto" }}
                   >
                     {fragmentsData !== undefined && (
-                      <TreeView data={fragmentsData} />
+                      <TreeView data={fragmentsData} className="w-full" />
                     )}
                   </div>
                 </div>
-                <div>
+                <div className="w-full">
                   <span className="mb-2 text-zinc-400 text-sm justify-between">
                     NOTEBOOKS
                   </span>
