@@ -75,6 +75,7 @@ import { Database } from "@/db/db";
 import { NonEmptyString50 } from "@/db/schema";
 import { initialContent } from "@/lib/data/initialContent";
 import FragmentNode from "./FragmentNode";
+import { TreeDataItem, TreeView } from "../tree-view";
 
 export const Sidebar = memo(
   ({
@@ -96,6 +97,16 @@ export const Sidebar = memo(
 
     // Use resize obserer
     const { ref, width, height } = useResizeObserver<HTMLDivElement>();
+    const {
+      ref: fragRef,
+      width: fragWidth,
+      height: fragHeight,
+    } = useResizeObserver<HTMLDivElement>();
+    const {
+      ref: navRef,
+      width: navWidth,
+      height: navHeight,
+    } = useResizeObserver<HTMLDivElement>();
 
     const [notebooks, sections, notes] = useQueries([
       notebooksQuery,
@@ -103,8 +114,13 @@ export const Sidebar = memo(
       notesQuery,
     ]);
 
+    const { rows: fragments } = useQuery(fragmentsQuery);
+
     // State
     const [treeData, setTreeData] = React.useState();
+    const [fragmentsData, setFragmentsData] = React.useState<TreeDataItem[]>(
+      [],
+    );
 
     // React Arborist
     /* Handle the data modifications outside the tree component */
@@ -190,8 +206,24 @@ export const Sidebar = memo(
         setTreeData(treeStructure);
       };
 
+      const getFragmentsData = async () => {
+        console.info("fragments", fragments);
+
+        const arr = [];
+
+        for (let i = 0; i < fragments.length; i++) {
+          arr.push({
+            id: i.toString(),
+            name: S.decodeSync(S.String)(fragments[i].title!),
+          });
+        }
+
+        setFragmentsData([...arr]);
+      };
+
+      getFragmentsData();
       getData();
-    }, [notebooks, sections, notes]);
+    }, [notebooks, sections, notes, fragments]);
 
     const handlePotentialClose = useCallback(() => {
       if (window.innerWidth < 1024) {
@@ -212,8 +244,6 @@ export const Sidebar = memo(
         title: S.decodeSync(NonEmptyString1000)(notebookName),
       });
     };
-
-    const { rows: fragments } = useQuery(fragmentsQuery);
 
     const createNoteFragment = () => {
       const { id } = create("notes", {
@@ -241,7 +271,7 @@ export const Sidebar = memo(
         <div className="w-full min-h-svh overflow-hidden">
           <div className="flex flex-col justify-between w-full h-full pb-5 overflow-auto min-h-svh">
             <div>
-              <div className="flex h-14 items-center justify-between border-b mb-3">
+              <div className="flex h-14 items-center justify-between">
                 <Link
                   href="/"
                   className="flex items-center gap-2 font-semibold"
@@ -348,38 +378,28 @@ export const Sidebar = memo(
                   )}
                 </Dialog>
               </div>
-
-              <nav className="grid gap-y-8 items-start text-sm font-medium">
+              <nav className="flex flex-col items-start text-sm font-medium">
                 <div>
                   <span className="mb-2 text-zinc-400 text-sm">FRAGMENTS</span>
-                  <div>
-                    <Tree
-                      width={width}
-                      ref={fragmentTreeRef}
-                      // initialData={treeData}
-                      height={150}
-                      data={fragments}
-                      rowHeight={40}
-                      openByDefault={false}
-                      onCreate={onCreate}
-                      onRename={onRename}
-                      onMove={onMove}
-                      onDelete={onDelete}
-                      sty
-                      className="h-fit"
-                    >
-                      {FragmentNode}
-                    </Tree>
+                  <div
+                    className="max-h-fit"
+                    style={{ height: "!important auto" }}
+                  >
+                    {fragmentsData !== undefined && (
+                      <TreeView data={fragmentsData} />
+                    )}
                   </div>
                 </div>
                 <div>
                   <span className="mb-2 text-zinc-400 text-sm justify-between">
                     NOTEBOOKS
                   </span>
+                  {treeData !== undefined && <TreeView data={treeData} />}
                   <Tree
                     width={width}
                     ref={treeRef}
                     // initialData={treeData}
+                    height={height / 2}
                     data={treeData}
                     rowHeight={40}
                     openByDefault={false}
@@ -393,6 +413,7 @@ export const Sidebar = memo(
                 </div>
               </nav>
             </div>
+
             <div>
               <Link href={"/settings"}>
                 <Button
