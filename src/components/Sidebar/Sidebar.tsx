@@ -270,7 +270,7 @@ export const Sidebar = memo(
       <div className={cn(windowClassName, "px-5")} ref={ref}>
         <div className="w-full min-h-svh overflow-hidden">
           <div className="flex flex-col justify-between w-full h-full pb-5 overflow-auto min-h-svh">
-            <div>
+            <div className="flex flex-col gap-y-14">
               <div className="flex h-14 items-center justify-between">
                 <Link
                   href="/"
@@ -395,21 +395,6 @@ export const Sidebar = memo(
                     NOTEBOOKS
                   </span>
                   {treeData !== undefined && <TreeView data={treeData} />}
-                  <Tree
-                    width={width}
-                    ref={treeRef}
-                    // initialData={treeData}
-                    height={height / 2}
-                    data={treeData}
-                    rowHeight={40}
-                    openByDefault={false}
-                    onCreate={onCreate}
-                    onRename={onRename}
-                    onMove={onMove}
-                    onDelete={onDelete}
-                  >
-                    {Node}
-                  </Tree>
                 </div>
               </nav>
             </div>
