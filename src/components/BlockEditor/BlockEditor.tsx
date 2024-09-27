@@ -344,25 +344,16 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const collapsePanel = () => {
     if (ref === null) return;
     const panel = ref.current;
-    console.log("0");
     setOpen();
-
     if (panel) {
-      console.log("1");
       if (!panel.isCollapsed()) {
         setSidebarSize(panel.getSize());
         panel.collapse();
-        console.log("2");
       } else {
         panel.expand(sidebarSize);
-        console.log("3");
       }
     }
   };
-
-  useEffect(() => {
-    console.log("open", open);
-  }, [open]);
 
   if (!editor) {
     return null;

@@ -481,7 +481,7 @@ export const Sidebar = memo(
                           selectNote(item);
                         }}
                         defaultLeafIcon={FileIcon}
-                        className="w-full"
+                        className="ml-0 w-full"
                       />
                     )}
                   </div>
