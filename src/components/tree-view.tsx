@@ -2,9 +2,18 @@
 
 import React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import * as S from "@effect/schema/Schema";
 import { ChevronRight } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { useEvolu } from "@evolu/react";
+import { NoteId, SectionId } from "@/db/schema";
 
 const treeVariants = cva(
   "group hover:before:opacity-100 before:absolute before:rounded-lg before:left-0 px-2 before:w-full before:opacity-0 before:bg-accent/70 before:h-[2rem] before:-z-10",
@@ -135,30 +144,64 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
     if (!(data instanceof Array)) {
       data = [data];
     }
+
+    const { create, update } = useEvolu<Database>();
+
+    const deleteNode = (item) => {
+      try {
+        update("sections", {
+          id: S.decodeSync(SectionId)(item.id),
+          isDeleted: true,
+        });
+        update("notes", {
+          id: S.decodeSync(NoteId)(item.id),
+          isDeleted: true,
+        });
+        console.log("2");
+        console.log("1");
+      } finally {
+        console.log("finally");
+      }
+    };
+
     return (
       <div ref={ref} role="tree" className={className} {...props}>
         <ul>
           {data.map((item) => (
-            <li key={item.id}>
-              {item.children ? (
-                <TreeNode
-                  item={item}
-                  selectedItemId={selectedItemId}
-                  expandedItemIds={expandedItemIds}
-                  handleSelectChange={handleSelectChange}
-                  defaultNodeIcon={defaultNodeIcon}
-                  defaultLeafIcon={defaultLeafIcon}
-                />
-              ) : (
-                <TreeLeaf
-                  item={item}
-                  selectedItemId={selectedItemId}
-                  handleSelectChange={handleSelectChange}
-                  defaultLeafIcon={defaultLeafIcon}
-                  className={className}
-                />
-              )}
-            </li>
+            <ContextMenu key={item.id}>
+              <ContextMenuTrigger>
+                <li>
+                  {item.children ? (
+                    <TreeNode
+                      item={item}
+                      selectedItemId={selectedItemId}
+                      expandedItemIds={expandedItemIds}
+                      handleSelectChange={handleSelectChange}
+                      defaultNodeIcon={defaultNodeIcon}
+                      defaultLeafIcon={defaultLeafIcon}
+                    />
+                  ) : (
+                    <TreeLeaf
+                      item={item}
+                      selectedItemId={selectedItemId}
+                      handleSelectChange={handleSelectChange}
+                      defaultLeafIcon={defaultLeafIcon}
+                      className={className}
+                    />
+                  )}
+                </li>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem
+                  onSelect={(e) => {
+                    deleteNode(item);
+                    e.preventDefault();
+                  }}
+                >
+                  Delete
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           ))}
         </ul>
       </div>
@@ -184,6 +227,7 @@ const TreeNode = ({
   const [value, setValue] = React.useState(
     expandedItemIds.includes(item.id) ? [item.id] : [],
   );
+
   return (
     <AccordionPrimitive.Root
       type="multiple"
