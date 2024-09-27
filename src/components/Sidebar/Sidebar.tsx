@@ -19,7 +19,14 @@ import {
   sectionsQuery,
 } from "@/db/queries";
 import { Button } from "../ui/Button";
-import { Diamond, Notebook, Settings, SquarePen } from "lucide-react";
+import {
+  Diamond,
+  File,
+  FileIcon,
+  Notebook,
+  Settings,
+  SquarePen,
+} from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import { ReactSketchCanvasRef } from "react-sketch-canvas";
@@ -71,11 +78,13 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Database } from "@/db/db";
-import { NonEmptyString50 } from "@/db/schema";
+import { Database, evolu } from "@/db/db";
+import { NonEmptyString50, NoteId } from "@/db/schema";
 import { initialContent } from "@/lib/data/initialContent";
 import FragmentNode from "./FragmentNode";
 import { TreeDataItem, TreeView } from "../tree-view";
+import useStateStore from "@/store/state";
+import useNoteStore from "@/store/note";
 
 export const Sidebar = memo(
   ({
@@ -97,16 +106,6 @@ export const Sidebar = memo(
 
     // Use resize obserer
     const { ref, width, height } = useResizeObserver<HTMLDivElement>();
-    const {
-      ref: fragRef,
-      width: fragWidth,
-      height: fragHeight,
-    } = useResizeObserver<HTMLDivElement>();
-    const {
-      ref: navRef,
-      width: navWidth,
-      height: navHeight,
-    } = useResizeObserver<HTMLDivElement>();
 
     const [notebooks, sections, notes] = useQueries([
       notebooksQuery,
@@ -121,13 +120,6 @@ export const Sidebar = memo(
     const [fragmentsData, setFragmentsData] = React.useState<TreeDataItem[]>(
       [],
     );
-
-    // React Arborist
-    /* Handle the data modifications outside the tree component */
-    const onCreate = ({ parentId, index, type }) => {};
-    const onRename = ({ id, name }) => {};
-    const onMove = ({ dragIds, parentId, index }) => {};
-    const onDelete = ({ ids }) => {};
 
     // Make treeview data
     const convertToTreeStructure = (data) => {
@@ -213,7 +205,7 @@ export const Sidebar = memo(
 
         for (let i = 0; i < fragments.length; i++) {
           arr.push({
-            id: i.toString(),
+            id: fragments[i].id,
             name: S.decodeSync(S.String)(fragments[i].title!),
           });
         }
@@ -257,6 +249,105 @@ export const Sidebar = memo(
         jsonData: initialContent,
       });
     };
+
+    // State
+    const [sectionDialog, onSectionDialog] = React.useState(false);
+    const [noteDialog, onNoteDialog] = React.useState(false);
+    const [sectionName, setSectionName] = React.useState("");
+    const [noteName, setNoteName] = React.useState("");
+
+    // References
+    const inputRef = React.useRef(null);
+
+    // Store
+    const setNote = useNoteStore((state) => state.setNote);
+
+    const { isInkEnabled, isPageSplit, setInkStatus, setPageSplit } =
+      useNoteStore((state) => ({
+        isInkEnabled: state.isInkEnabled,
+        isPageSplit: state.isPageSplit,
+        setInkStatus: state.setInkStatus,
+        setPageSplit: state.setPageSplit,
+      }));
+
+    // Evolu
+    const exportedDataQuery = React.useCallback(
+      () =>
+        evolu.createQuery((db) =>
+          db
+            .selectFrom("exportedData")
+            .select("id")
+            .select("jsonData")
+            .select("noteId")
+            .select("inkData"),
+        ),
+      [],
+    );
+    const noteSettingsQuery = React.useCallback(
+      () =>
+        evolu.createQuery((db) => db.selectFrom("noteSettings").selectAll()),
+      [],
+    );
+
+    const [exportedDataRows, noteSettings] = useQueries([
+      exportedDataQuery(),
+      noteSettingsQuery(),
+    ]);
+
+    // const [selectedSection, setSelectedSection] = React.useState(node.id);
+
+    const { update } = useEvolu<Database>();
+
+    // Update selectNote to use the query results
+    const selectNote = (item: TreeDataItem | undefined) => {
+      console.info("selected item ", item);
+
+      if (item !== undefined) {
+        const exportedData = exportedDataRows.rows.find(
+          (row) => row.noteId === item.id,
+        );
+        const noteSetting = noteSettings.rows.find(
+          (row) => row.noteId === item.id,
+        );
+        console.log("JSON Data, ", exportedData?.jsonData);
+        console.log("INK Data, ", exportedData?.inkData);
+        if (exportedData) {
+          setNote(
+            exportedData.jsonData!,
+            S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
+            S.decodeSync(NoteId)(item.id),
+            exportedData.id,
+          );
+          const ink = exportedData.inkData as unknown as CanvasPath[];
+          if (canvasRef && exportedData.inkData) {
+            canvasRef.resetCanvas();
+            canvasRef.loadPaths(ink);
+          }
+          if (canvasRef && exportedData.inkData === null) {
+            canvasRef.resetCanvas();
+            // console.log("clear");
+          }
+          if (editor) editor.commands.setContent(exportedData.jsonData!);
+        }
+      }
+    };
+
+    // const deleteNode = () => {
+    //   if (node.level !== 0) {
+    //     if (node.data.type === "section") {
+    //       update("sections", {
+    //         id: S.decodeSync(SectionId)(node.id),
+    //         isDeleted: true,
+    //       });
+    //     }
+    //     if (node.data.type === "note") {
+    //       update("notes", {
+    //         id: S.decodeSync(NoteId)(node.id),
+    //         isDeleted: true,
+    //       });
+    //     }
+    //   }
+    // };
 
     const windowClassName = cn(
       "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
@@ -384,7 +475,14 @@ export const Sidebar = memo(
                     style={{ height: "!important auto" }}
                   >
                     {fragmentsData !== undefined && (
-                      <TreeView data={fragmentsData} className="w-full" />
+                      <TreeView
+                        data={fragmentsData}
+                        onSelectChange={(item) => {
+                          selectNote(item);
+                        }}
+                        defaultLeafIcon={FileIcon}
+                        className="w-full"
+                      />
                     )}
                   </div>
                 </div>
@@ -392,7 +490,16 @@ export const Sidebar = memo(
                   <span className="mb-2 text-zinc-400 text-sm justify-between">
                     NOTEBOOKS
                   </span>
-                  {treeData !== undefined && <TreeView data={treeData} />}
+                  {treeData !== undefined && (
+                    <TreeView
+                      data={treeData}
+                      onSelectChange={(item) => {
+                        selectNote(item);
+                      }}
+                      defaultLeafIcon={FileIcon}
+                      className="w-full"
+                    />
+                  )}
                 </div>
               </nav>
             </div>

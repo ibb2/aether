@@ -7,7 +7,7 @@ import { ReactSketchCanvasRef } from "react-sketch-canvas";
 
 export type EditorHeaderProps = {
   isSidebarOpen?: boolean;
-  toggleSidebar?: () => void;
+  toggleSidebar?: any;
   characters: number;
   words: number;
   // collabState: WebSocketStatus;
@@ -34,11 +34,14 @@ export const EditorHeader = ({
         <div className="flex items-center gap-x-1.5">
           <Toolbar.Button
             tooltip={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-            onClick={toggleSidebar}
-            active={isSidebarOpen}
+            onClick={() => {
+              toggleSidebar();
+              console.log("is the sidebar open", isSidebarOpen);
+            }}
+            // active={isSidebarOpen}
             className={isSidebarOpen ? "bg-transparent" : ""}
           >
-            <Icon name={isSidebarOpen ? "PanelLeftClose" : "PanelLeft"} />
+            <Icon name={isSidebarOpen ? "PanelRightOpen" : "PanelLeftOpen"} />
           </Toolbar.Button>
         </div>
       </div>
