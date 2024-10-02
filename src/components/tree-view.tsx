@@ -481,6 +481,17 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
                       <DialogTrigger asChild>
                         <ContextMenuItem
                           onSelect={(e) => {
+                            handleDialogOpen("note");
+                            e.preventDefault();
+                          }}
+                        >
+                          <span>Rename</span>
+                        </ContextMenuItem>
+                      </DialogTrigger>
+                      <ContextMenuSeparator />
+                      <DialogTrigger asChild>
+                        <ContextMenuItem
+                          onSelect={(e) => {
                             handleDialogOpen("section");
                             e.preventDefault();
                           }}
