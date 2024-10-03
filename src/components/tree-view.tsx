@@ -315,7 +315,7 @@ const TreeNode = ({
   // Update the parent section to include the new child section
   // const { rows: parentRows } = useQuery(parentQuery);
 
-  const handleDialogOpen = (dialogType: string) => {
+  const openDialog = (dialogType: string) => {
     if (dialogType === "section") {
       onSectionDialog(true);
       onNoteDialog(false);
@@ -366,28 +366,28 @@ const TreeNode = ({
   //   }
   // };
 
-  // const newSection = () => {
-  //   // For creating sections
+  const newSection = () => {
+    // For creating sections
 
-  //   if (item.type === "notebook") {
-  //     // Create a new section from notebook
-  //     create("sections", {
-  //       title: S.decodeSync(NonEmptyString1000)(sectionName),
-  //       notebookId: S.decodeSync(NotebookId)(item.id),
-  //       isFolder: true,
-  //       isSection: true,
-  //     });
-  //   } else {
-  //     // Create a new section from a section
-  //     const { id: sectionId } = create("sections", {
-  //       title: S.decodeSync(NonEmptyString1000)(sectionName),
-  //       parentId: S.decodeSync(SectionId)(item.id),
-  //       notebookId: S.decodeSync(NotebookId)(item.notebookId),
-  //       isFolder: true,
-  //       isSection: true,
-  //     });
-  //   }
-  // };
+    if (item.type === "notebook") {
+      // Create a new section from notebook
+      create("sections", {
+        title: S.decodeSync(NonEmptyString1000)(sectionName),
+        notebookId: S.decodeSync(NotebookId)(item.id),
+        isFolder: true,
+        isSection: true,
+      });
+    } else {
+      // Create a new section from a section
+      create("sections", {
+        title: S.decodeSync(NonEmptyString1000)(sectionName),
+        parentId: S.decodeSync(SectionId)(item.id),
+        notebookId: S.decodeSync(NotebookId)(item.notebookId),
+        isFolder: true,
+        isSection: true,
+      });
+    }
+  };
 
   // const newNote = () => {
   //   // For creating note
@@ -552,8 +552,8 @@ const TreeNode = ({
           <DialogTrigger asChild>
             <ContextMenuItem
               onSelect={(e) => {
-                // handleDialogOpen("section");
-                // e.preventDefault();
+                openDialog("section");
+                e.preventDefault();
               }}
             >
               <span>New Section</span>
@@ -580,48 +580,50 @@ const TreeNode = ({
               <span>Delete</span>
             </ContextMenuItem>
           </DialogTrigger>
-          <DialogContent
-            className="sm:max-w-[425px]"
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.stopPropagation()}
-          >
-            <DialogHeader>
-              <DialogTitle>New Section</DialogTitle>
-              <DialogDescription>
-                Organise your thoughts and ideas.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                type="text"
-                id="name"
-                placeholder="new section"
-                onChange={(e) => setSectionName(e.target.value)}
-              />
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button
-                  variant="secondary"
-                  onClick={() => onSectionDialog(false)}
-                >
-                  Cancel
-                </Button>
-              </DialogClose>
-              <DialogClose asChild>
-                <Button
-                  type="submit"
-                  onClick={() => {
-                    // newSection();
-                    onSectionDialog(false);
-                  }}
-                >
-                  Create
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
+          {sectionDialog && (
+            <DialogContent
+              className="sm:max-w-[425px]"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <DialogHeader>
+                <DialogTitle>New Section</DialogTitle>
+                <DialogDescription>
+                  Organise your thoughts and ideas.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="new section"
+                  onChange={(e) => setSectionName(e.target.value)}
+                />
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    variant="secondary"
+                    onClick={() => onSectionDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      newSection(sectionName);
+                      onSectionDialog(false);
+                    }}
+                  >
+                    Create
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          )}
         </ContextMenuContent>
       </ContextMenu>
     </Dialog>
