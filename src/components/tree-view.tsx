@@ -650,21 +650,6 @@ const TreeLeaf = React.forwardRef<
   ) => {
     const { create, update } = useEvolu<Database>();
 
-    /* This node instance can do many things. See the API reference. */
-    // console.log("node ", node);
-    //
-    // State
-    //
-    // const [item] = React.useState(data[0]);
-    const [sectionDialog, onSectionDialog] = React.useState(false);
-    const [noteDialog, onNoteDialog] = React.useState(false);
-    const [sectionName, setSectionName] = React.useState("");
-    const [noteName, setNoteName] = React.useState("");
-    const [selectedSection, setSelectedSection] = React.useState();
-
-    // References
-    const inputRef = React.useRef(null);
-
     // Store
     const setNote = useNoteStore((state) => state.setNote);
 
@@ -706,151 +691,6 @@ const TreeLeaf = React.forwardRef<
       sectionsQuery,
       settingQuery,
     ]);
-
-    let parentQuery;
-    // Create a new section from notebook
-
-    // parentQuery = evolu.createQuery((db) =>
-    //   db
-    //     .selectFrom("notebooks")
-    //     .where("isDeleted", "is not", cast(true))
-    //     .where("id", "==", S.decodeSync(NotebookId)(item.notebookdId))
-    //     .selectAll(),
-    // );
-
-    // parentQuery = evolu.createQuery((db) =>
-    //   db
-    //     .selectFrom("sections")
-    //     .where("isDeleted", "is not", cast(true))
-    //     .where("id", "==", S.decodeSync(SectionId)(item.sectionId))
-    //     .selectAll(),
-    // );
-
-    // Update the parent section to include the new child section
-    // const { rows: parentRows } = useQuery(parentQuery);
-
-    const handleDialogOpen = (dialogType: string) => {
-      if (dialogType === "section") {
-        onSectionDialog(true);
-        onNoteDialog(false);
-      } else {
-        onSectionDialog(false);
-        onNoteDialog(true);
-      }
-      // Use a timeout to ensure the dialog is rendered before focusing
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 0);
-    };
-
-    // console.log(node.is)
-    // Update selectNote to use the query results
-    // const selectNote = () => {
-    //   const noteId = S.decodeSync(NoteId)(node.id);
-    //   const exportedData = exportedDataRows.rows.find(
-    //     (row) => row.noteId === noteId,
-    //   );
-    //   const noteSetting = noteSettings.rows.find(
-    //     (row) => row.noteId === noteId,
-    //   );
-    //   console.log("JSON Data, ", exportedData?.jsonData);
-    //   console.log("INK Data, ", exportedData?.inkData);
-
-    //   if (exportedData) {
-    //     setNote(
-    //       exportedData.jsonData!,
-    //       S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
-    //       noteId,
-    //       exportedData.id,
-    //     );
-
-    //     const ink = exportedData.inkData as unknown as CanvasPath[];
-
-    //     if (canvasRef && exportedData.inkData) {
-    //       canvasRef.resetCanvas();
-    //       canvasRef.loadPaths(ink);
-    //     }
-    //     if (canvasRef && exportedData.inkData === null) {
-    //       canvasRef.resetCanvas();
-    //       // console.log("clear");
-    //     }
-    //     if (editor) editor.commands.setContent(exportedData.jsonData!);
-    //   }
-    // };
-
-    // const newSection = () => {
-    //   // For creating sections
-
-    //   if (item.type === "notebook") {
-    //     // Create a new section from notebook
-    //     create("sections", {
-    //       title: S.decodeSync(NonEmptyString1000)(sectionName),
-    //       notebookId: S.decodeSync(NotebookId)(item.id),
-    //       isFolder: true,
-    //       isSection: true,
-    //     });
-    //   } else {
-    //     // Create a new section from a section
-    //     const { id: sectionId } = create("sections", {
-    //       title: S.decodeSync(NonEmptyString1000)(sectionName),
-    //       parentId: S.decodeSync(SectionId)(item.id),
-    //       notebookId: S.decodeSync(NotebookId)(item.notebookId),
-    //       isFolder: true,
-    //       isSection: true,
-    //     });
-    //   }
-    // };
-
-    // const newNote = () => {
-    //   // For creating note
-
-    //   let newNote: NoteId;
-
-    //   if (node.level === 0) {
-    //     // from a notebook (root)
-    //     const { id: noteId } = create("notes", {
-    //       title: S.decodeSync(NonEmptyString1000)(noteName),
-    //       notebookId: S.decodeSync(NotebookId)(node.id),
-    //     });
-
-    //     newNote = noteId;
-    //   } else {
-    //     // from a section (folder)
-    //     const { id: noteId } = create("notes", {
-    //       title: S.decodeSync(NonEmptyString1000)(noteName),
-    //       notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
-    //       sectionId: S.decodeSync(SectionId)(selectedSection),
-    //     });
-
-    //     const prevChildrenIds = node.data.children
-    //       .filter((node) => node.type === "note")
-    //       .map((node) => S.decodeSync(NoteId)(node.id));
-
-    //     update("sections", {
-    //       id: S.decodeSync(SectionId)(selectedSection),
-    //       notesId: [...prevChildrenIds, noteId],
-    //     });
-
-    //     newNote = noteId;
-    //   }
-
-    //   create("exportedData", {
-    //     noteId: newNote,
-    //     jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
-    //     jsonData: initialContent,
-    //   });
-
-    //   create("noteSettings", {
-    //     noteId: newNote,
-    //     pageType: 1,
-    //     isInkEnabled: cast(true),
-    //     isPageSplit: cast(false),
-    //   });
-
-    //   console.log(tree.prevNode);
-    // };
 
     const deleteNote = () => {
       update("notes", {
@@ -934,72 +774,25 @@ const TreeLeaf = React.forwardRef<
               </TreeActions>
             </div>
           </ContextMenuTrigger>
-
           <ContextMenuContent>
-            <DialogTrigger asChild>
-              <ContextMenuItem
-                onSelect={(e) => {
-                  // handleDialogOpen("note");
-                  e.preventDefault();
-                  console.log("notebook and section ", item);
-                }}
-              >
-                <span>Rename</span>
-              </ContextMenuItem>
-            </DialogTrigger>
-            <ContextMenuSeparator />
-            <DialogTrigger asChild>
-              <ContextMenuItem
-                onSelect={(e) => {
-                  deleteNote();
-                  e.preventDefault();
-                }}
-              >
-                <span>Delete</span>
-              </ContextMenuItem>
-            </DialogTrigger>
-            <DialogContent
-              className="sm:max-w-[425px]"
-              onClick={(e) => e.stopPropagation()}
-              onKeyDown={(e) => e.stopPropagation()}
+            <ContextMenuItem
+              onSelect={(e) => {
+                // handleDialogOpen("note");
+                e.preventDefault();
+                console.log("notebook and section ", item);
+              }}
             >
-              <DialogHeader>
-                <DialogTitle>New Section</DialogTitle>
-                <DialogDescription>
-                  Organise your thoughts and ideas.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  type="text"
-                  id="name"
-                  placeholder="new section"
-                  onChange={(e) => setSectionName(e.target.value)}
-                />
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button
-                    variant="secondary"
-                    onClick={() => onSectionDialog(false)}
-                  >
-                    Cancel
-                  </Button>
-                </DialogClose>
-                <DialogClose asChild>
-                  <Button
-                    type="submit"
-                    onClick={() => {
-                      // newSection();
-                      onSectionDialog(false);
-                    }}
-                  >
-                    Create
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
+              <span>Rename</span>
+            </ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem
+              onSelect={(e) => {
+                deleteNote();
+                e.preventDefault();
+              }}
+            >
+              <span>Delete</span>
+            </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
       </Dialog>

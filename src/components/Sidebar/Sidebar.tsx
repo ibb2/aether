@@ -153,7 +153,7 @@ export const Sidebar = memo(
           notebookId: item.notebookId,
           parentId: item.parentId,
         };
-        if (children.length > 0) {
+        if (item.type !== "note") {
           result.children = children;
         }
         return result;
