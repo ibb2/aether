@@ -23,9 +23,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useEvolu, useQueries, useQuery } from "@evolu/react";
+import {
+  cast,
+  NonEmptyString1000,
+  useEvolu,
+  useQueries,
+  useQuery,
+} from "@evolu/react";
 import {
   NonEmptyString50,
+  NotebookId,
   NoteId,
   SectionId,
   SectionsTable,
@@ -175,14 +182,485 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
     if (!(data instanceof Array)) {
       data = [data];
     }
+
+    return (
+      <div ref={ref} role="tree" className={className} {...props}>
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>
+              {item.children ? (
+                <TreeNode
+                  item={item}
+                  selectedItemId={selectedItemId}
+                  expandedItemIds={expandedItemIds}
+                  handleSelectChange={handleSelectChange}
+                  defaultNodeIcon={defaultNodeIcon}
+                  defaultLeafIcon={defaultLeafIcon}
+                />
+              ) : (
+                <TreeLeaf
+                  item={item}
+                  selectedItemId={selectedItemId}
+                  handleSelectChange={handleSelectChange}
+                  defaultLeafIcon={defaultLeafIcon}
+                  className={className}
+                />
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  },
+);
+
+TreeItem.displayName = "TreeItem";
+
+const TreeNode = ({
+  item,
+  handleSelectChange,
+  expandedItemIds,
+  selectedItemId,
+  defaultNodeIcon,
+  defaultLeafIcon,
+}: {
+  item: TreeDataItem;
+  handleSelectChange: (item: TreeDataItem | undefined) => void;
+  expandedItemIds: string[];
+  selectedItemId?: string;
+  defaultNodeIcon?: any;
+  defaultLeafIcon?: any;
+}) => {
+  const [value, setValue] = React.useState(
+    expandedItemIds.includes(item.id) ? [item.id] : [],
+  );
+
+  const { create, update } = useEvolu<Database>();
+
+  /* This node instance can do many things. See the API reference. */
+  // console.log("node ", node);
+  //
+  // State
+  //
+  // const [item] = React.useState(data[0]);
+  const [sectionDialog, onSectionDialog] = React.useState(false);
+  const [noteDialog, onNoteDialog] = React.useState(false);
+  const [sectionName, setSectionName] = React.useState("");
+  const [noteName, setNoteName] = React.useState("");
+  const [selectedSection, setSelectedSection] = React.useState();
+
+  // References
+  const inputRef = React.useRef(null);
+
+  // Store
+  const setNote = useNoteStore((state) => state.setNote);
+
+  const { isInkEnabled, isPageSplit, setInkStatus, setPageSplit } =
+    useNoteStore((state) => ({
+      isInkEnabled: state.isInkEnabled,
+      isPageSplit: state.isPageSplit,
+      setInkStatus: state.setInkStatus,
+      setPageSplit: state.setPageSplit,
+    }));
+
+  const { editor, canvasRef } = useStateStore((state) => ({
+    editor: state.editor,
+    canvasRef: state.canvasRef.current,
+  }));
+
+  // Evolu
+  const exportedDataQuery = React.useCallback(
+    () =>
+      evolu.createQuery((db) =>
+        db
+          .selectFrom("exportedData")
+          .select("id")
+          .select("jsonData")
+          .select("noteId")
+          .select("inkData"),
+      ),
+    [],
+  );
+  const noteSettingsQuery = React.useCallback(
+    () => evolu.createQuery((db) => db.selectFrom("noteSettings").selectAll()),
+    [],
+  );
+
+  const [exportedDataRows, noteSettings, sections, settings] = useQueries([
+    exportedDataQuery(),
+    noteSettingsQuery(),
+    sectionsQuery,
+    settingQuery,
+  ]);
+
+  let parentQuery;
+  // Create a new section from notebook
+
+  // parentQuery = evolu.createQuery((db) =>
+  //   db
+  //     .selectFrom("notebooks")
+  //     .where("isDeleted", "is not", cast(true))
+  //     .where("id", "==", S.decodeSync(NotebookId)(item.notebookdId))
+  //     .selectAll(),
+  // );
+
+  // parentQuery = evolu.createQuery((db) =>
+  //   db
+  //     .selectFrom("sections")
+  //     .where("isDeleted", "is not", cast(true))
+  //     .where("id", "==", S.decodeSync(SectionId)(item.sectionId))
+  //     .selectAll(),
+  // );
+
+  // Update the parent section to include the new child section
+  // const { rows: parentRows } = useQuery(parentQuery);
+
+  const handleDialogOpen = (dialogType: string) => {
+    if (dialogType === "section") {
+      onSectionDialog(true);
+      onNoteDialog(false);
+    } else {
+      onSectionDialog(false);
+      onNoteDialog(true);
+    }
+    // Use a timeout to ensure the dialog is rendered before focusing
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  // console.log(node.is)
+  // Update selectNote to use the query results
+  // const selectNote = () => {
+  //   const noteId = S.decodeSync(NoteId)(node.id);
+  //   const exportedData = exportedDataRows.rows.find(
+  //     (row) => row.noteId === noteId,
+  //   );
+  //   const noteSetting = noteSettings.rows.find(
+  //     (row) => row.noteId === noteId,
+  //   );
+  //   console.log("JSON Data, ", exportedData?.jsonData);
+  //   console.log("INK Data, ", exportedData?.inkData);
+
+  //   if (exportedData) {
+  //     setNote(
+  //       exportedData.jsonData!,
+  //       S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
+  //       noteId,
+  //       exportedData.id,
+  //     );
+
+  //     const ink = exportedData.inkData as unknown as CanvasPath[];
+
+  //     if (canvasRef && exportedData.inkData) {
+  //       canvasRef.resetCanvas();
+  //       canvasRef.loadPaths(ink);
+  //     }
+  //     if (canvasRef && exportedData.inkData === null) {
+  //       canvasRef.resetCanvas();
+  //       // console.log("clear");
+  //     }
+  //     if (editor) editor.commands.setContent(exportedData.jsonData!);
+  //   }
+  // };
+
+  // const newSection = () => {
+  //   // For creating sections
+
+  //   if (item.type === "notebook") {
+  //     // Create a new section from notebook
+  //     create("sections", {
+  //       title: S.decodeSync(NonEmptyString1000)(sectionName),
+  //       notebookId: S.decodeSync(NotebookId)(item.id),
+  //       isFolder: true,
+  //       isSection: true,
+  //     });
+  //   } else {
+  //     // Create a new section from a section
+  //     const { id: sectionId } = create("sections", {
+  //       title: S.decodeSync(NonEmptyString1000)(sectionName),
+  //       parentId: S.decodeSync(SectionId)(item.id),
+  //       notebookId: S.decodeSync(NotebookId)(item.notebookId),
+  //       isFolder: true,
+  //       isSection: true,
+  //     });
+  //   }
+  // };
+
+  // const newNote = () => {
+  //   // For creating note
+
+  //   let newNote: NoteId;
+
+  //   if (node.level === 0) {
+  //     // from a notebook (root)
+  //     const { id: noteId } = create("notes", {
+  //       title: S.decodeSync(NonEmptyString1000)(noteName),
+  //       notebookId: S.decodeSync(NotebookId)(node.id),
+  //     });
+
+  //     newNote = noteId;
+  //   } else {
+  //     // from a section (folder)
+  //     const { id: noteId } = create("notes", {
+  //       title: S.decodeSync(NonEmptyString1000)(noteName),
+  //       notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
+  //       sectionId: S.decodeSync(SectionId)(selectedSection),
+  //     });
+
+  //     const prevChildrenIds = node.data.children
+  //       .filter((node) => node.type === "note")
+  //       .map((node) => S.decodeSync(NoteId)(node.id));
+
+  //     update("sections", {
+  //       id: S.decodeSync(SectionId)(selectedSection),
+  //       notesId: [...prevChildrenIds, noteId],
+  //     });
+
+  //     newNote = noteId;
+  //   }
+
+  //   create("exportedData", {
+  //     noteId: newNote,
+  //     jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
+  //     jsonData: initialContent,
+  //   });
+
+  //   create("noteSettings", {
+  //     noteId: newNote,
+  //     pageType: 1,
+  //     isInkEnabled: cast(true),
+  //     isPageSplit: cast(false),
+  //   });
+
+  //   console.log(tree.prevNode);
+  // };
+
+  const deleteNode = () => {
+    if (item.type === "section") {
+      update("sections", {
+        id: S.decodeSync(SectionId)(item.id),
+        isDeleted: true,
+      });
+    }
+  };
+
+  const defaultNote = (
+    noteId: (string & Brand<"Id"> & Brand<"Note">) | null,
+    exportedDataId: (string & Brand<"Id"> & Brand<"ExportedData">) | null,
+  ) => {
+    // const noteId = S.decodeSync(NoteId)(node.id);
+    const exportedData = exportedDataRows.rows.find(
+      (row) => row.noteId === noteId!,
+    );
+    const noteSetting = noteSettings.rows.find((row) => row.noteId === noteId);
+    console.log("JSON Data, ", exportedData?.jsonData);
+    console.log("INK Data, ", exportedData?.inkData);
+
+    if (exportedData) {
+      setNote(
+        exportedData.jsonData!,
+        S.decodeSync(NonEmptyString50)(exportedData.noteId ?? "default"),
+        noteId!,
+        exportedData.id,
+      );
+
+      const ink = exportedData.inkData as unknown as CanvasPath[];
+
+      if (canvasRef && exportedData.inkData) {
+        canvasRef.resetCanvas();
+        canvasRef.loadPaths(ink);
+      }
+      if (canvasRef && exportedData.inkData === null) {
+        canvasRef.resetCanvas();
+        // console.log("clear");
+      }
+      if (editor) editor.commands.setContent(exportedData.jsonData!);
+    }
+  };
+
+  React.useEffect(() => {
+    if (settings.row !== null) {
+      const noteId = settings.row.lastAccessedNote;
+      const exportedDataId = settings.row.defaultPageExport;
+      console.log("settings exist arborist", settings.row);
+      editor?.commands.setContent(settings.row.defaultPage);
+      defaultNote(noteId, exportedDataId);
+    }
+  }, [editor]);
+
+  return (
+    <Dialog>
+      <ContextMenu>
+        <AccordionPrimitive.Root
+          type="multiple"
+          value={value}
+          onValueChange={(s) => setValue(s)}
+        >
+          <AccordionPrimitive.Item value={item.id}>
+            <ContextMenuTrigger asChild>
+              <AccordionTrigger
+                className={cn(
+                  treeVariants(),
+                  selectedItemId === item.id && selectedTreeVariants(),
+                )}
+                onClick={() => {
+                  handleSelectChange(item);
+                  item.onClick?.();
+                }}
+              >
+                <TreeIcon
+                  item={item}
+                  isSelected={selectedItemId === item.id}
+                  isOpen={value.includes(item.id)}
+                  default={defaultNodeIcon}
+                />
+                <span className="text-sm truncate">{item.name}</span>
+                <TreeActions isSelected={selectedItemId === item.id}>
+                  {item.actions}
+                </TreeActions>
+              </AccordionTrigger>
+            </ContextMenuTrigger>
+
+            <AccordionContent className="ml-4 pl-1 border-l">
+              <TreeItem
+                data={item.children ? item.children : item}
+                selectedItemId={selectedItemId}
+                handleSelectChange={handleSelectChange}
+                expandedItemIds={expandedItemIds}
+                defaultLeafIcon={defaultLeafIcon}
+                defaultNodeIcon={defaultNodeIcon}
+              />
+            </AccordionContent>
+          </AccordionPrimitive.Item>
+        </AccordionPrimitive.Root>
+        <ContextMenuContent>
+          <DialogTrigger asChild>
+            <ContextMenuItem
+              onSelect={(e) => {
+                // handleDialogOpen("note");
+                e.preventDefault();
+                console.log("notebook and section ", item);
+              }}
+            >
+              <span>Rename</span>
+            </ContextMenuItem>
+          </DialogTrigger>
+          <ContextMenuSeparator />
+          <DialogTrigger asChild>
+            <ContextMenuItem
+              onSelect={(e) => {
+                // handleDialogOpen("section");
+                // e.preventDefault();
+              }}
+            >
+              <span>New Section</span>
+            </ContextMenuItem>
+          </DialogTrigger>
+          <DialogTrigger asChild>
+            <ContextMenuItem
+              onSelect={(e) => {
+                // handleDialogOpen("note");
+                // e.preventDefault();
+              }}
+            >
+              <span>New Note</span>
+            </ContextMenuItem>
+          </DialogTrigger>
+          <ContextMenuSeparator />
+          <DialogTrigger asChild>
+            <ContextMenuItem
+              onSelect={(e) => {
+                deleteNode();
+                e.preventDefault();
+              }}
+            >
+              <span>Delete</span>
+            </ContextMenuItem>
+          </DialogTrigger>
+          <DialogContent
+            className="sm:max-w-[425px]"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <DialogHeader>
+              <DialogTitle>New Section</DialogTitle>
+              <DialogDescription>
+                Organise your thoughts and ideas.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                type="text"
+                id="name"
+                placeholder="new section"
+                onChange={(e) => setSectionName(e.target.value)}
+              />
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button
+                  variant="secondary"
+                  onClick={() => onSectionDialog(false)}
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    // newSection();
+                    onSectionDialog(false);
+                  }}
+                >
+                  Create
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </ContextMenuContent>
+      </ContextMenu>
+    </Dialog>
+  );
+};
+
+const TreeLeaf = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    item: TreeDataItem;
+    selectedItemId?: string;
+    handleSelectChange: (item: TreeDataItem | undefined) => void;
+    defaultLeafIcon?: any;
+  }
+>(
+  (
+    {
+      className,
+      item,
+      selectedItemId,
+      handleSelectChange,
+      defaultLeafIcon,
+      ...props
+    },
+    ref,
+  ) => {
+    const { create, update } = useEvolu<Database>();
+
     /* This node instance can do many things. See the API reference. */
     // console.log("node ", node);
     //
     // State
+    //
+    // const [item] = React.useState(data[0]);
     const [sectionDialog, onSectionDialog] = React.useState(false);
     const [noteDialog, onNoteDialog] = React.useState(false);
     const [sectionName, setSectionName] = React.useState("");
     const [noteName, setNoteName] = React.useState("");
+    const [selectedSection, setSelectedSection] = React.useState();
 
     // References
     const inputRef = React.useRef(null);
@@ -229,9 +707,27 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
       settingQuery,
     ]);
 
-    const [selectedSection, setSelectedSection] = React.useState();
+    let parentQuery;
+    // Create a new section from notebook
 
-    const { create, update } = useEvolu<Database>();
+    // parentQuery = evolu.createQuery((db) =>
+    //   db
+    //     .selectFrom("notebooks")
+    //     .where("isDeleted", "is not", cast(true))
+    //     .where("id", "==", S.decodeSync(NotebookId)(item.notebookdId))
+    //     .selectAll(),
+    // );
+
+    // parentQuery = evolu.createQuery((db) =>
+    //   db
+    //     .selectFrom("sections")
+    //     .where("isDeleted", "is not", cast(true))
+    //     .where("id", "==", S.decodeSync(SectionId)(item.sectionId))
+    //     .selectAll(),
+    // );
+
+    // Update the parent section to include the new child section
+    // const { rows: parentRows } = useQuery(parentQuery);
 
     const handleDialogOpen = (dialogType: string) => {
       if (dialogType === "section") {
@@ -251,154 +747,116 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
 
     // console.log(node.is)
     // Update selectNote to use the query results
-    const selectNote = () => {
-      const noteId = S.decodeSync(NoteId)(node.id);
-      const exportedData = exportedDataRows.rows.find(
-        (row) => row.noteId === noteId,
-      );
-      const noteSetting = noteSettings.rows.find(
-        (row) => row.noteId === noteId,
-      );
-      console.log("JSON Data, ", exportedData?.jsonData);
-      console.log("INK Data, ", exportedData?.inkData);
+    // const selectNote = () => {
+    //   const noteId = S.decodeSync(NoteId)(node.id);
+    //   const exportedData = exportedDataRows.rows.find(
+    //     (row) => row.noteId === noteId,
+    //   );
+    //   const noteSetting = noteSettings.rows.find(
+    //     (row) => row.noteId === noteId,
+    //   );
+    //   console.log("JSON Data, ", exportedData?.jsonData);
+    //   console.log("INK Data, ", exportedData?.inkData);
 
-      if (exportedData) {
-        setNote(
-          exportedData.jsonData!,
-          S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
-          noteId,
-          exportedData.id,
-        );
+    //   if (exportedData) {
+    //     setNote(
+    //       exportedData.jsonData!,
+    //       S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ""),
+    //       noteId,
+    //       exportedData.id,
+    //     );
 
-        const ink = exportedData.inkData as unknown as CanvasPath[];
+    //     const ink = exportedData.inkData as unknown as CanvasPath[];
 
-        if (canvasRef && exportedData.inkData) {
-          canvasRef.resetCanvas();
-          canvasRef.loadPaths(ink);
-        }
-        if (canvasRef && exportedData.inkData === null) {
-          canvasRef.resetCanvas();
-          // console.log("clear");
-        }
-        if (editor) editor.commands.setContent(exportedData.jsonData!);
-      }
-    };
+    //     if (canvasRef && exportedData.inkData) {
+    //       canvasRef.resetCanvas();
+    //       canvasRef.loadPaths(ink);
+    //     }
+    //     if (canvasRef && exportedData.inkData === null) {
+    //       canvasRef.resetCanvas();
+    //       // console.log("clear");
+    //     }
+    //     if (editor) editor.commands.setContent(exportedData.jsonData!);
+    //   }
+    // };
 
-    const newSection = () => {
-      // For creating sections
+    // const newSection = () => {
+    //   // For creating sections
 
-      if (node.level === 0) {
-        // Create a new section from notebook
-        const { id: sectionId } = create("sections", {
-          title: S.decodeSync(NonEmptyString1000)(sectionName),
-          notebookId: S.decodeSync(NotebookId)(node.id),
-          isFolder: true,
-          isSection: true,
-        });
-      } else {
-        // Create a new section from a section
-        console.log(tree.prevNode);
-        console.log(node.id);
-        console.log(S.decodeSync(SectionId)(node.id));
-        console.log("hey", node.data);
+    //   if (item.type === "notebook") {
+    //     // Create a new section from notebook
+    //     create("sections", {
+    //       title: S.decodeSync(NonEmptyString1000)(sectionName),
+    //       notebookId: S.decodeSync(NotebookId)(item.id),
+    //       isFolder: true,
+    //       isSection: true,
+    //     });
+    //   } else {
+    //     // Create a new section from a section
+    //     const { id: sectionId } = create("sections", {
+    //       title: S.decodeSync(NonEmptyString1000)(sectionName),
+    //       parentId: S.decodeSync(SectionId)(item.id),
+    //       notebookId: S.decodeSync(NotebookId)(item.notebookId),
+    //       isFolder: true,
+    //       isSection: true,
+    //     });
+    //   }
+    // };
 
-        const { id: sectionId } = create("sections", {
-          title: S.decodeSync(NonEmptyString1000)(sectionName),
-          parentId: S.decodeSync(SectionId)(node.id),
-          notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
-          isFolder: true,
-          isSection: true,
-        });
+    // const newNote = () => {
+    //   // For creating note
 
-        // Update the parent section to include the new child section
-        const parentSection = tree.get(node.id);
-        if (parentSection) {
-          const updatedChildren = [
-            ...(parentSection.data.children || []),
-            { id: sectionId, type: "section" },
-          ];
-          update("sections", {
-            id: S.decodeSync(SectionId)(node.id),
-            childrenId: updatedChildren.map((child) => child.id),
-          });
+    //   let newNote: NoteId;
 
-          // Update the tree structure
-          tree.edit(node.id, {
-            ...parentSection.data,
-            children: updatedChildren,
-          });
-        }
-      }
+    //   if (node.level === 0) {
+    //     // from a notebook (root)
+    //     const { id: noteId } = create("notes", {
+    //       title: S.decodeSync(NonEmptyString1000)(noteName),
+    //       notebookId: S.decodeSync(NotebookId)(node.id),
+    //     });
 
-      // Clear the input and close the dialog
-      setSectionName("");
-      onSectionDialog(false);
-    };
+    //     newNote = noteId;
+    //   } else {
+    //     // from a section (folder)
+    //     const { id: noteId } = create("notes", {
+    //       title: S.decodeSync(NonEmptyString1000)(noteName),
+    //       notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
+    //       sectionId: S.decodeSync(SectionId)(selectedSection),
+    //     });
 
-    const newNote = () => {
-      // For creating note
+    //     const prevChildrenIds = node.data.children
+    //       .filter((node) => node.type === "note")
+    //       .map((node) => S.decodeSync(NoteId)(node.id));
 
-      let newNote: NoteId;
+    //     update("sections", {
+    //       id: S.decodeSync(SectionId)(selectedSection),
+    //       notesId: [...prevChildrenIds, noteId],
+    //     });
 
-      if (node.level === 0) {
-        // from a notebook (root)
-        const { id: noteId } = create("notes", {
-          title: S.decodeSync(NonEmptyString1000)(noteName),
-          notebookId: S.decodeSync(NotebookId)(node.id),
-        });
+    //     newNote = noteId;
+    //   }
 
-        newNote = noteId;
-      } else {
-        // from a section (folder)
-        const { id: noteId } = create("notes", {
-          title: S.decodeSync(NonEmptyString1000)(noteName),
-          notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
-          sectionId: S.decodeSync(SectionId)(selectedSection),
-        });
+    //   create("exportedData", {
+    //     noteId: newNote,
+    //     jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
+    //     jsonData: initialContent,
+    //   });
 
-        const prevChildrenIds = node.data.children
-          .filter((node) => node.type === "note")
-          .map((node) => S.decodeSync(NoteId)(node.id));
+    //   create("noteSettings", {
+    //     noteId: newNote,
+    //     pageType: 1,
+    //     isInkEnabled: cast(true),
+    //     isPageSplit: cast(false),
+    //   });
 
-        update("sections", {
-          id: S.decodeSync(SectionId)(selectedSection),
-          notesId: [...prevChildrenIds, noteId],
-        });
+    //   console.log(tree.prevNode);
+    // };
 
-        newNote = noteId;
-      }
-
-      create("exportedData", {
-        noteId: newNote,
-        jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
-        jsonData: initialContent,
+    const deleteNote = () => {
+      update("notes", {
+        id: S.decodeSync(NoteId)(item.id),
+        isDeleted: true,
       });
-
-      create("noteSettings", {
-        noteId: newNote,
-        pageType: 1,
-        isInkEnabled: cast(true),
-        isPageSplit: cast(false),
-      });
-
-      console.log(tree.prevNode);
-    };
-
-    const deleteNode = () => {
-      if (node.level !== 0) {
-        if (node.data.type === "section") {
-          update("sections", {
-            id: S.decodeSync(SectionId)(node.id),
-            isDeleted: true,
-          });
-        }
-        if (node.data.type === "note") {
-          update("notes", {
-            id: S.decodeSync(NoteId)(node.id),
-            isDeleted: true,
-          });
-        }
-      }
     };
 
     const defaultNote = (
@@ -448,252 +906,103 @@ const TreeItem = React.forwardRef<HTMLDivElement, TreeItemProps>(
     }, [editor]);
 
     return (
-      <div ref={ref} role="tree" className={className} {...props}>
-        <Dialog>
-          <ul>
-            {data.map((item) => (
-              <ContextMenu key={item.id}>
-                <ContextMenuTrigger>
-                  <li>
-                    {item.children ? (
-                      <TreeNode
-                        item={item}
-                        selectedItemId={selectedItemId}
-                        expandedItemIds={expandedItemIds}
-                        handleSelectChange={handleSelectChange}
-                        defaultNodeIcon={defaultNodeIcon}
-                        defaultLeafIcon={defaultLeafIcon}
-                      />
-                    ) : (
-                      <TreeLeaf
-                        item={item}
-                        selectedItemId={selectedItemId}
-                        handleSelectChange={handleSelectChange}
-                        defaultLeafIcon={defaultLeafIcon}
-                        className={className}
-                      />
-                    )}
-                  </li>
-                </ContextMenuTrigger>
-                {item.children ? (
-                  <>
-                    <ContextMenuContent>
-                      <DialogTrigger asChild>
-                        <ContextMenuItem
-                          onSelect={(e) => {
-                            handleDialogOpen("note");
-                            e.preventDefault();
-                          }}
-                        >
-                          <span>Rename</span>
-                        </ContextMenuItem>
-                      </DialogTrigger>
-                      <ContextMenuSeparator />
-                      <DialogTrigger asChild>
-                        <ContextMenuItem
-                          onSelect={(e) => {
-                            handleDialogOpen("section");
-                            e.preventDefault();
-                          }}
-                        >
-                          <span>New Section</span>
-                        </ContextMenuItem>
-                      </DialogTrigger>
-                      <DialogTrigger asChild>
-                        <ContextMenuItem
-                          onSelect={(e) => {
-                            handleDialogOpen("note");
-                            e.preventDefault();
-                          }}
-                        >
-                          <span>New Note</span>
-                        </ContextMenuItem>
-                      </DialogTrigger>
-                      <ContextMenuSeparator />
-                      <DialogTrigger asChild>
-                        <ContextMenuItem
-                          onSelect={(e) => {
-                            deleteNode();
-                            e.preventDefault();
-                          }}
-                        >
-                          <span>Delete</span>
-                        </ContextMenuItem>
-                      </DialogTrigger>
-                    </ContextMenuContent>
-                    <DialogContent
-                      className="sm:max-w-[425px]"
-                      onClick={(e) => e.stopPropagation()}
-                      onKeyDown={(e) => e.stopPropagation()}
-                    >
-                      <DialogHeader>
-                        <DialogTitle>New Section</DialogTitle>
-                        <DialogDescription>
-                          Organise your thoughts and ideas.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                          type="text"
-                          id="name"
-                          placeholder="new section"
-                          onChange={(e) => setSectionName(e.target.value)}
-                        />
-                      </div>
-                      <DialogFooter>
-                        <DialogClose asChild>
-                          <Button
-                            variant="secondary"
-                            onClick={() => onSectionDialog(false)}
-                          >
-                            Cancel
-                          </Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                          <Button
-                            type="submit"
-                            onClick={() => {
-                              newSection();
-                              onSectionDialog(false);
-                            }}
-                          >
-                            Create
-                          </Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </>
-                ) : (
-                  <ContextMenuContent>
-                    <ContextMenuItem
-                      onSelect={(e) => {
-                        deleteNode(item);
-                        e.preventDefault();
-                      }}
-                    >
-                      <span>Delete</span>
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                )}
-              </ContextMenu>
-            ))}
-          </ul>
-        </Dialog>
-      </div>
-    );
-  },
-);
+      <Dialog>
+        <ContextMenu>
+          <ContextMenuTrigger asChild>
+            <div
+              ref={ref}
+              className={cn(
+                "ml-5 flex text-left items-center py-2 cursor-pointer before:right-1",
+                treeVariants(),
+                className,
+                selectedItemId === item.id && selectedTreeVariants(),
+              )}
+              onClick={() => {
+                handleSelectChange(item);
+                item.onClick?.();
+              }}
+              {...props}
+            >
+              <TreeIcon
+                item={item}
+                isSelected={selectedItemId === item.id}
+                default={defaultLeafIcon}
+              />
+              <span className="flex-grow text-sm truncate">{item.name}</span>
+              <TreeActions isSelected={selectedItemId === item.id}>
+                {item.actions}
+              </TreeActions>
+            </div>
+          </ContextMenuTrigger>
 
-TreeItem.displayName = "TreeItem";
-
-const TreeNode = ({
-  item,
-  handleSelectChange,
-  expandedItemIds,
-  selectedItemId,
-  defaultNodeIcon,
-  defaultLeafIcon,
-}: {
-  item: TreeDataItem;
-  handleSelectChange: (item: TreeDataItem | undefined) => void;
-  expandedItemIds: string[];
-  selectedItemId?: string;
-  defaultNodeIcon?: any;
-  defaultLeafIcon?: any;
-}) => {
-  const [value, setValue] = React.useState(
-    expandedItemIds.includes(item.id) ? [item.id] : [],
-  );
-
-  return (
-    <AccordionPrimitive.Root
-      type="multiple"
-      value={value}
-      onValueChange={(s) => setValue(s)}
-    >
-      <AccordionPrimitive.Item value={item.id}>
-        <AccordionTrigger
-          className={cn(
-            treeVariants(),
-            selectedItemId === item.id && selectedTreeVariants(),
-          )}
-          onClick={() => {
-            handleSelectChange(item);
-            item.onClick?.();
-          }}
-        >
-          <TreeIcon
-            item={item}
-            isSelected={selectedItemId === item.id}
-            isOpen={value.includes(item.id)}
-            default={defaultNodeIcon}
-          />
-          <span className="text-sm truncate">{item.name}</span>
-          <TreeActions isSelected={selectedItemId === item.id}>
-            {item.actions}
-          </TreeActions>
-        </AccordionTrigger>
-        <AccordionContent className="ml-4 pl-1 border-l">
-          <TreeItem
-            data={item.children ? item.children : item}
-            selectedItemId={selectedItemId}
-            handleSelectChange={handleSelectChange}
-            expandedItemIds={expandedItemIds}
-            defaultLeafIcon={defaultLeafIcon}
-            defaultNodeIcon={defaultNodeIcon}
-          />
-        </AccordionContent>
-      </AccordionPrimitive.Item>
-    </AccordionPrimitive.Root>
-  );
-};
-
-const TreeLeaf = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
-    item: TreeDataItem;
-    selectedItemId?: string;
-    handleSelectChange: (item: TreeDataItem | undefined) => void;
-    defaultLeafIcon?: any;
-  }
->(
-  (
-    {
-      className,
-      item,
-      selectedItemId,
-      handleSelectChange,
-      defaultLeafIcon,
-      ...props
-    },
-    ref,
-  ) => {
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          "ml-5 flex text-left items-center py-2 cursor-pointer before:right-1",
-          treeVariants(),
-          className,
-          selectedItemId === item.id && selectedTreeVariants(),
-        )}
-        onClick={() => {
-          handleSelectChange(item);
-          item.onClick?.();
-        }}
-        {...props}
-      >
-        <TreeIcon
-          item={item}
-          isSelected={selectedItemId === item.id}
-          default={defaultLeafIcon}
-        />
-        <span className="flex-grow text-sm truncate">{item.name}</span>
-        <TreeActions isSelected={selectedItemId === item.id}>
-          {item.actions}
-        </TreeActions>
-      </div>
+          <ContextMenuContent>
+            <DialogTrigger asChild>
+              <ContextMenuItem
+                onSelect={(e) => {
+                  // handleDialogOpen("note");
+                  e.preventDefault();
+                  console.log("notebook and section ", item);
+                }}
+              >
+                <span>Rename</span>
+              </ContextMenuItem>
+            </DialogTrigger>
+            <ContextMenuSeparator />
+            <DialogTrigger asChild>
+              <ContextMenuItem
+                onSelect={(e) => {
+                  deleteNote();
+                  e.preventDefault();
+                }}
+              >
+                <span>Delete</span>
+              </ContextMenuItem>
+            </DialogTrigger>
+            <DialogContent
+              className="sm:max-w-[425px]"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <DialogHeader>
+                <DialogTitle>New Section</DialogTitle>
+                <DialogDescription>
+                  Organise your thoughts and ideas.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="new section"
+                  onChange={(e) => setSectionName(e.target.value)}
+                />
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    variant="secondary"
+                    onClick={() => onSectionDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      // newSection();
+                      onSectionDialog(false);
+                    }}
+                  >
+                    Create
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </ContextMenuContent>
+        </ContextMenu>
+      </Dialog>
     );
   },
 );

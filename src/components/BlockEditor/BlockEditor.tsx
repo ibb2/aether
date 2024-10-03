@@ -124,15 +124,12 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     settingQuery,
   ]);
 
-  console.log("settings exist", settings.row);
   if (settings.row === null || settings.row === undefined) {
-    console.log("empty");
     create("settings", { title: S.decodeSync(NonEmptyString50)("settings") });
   }
 
   // Get initial data
   const getInitialData = async (editor: Editor) => {
-    console.log("initial data");
     const { id, jsonData, noteId, inkData } = exportedDataRows[0];
     setNote(jsonData!, name, noteId!, id);
     editor.commands.setContent(jsonData!);
