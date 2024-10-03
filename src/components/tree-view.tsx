@@ -50,6 +50,7 @@ import { Database, evolu } from "@/db/db";
 import useNoteDialogStore from "@/store/note-dialog";
 import useNoteStore from "@/store/note";
 import useStateStore from "@/store/state";
+import { initialContent } from "@/lib/data/initialContent";
 
 const treeVariants = cva(
   "group hover:before:opacity-100 before:absolute before:rounded-lg before:left-0 px-2 before:w-full before:opacity-0 before:bg-accent/70 before:h-[2rem] before:-z-10",
@@ -389,54 +390,43 @@ const TreeNode = ({
     }
   };
 
-  // const newNote = () => {
-  //   // For creating note
+  const newNote = () => {
+    // Creating a new Note
 
-  //   let newNote: NoteId;
+    let newNote: NoteId;
 
-  //   if (node.level === 0) {
-  //     // from a notebook (root)
-  //     const { id: noteId } = create("notes", {
-  //       title: S.decodeSync(NonEmptyString1000)(noteName),
-  //       notebookId: S.decodeSync(NotebookId)(node.id),
-  //     });
+    if (item.type === "notebook") {
+      // from a notebook (root)
+      const { id: noteId } = create("notes", {
+        title: S.decodeSync(NonEmptyString1000)(noteName),
+        notebookId: S.decodeSync(NotebookId)(item.id),
+      });
 
-  //     newNote = noteId;
-  //   } else {
-  //     // from a section (folder)
-  //     const { id: noteId } = create("notes", {
-  //       title: S.decodeSync(NonEmptyString1000)(noteName),
-  //       notebookId: S.decodeSync(NotebookId)(node.data.notebookId),
-  //       sectionId: S.decodeSync(SectionId)(selectedSection),
-  //     });
+      newNote = noteId;
+    } else {
+      // from a section (folder)
+      const { id: noteId } = create("notes", {
+        title: S.decodeSync(NonEmptyString1000)(noteName),
+        notebookId: S.decodeSync(NotebookId)(item.notebookId),
+        sectionId: S.decodeSync(SectionId)(item.id),
+      });
 
-  //     const prevChildrenIds = node.data.children
-  //       .filter((node) => node.type === "note")
-  //       .map((node) => S.decodeSync(NoteId)(node.id));
+      newNote = noteId;
+    }
 
-  //     update("sections", {
-  //       id: S.decodeSync(SectionId)(selectedSection),
-  //       notesId: [...prevChildrenIds, noteId],
-  //     });
+    create("exportedData", {
+      noteId: newNote,
+      jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
+      jsonData: initialContent,
+    });
 
-  //     newNote = noteId;
-  //   }
-
-  //   create("exportedData", {
-  //     noteId: newNote,
-  //     jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
-  //     jsonData: initialContent,
-  //   });
-
-  //   create("noteSettings", {
-  //     noteId: newNote,
-  //     pageType: 1,
-  //     isInkEnabled: cast(true),
-  //     isPageSplit: cast(false),
-  //   });
-
-  //   console.log(tree.prevNode);
-  // };
+    create("noteSettings", {
+      noteId: newNote,
+      pageType: 1,
+      isInkEnabled: cast(true),
+      isPageSplit: cast(false),
+    });
+  };
 
   const deleteNode = () => {
     if (item.type === "section") {
@@ -562,8 +552,8 @@ const TreeNode = ({
           <DialogTrigger asChild>
             <ContextMenuItem
               onSelect={(e) => {
-                // handleDialogOpen("note");
-                // e.preventDefault();
+                openDialog("note");
+                e.preventDefault();
               }}
             >
               <span>New Note</span>
@@ -580,7 +570,7 @@ const TreeNode = ({
               <span>Delete</span>
             </ContextMenuItem>
           </DialogTrigger>
-          {sectionDialog && (
+          {sectionDialog ? (
             <DialogContent
               className="sm:max-w-[425px]"
               onClick={(e) => e.stopPropagation()}
@@ -616,6 +606,47 @@ const TreeNode = ({
                     onClick={() => {
                       newSection(sectionName);
                       onSectionDialog(false);
+                    }}
+                  >
+                    Create
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          ) : (
+            <DialogContent
+              className="sm:max-w-[425px]"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <DialogHeader>
+                <DialogTitle>New Note</DialogTitle>
+                <DialogDescription>A blank slate.</DialogDescription>
+              </DialogHeader>
+              <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="new note"
+                  onChange={(e) => setNoteName(e.target.value)}
+                />
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    variant="secondary"
+                    onClick={() => onNoteDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      newNote();
+                      onNoteDialog(false);
                     }}
                   >
                     Create
