@@ -8,6 +8,9 @@ import PostHogPageView from "./PostHogPageView";
 import { PHProvider } from "./providers";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Suspense } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { PrivacyToast } from "@/components/Toast/PrivacyToast";
+import PrivacyConsent from "@/components/Consent/Privacy";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,6 +52,7 @@ export default function RootLayout({
         >
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <PostHogPageView />
+            <PrivacyConsent />
             {children}
           </ThemeProvider>
         </body>
