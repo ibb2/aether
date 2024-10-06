@@ -30,6 +30,7 @@
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
+    "@radix-ui/react-toast": "^1.2.2",
     "@svgr/webpack": "^8.1.0",
     "@tippyjs/react": "^4.2.6",
     "@tiptap-pro/extension-drag-handle-react": "^2.10.11",
