@@ -7,7 +7,7 @@ import { usePostHog } from "posthog-js/react";
 
 export default function PostHogPageView(): null {
   const analyticsDisabled =
-    JSON.parse(window.localStorage.getItem("analytics_allowed")!) == 0
+    JSON.parse(window.localStorage.getItem("analytics_allowed")!) === 0
       ? true
       : false;
 
