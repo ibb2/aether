@@ -3,14 +3,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { PHProvider } from "./providers";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import PrivacyConsent from "@/components/Consent/Privacy";
 import dynamic from "next/dynamic";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Aether",
-  description: "aether - a traditonal notetaking experience",
+  description: "aether - a traditional notetaking experience",
   keywords: [
     "notebook",
     "notes",
@@ -31,9 +30,13 @@ export const metadata: Metadata = {
   },
 };
 
-const PostHogPageView = dynamic(() => import("./PostHogPageView"), {
-  ssr: false,
-});
+// Dynamically import client-side components
+const ClientComponents = dynamic(
+  () => import("../components/Layout/ClientComponents"),
+  {
+    ssr: false,
+  },
+);
 
 export default function RootLayout({
   children,
@@ -41,20 +44,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="min-h-svh" suppressHydrationWarning>
-      <PHProvider>
-        <body
-          className={
-            (inter.className, "flex min-h-svh items-center justify-center")
-          }
-        >
+    <html
+      lang="en"
+      className={`${inter.className} min-h-svh`}
+      suppressHydrationWarning
+    >
+      <body className="flex min-h-svh items-center justify-center">
+        <PHProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <PostHogPageView />
-            <PrivacyConsent />
-            {children}
+            <ClientComponents>{children}</ClientComponents>
           </ThemeProvider>
-        </body>
-      </PHProvider>
+        </PHProvider>
+      </body>
     </html>
   );
 }

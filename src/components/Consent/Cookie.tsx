@@ -72,9 +72,9 @@ export default function CookieConsent({
               <br />
               <br />
               <span className="text-xs">
-                By clicking "
-                <span className="font-medium opacity-80">Accept</span>", you
-                agree to our use of cookies.
+                By clicking &ldquo
+                <span className="font-medium opacity-80">Accept</span>&ldquo,
+                you agree to our use of cookies.
               </span>
               <br />
               <a href="#" className="text-xs underline">
