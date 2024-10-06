@@ -41,20 +41,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="min-h-svh" suppressHydrationWarning>
-      {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem> */}
-      {/* <PHProvider> */}
-      <body
-        className={
-          (inter.className, "flex min-h-svh items-center justify-center")
-        }
-      >
-        {/* <Suspense> */}
-        {/* <PostHogPageView /> */}
-        {children}
-        {/* </Suspense> */}
-      </body>
-      {/* </PHProvider> */}
-      {/* </ThemeProvider>  */}
+      <PHProvider>
+        <body
+          className={
+            (inter.className, "flex min-h-svh items-center justify-center")
+          }
+        >
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <PostHogPageView />
+            {children}
+          </ThemeProvider>
+        </body>
+      </PHProvider>
     </html>
   );
 }
