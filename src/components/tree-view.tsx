@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import * as S from "@effect/schema/Schema";
 import { ChevronRight, Trash } from "lucide-react";
@@ -585,16 +585,14 @@ const TreeNode = ({
             >
               <DialogHeader>
                 <DialogTitle>Rename Section</DialogTitle>
-                <DialogDescription>
-                  Organise your thoughts and ideas.
-                </DialogDescription>
+                <DialogDescription>New title.</DialogDescription>
               </DialogHeader>
               <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
                 <Label htmlFor="name">Name</Label>
                 <Input
                   type="text"
                   id="name"
-                  placeholder="new section"
+                  placeholder={item.name}
                   value={currentName}
                   onChange={(e) => setCurrentName(e.target.value)}
                 />
@@ -736,6 +734,9 @@ const TreeLeaf = React.forwardRef<
   ) => {
     const { create, update } = useEvolu<Database>();
 
+    // State
+    const [currentName, setCurrentName] = React.useState(item.name);
+
     // Store
     const setNote = useNoteStore((state) => state.setNote);
 
@@ -777,6 +778,15 @@ const TreeLeaf = React.forwardRef<
       sectionsQuery,
       settingQuery,
     ]);
+
+    const renameNote = (nameOfNewNote: string) => {
+      setCurrentName("");
+
+      update("notes", {
+        id: S.decodeSync(NoteId)(item.id),
+        title: S.decodeSync(NonEmptyString1000)(nameOfNewNote),
+      });
+    };
 
     const deleteNote = () => {
       update("notes", {
@@ -861,15 +871,17 @@ const TreeLeaf = React.forwardRef<
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent>
-            <ContextMenuItem
-              onSelect={(e) => {
-                // handleDialogOpen("note");
-                e.preventDefault();
-                console.log("notebook and section ", item);
-              }}
-            >
-              <span>Rename</span>
-            </ContextMenuItem>
+            <DialogTrigger asChild>
+              <ContextMenuItem
+                onSelect={(e) => {
+                  // handleDialogOpen("note");
+                  e.preventDefault();
+                  console.log("notebook and section ", item);
+                }}
+              >
+                <span>Rename</span>
+              </ContextMenuItem>
+            </DialogTrigger>
             <ContextMenuSeparator />
             <ContextMenuItem
               onSelect={(e) => {
@@ -880,6 +892,41 @@ const TreeLeaf = React.forwardRef<
               <span>Delete</span>
             </ContextMenuItem>
           </ContextMenuContent>
+          <DialogContent
+            className="sm:max-w-[425px]"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <DialogHeader>
+              <DialogTitle>Rename Note</DialogTitle>
+              <DialogDescription>New title.</DialogDescription>
+            </DialogHeader>
+            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                type="text"
+                id="name"
+                placeholder={item.name}
+                value={currentName}
+                onChange={(e) => setCurrentName(e.target.value)}
+              />
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="secondary">Cancel</Button>
+              </DialogClose>
+              <DialogClose asChild>
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    renameNote(currentName);
+                  }}
+                >
+                  Update
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
         </ContextMenu>
       </Dialog>
     );
