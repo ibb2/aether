@@ -2,8 +2,13 @@ import { cn } from "@/lib/utils";
 import { ArrowLeft, Brush, EyeOff, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/Button";
+import { usePathname, useRouter } from "next/navigation";
 
 export const SettingsSidebar = () => {
+  const pathName = usePathname();
+
+  console.log("Path Name: ", pathName);
+
   const windowClassName = cn(
     "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
     "dark:bg-black lg:dark:bg-black/30",
@@ -12,6 +17,10 @@ export const SettingsSidebar = () => {
     // !isOpen && "border-r-transparent",
     // isOpen && "w-full",
   );
+
+  // const active = cn(
+  //   pathName = ""
+  // )
 
   return (
     <div className={cn(windowClassName, "px-5")}>
@@ -28,10 +37,13 @@ export const SettingsSidebar = () => {
               </Link>
             </div>
 
-            <nav className="grid items-start font-medium">
+            <nav className="grid items-start font-medium gap-y-1">
               <Button
                 variant="ghost"
-                className="w-full justify-start items-center"
+                className={cn(
+                  "w-full justify-start items-center",
+                  pathName === "/settings" && "bg-zinc-100",
+                )}
                 asChild
               >
                 <Link href="#" className="w-full gap-2">
@@ -41,7 +53,10 @@ export const SettingsSidebar = () => {
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start items-center"
+                className={cn(
+                  "w-full justify-start items-center",
+                  pathName === "/settings/personalisation" && "bg-zinc-100",
+                )}
                 asChild
               >
                 <Link href="#" className="w-full gap-2">
@@ -51,10 +66,13 @@ export const SettingsSidebar = () => {
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start items-center"
+                className={cn(
+                  "w-full justify-start items-center",
+                  pathName === "/settings/privacy" && "bg-zinc-100",
+                )}
                 asChild
               >
-                <Link href="#" className="w-full gap-2">
+                <Link href="/settings/privacy" className="w-full gap-2">
                   <EyeOff />
                   Privacy
                 </Link>
