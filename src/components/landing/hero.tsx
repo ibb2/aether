@@ -31,11 +31,13 @@ export default function Hero() {
         </BoxReveal>
 
         <BoxReveal boxColor={"#5046e6"} duration={0.5}>
-          <h1 className="mt-[.5rem] text-[1rem]">
-            Note taking for{" "}
+          <>
+            <h1 className="mt-[.5rem] text-[1rem]">
+              Note taking for{" "}
+              {/* <span className="text-[#5046e6]">Design Engineers</span> */}
+            </h1>
             <TypingAnimation className="text-[#5046e6]" text="everyone" />
-            {/* <span className="text-[#5046e6]">Design Engineers</span> */}
-          </h1>
+          </>
         </BoxReveal>
 
         <BoxReveal boxColor={"#5046e6"} duration={0.5}>
