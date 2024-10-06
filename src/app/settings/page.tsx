@@ -52,7 +52,7 @@ export default function Settings() {
               <CardDescription>Account related settings.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-x-20 gap-y-5">
-              <div className="flex justify-between">
+              <div className="flex flex-col justify-between w-full">
                 <div className="grid">
                   <h1>Mnemonic</h1>
                   <div className="flex items-center space-x-2">

@@ -61,7 +61,7 @@ export default function CopySecret() {
   };
 
   return (
-    <div className="w-full max-w-2xl space-y-4">
+    <div className="w-full  space-y-4">
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
           <Input
@@ -76,7 +76,7 @@ export default function CopySecret() {
             onClick={copyToClipboard}
             className="max-w-15"
           >
-            {copied ? <Check className="text-white" /> : <Clipboard />}
+            {copied ? <Check className="text-green-600" /> : <Clipboard />}
           </Button>
           {/* <Button variant="secondary" onClick={updateMnemonic}>
             update
