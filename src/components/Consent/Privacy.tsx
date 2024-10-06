@@ -67,9 +67,9 @@ export default function PrivacyConsent({
           </div>
           <div className="p-4">
             <p className="text-sm font-normal text-start">
-              We use analtyics (PostHog) to ensure you get the best experience
-              on our website. For more information on how we use analytics,
-              please see our privacy policy (coming soon).
+              We use anonymized analtyics (PostHog) to ensure you get the best
+              experience on our website. For more information on how we use
+              analytics, please see our privacy policy (coming soon).
               <br />
               <br />
               <span className="text-xs">
