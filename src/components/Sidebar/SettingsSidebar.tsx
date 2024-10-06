@@ -23,7 +23,7 @@ export const SettingsSidebar = () => {
                 href="/app"
                 className="flex items-center gap-2 font-semibold"
               >
-                <ArrowLeft className="h-6 w-6" />
+                <ArrowLeft className="h-5 w-5" />
                 <span>Settings</span>
               </Link>
             </div>
