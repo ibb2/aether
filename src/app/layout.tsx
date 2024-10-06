@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { EvoluProvider } from "@evolu/react";
-import { evolu } from "@/db/db";
-import posthog from "posthog-js";
-import PostHogPageView from "./PostHogPageView";
 import { PHProvider } from "./providers";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { Suspense } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { PrivacyToast } from "@/components/Toast/PrivacyToast";
 import PrivacyConsent from "@/components/Consent/Privacy";
+import dynamic from "next/dynamic";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +30,10 @@ export const metadata: Metadata = {
     googleBot: "index, follow",
   },
 };
+
+const PostHogPageView = dynamic(() => import("./PostHogPageView"), {
+  ssr: false,
+});
 
 export default function RootLayout({
   children,
