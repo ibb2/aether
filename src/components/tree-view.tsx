@@ -246,6 +246,8 @@ const TreeNode = ({
   // const [item] = React.useState(data[0]);
   const [sectionDialog, onSectionDialog] = React.useState(false);
   const [noteDialog, onNoteDialog] = React.useState(false);
+  const [renameDialog, onRenameDialog] = React.useState(false);
+  const [currentName, setCurrentName] = React.useState("");
   const [sectionName, setSectionName] = React.useState("");
   const [noteName, setNoteName] = React.useState("");
   const [selectedSection, setSelectedSection] = React.useState();
@@ -294,35 +296,20 @@ const TreeNode = ({
     settingQuery,
   ]);
 
-  let parentQuery;
-  // Create a new section from notebook
-
-  // parentQuery = evolu.createQuery((db) =>
-  //   db
-  //     .selectFrom("notebooks")
-  //     .where("isDeleted", "is not", cast(true))
-  //     .where("id", "==", S.decodeSync(NotebookId)(item.notebookdId))
-  //     .selectAll(),
-  // );
-
-  // parentQuery = evolu.createQuery((db) =>
-  //   db
-  //     .selectFrom("sections")
-  //     .where("isDeleted", "is not", cast(true))
-  //     .where("id", "==", S.decodeSync(SectionId)(item.sectionId))
-  //     .selectAll(),
-  // );
-
-  // Update the parent section to include the new child section
-  // const { rows: parentRows } = useQuery(parentQuery);
-
   const openDialog = (dialogType: string) => {
     if (dialogType === "section") {
       onSectionDialog(true);
       onNoteDialog(false);
-    } else {
+      onRenameDialog(false);
+    } else if (dialogType === "note") {
       onSectionDialog(false);
       onNoteDialog(true);
+      onRenameDialog(false);
+    } else {
+      onSectionDialog(false);
+      onNoteDialog(false);
+      onRenameDialog(true);
+      setCurrentName(item.name);
     }
     // Use a timeout to ensure the dialog is rendered before focusing
     setTimeout(() => {
@@ -366,6 +353,26 @@ const TreeNode = ({
   //     if (editor) editor.commands.setContent(exportedData.jsonData!);
   //   }
   // };
+
+  const renameSection = (newName: string) => {
+    // Renames Notebooks and Sections
+
+    setCurrentName("");
+
+    if (item.type === "notebook") {
+      // Create a new section from notebook
+      update("notebooks", {
+        id: S.decodeSync(NotebookId)(item.id),
+        title: S.decodeSync(NonEmptyString1000)(newName),
+      });
+    } else {
+      // Create a new section from a section
+      update("sections", {
+        id: S.decodeSync(SectionId)(item.id),
+        title: S.decodeSync(NonEmptyString1000)(currentName),
+      });
+    }
+  };
 
   const newSection = () => {
     // For creating sections
@@ -530,7 +537,7 @@ const TreeNode = ({
           <DialogTrigger asChild>
             <ContextMenuItem
               onSelect={(e) => {
-                // handleDialogOpen("note");
+                openDialog("rename");
                 e.preventDefault();
                 console.log("notebook and section ", item);
               }}
@@ -570,7 +577,52 @@ const TreeNode = ({
               <span>Delete</span>
             </ContextMenuItem>
           </DialogTrigger>
-          {sectionDialog ? (
+          {renameDialog && (
+            <DialogContent
+              className="sm:max-w-[425px]"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <DialogHeader>
+                <DialogTitle>Rename Section</DialogTitle>
+                <DialogDescription>
+                  Organise your thoughts and ideas.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="new section"
+                  value={currentName}
+                  onChange={(e) => setCurrentName(e.target.value)}
+                />
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    variant="secondary"
+                    onClick={() => onRenameDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      renameSection(currentName);
+                      onRenameDialog(false);
+                    }}
+                  >
+                    Update
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          )}
+          {sectionDialog && (
             <DialogContent
               className="sm:max-w-[425px]"
               onClick={(e) => e.stopPropagation()}
@@ -613,7 +665,8 @@ const TreeNode = ({
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
-          ) : (
+          )}
+          {noteDialog && (
             <DialogContent
               className="sm:max-w-[425px]"
               onClick={(e) => e.stopPropagation()}
