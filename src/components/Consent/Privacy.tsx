@@ -35,6 +35,11 @@ export default function PrivacyConsent({
 
   useEffect(() => {
     try {
+      const privacyExistsInStorage =
+        window.localStorage.getItem("analytics_allowed");
+
+      if (privacyExistsInStorage) return;
+
       setIsOpen(true);
       if (document.cookie.includes("cookieConsent=true")) {
         if (!demo) {
@@ -73,8 +78,8 @@ export default function PrivacyConsent({
               <br />
               <br />
               <span className="text-xs">
-                By clicking &ldquo
-                <span className="font-medium opacity-80">Accept</span>&ldquo,
+                By clicking &ldquo;
+                <span className="font-medium opacity-80">Accept</span>&ldquo;,
                 you agree to our use of analytics.
               </span>
               <br />
