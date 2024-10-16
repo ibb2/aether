@@ -7,20 +7,12 @@ import { usePathname, useRouter } from "next/navigation";
 export const SettingsSidebar = () => {
   const pathName = usePathname();
 
-  console.log("Path Name: ", pathName);
-
   const windowClassName = cn(
     "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
     "dark:bg-black lg:dark:bg-black/30",
     "min-h-svh",
     "w-full",
-    // !isOpen && "border-r-transparent",
-    // isOpen && "w-full",
   );
-
-  // const active = cn(
-  //   pathName = ""
-  // )
 
   return (
     <div className={cn(windowClassName, "px-5")}>

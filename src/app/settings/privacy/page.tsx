@@ -23,6 +23,9 @@ export default function Privacy() {
   const handleAnalytics = () => {};
 
   const toggleSwitch = (state: boolean) => {
+    // On switch change handle convert the bool val to int representation
+    // This is then stored into the analytics_allowed value for persistance across refreshes.
+
     setSwitchState(state);
     window.localStorage.setItem(
       "analytics_allowed",
@@ -44,10 +47,7 @@ export default function Privacy() {
       }
     }
 
-    // On switch change handle convert the bool val to int representation
-    // This is then stored into the analytics_allowed value for persistance across refreshes.
     setAnalyticsEnabled(switchState ? 1 : 0);
-    console.log("Analytics ", switchState, analyticsChoice, render);
   }, [switchState, analyticsEnabled, render]);
 
   return (
