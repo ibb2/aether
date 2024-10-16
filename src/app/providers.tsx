@@ -21,7 +21,7 @@ export function PHProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const enabled =
-      JSON.parse(localStorage.getItem("analytics_allowed") || "false") === 1;
+      JSON.parse(localStorage.getItem("analytics_allowed")!) === 1;
     setAnalyticsEnabled(enabled);
   }, []);
 
