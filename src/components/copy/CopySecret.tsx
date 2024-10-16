@@ -4,6 +4,8 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 
+"use client";
+
 import * as S from "@effect/schema/Schema";
 import { formatError } from "@effect/schema/TreeFormatter";
 
