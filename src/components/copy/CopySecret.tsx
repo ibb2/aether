@@ -4,14 +4,18 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 
+import * as S from "@effect/schema/Schema";
+import { formatError } from "@effect/schema/TreeFormatter";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/Button";
 import React from "react";
 import { evolu } from "@/db/db";
 import { cn } from "@/lib/utils";
-import { Check, Clipboard } from "lucide-react";
+import { Check, Clipboard, RotateCcw } from "lucide-react";
 import {
   Mnemonic,
+  NonEmptyString1000,
   Owner,
   parseMnemonic,
   useEvolu,
@@ -23,6 +27,7 @@ export default function CopySecret() {
   const evolu = useEvolu();
 
   const [mnemonic, setMnemonic] = React.useState("");
+  const [restoreMnemonic, setRestoreMnemonic] = React.useState("");
   const [copied, onCopied] = React.useState(false);
   const [blurred, onBlurred] = React.useState(true);
   const [isAnimating, setIsAnimating] = React.useState(false);
@@ -32,6 +37,7 @@ export default function CopySecret() {
   React.useEffect(() => {
     if (owner && owner.mnemonic) {
       setMnemonic(owner.mnemonic);
+      setRestoreMnemonic(owner.mnemonic);
     }
   }, [owner]);
 
@@ -46,18 +52,35 @@ export default function CopySecret() {
     }, 1000);
   };
 
-  const updateMnemonic = () => {
-    console.log("Mnemonic", mnemonic);
-    parseMnemonic(mnemonic)
-      .pipe(Effect.runPromiseExit)
-      .then(
-        Exit.match({
-          onFailure: () => {},
-          onSuccess: (m) => {
-            evolu.restoreOwner(m);
-          },
-        }),
-      );
+  // const updateMnemonic = () => {
+  //   console.log("Mnemonic", mnemonic);
+  //   parseMnemonic(mnemonic)
+  //     .pipe(Effect.runPromiseExit)
+  //     .then(
+  //       Exit.match({
+  //         onFailure: () => {},
+  //         onSuccess: (m) => {
+  //           evolu.restoreOwner(m);
+  //         },
+  //       }),
+  //     );
+  // };
+
+  const handleRestoreOwnerClick = () => {
+    prompt(NonEmptyString1000, "Your Mnemonic", (mnemonic: any) => {
+      parseMnemonic(mnemonic)
+        .pipe(Effect.runPromiseExit)
+        .then(
+          Exit.match({
+            onFailure: (error) => {
+              alert(JSON.stringify(error, null, 2));
+            },
+            onSuccess: (mnemonic) => {
+              evolu.restoreOwner(mnemonic);
+            },
+          }),
+        );
+    });
   };
 
   return (
@@ -65,25 +88,35 @@ export default function CopySecret() {
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
           <Input
-            // value={mnemonic}
-            readOnly
+            value={restoreMnemonic}
+            // readOnly
             defaultValue={mnemonic}
-            onChange={(e) => setMnemonic(e.target.value)}
+            onChange={(e) => setRestoreMnemonic(e.target.value)}
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={copyToClipboard}
-            className="max-w-15"
-          >
+          <Button onClick={copyToClipboard} className="max-w-15">
             {copied ? <Check className="text-green-600" /> : <Clipboard />}
           </Button>
-          {/* <Button variant="secondary" onClick={updateMnemonic}>
-            update
-          </Button> */}
+          <Button variant="secondary" onClick={handleRestoreOwnerClick}>
+            <RotateCcw />
+          </Button>
           {/* {copied && <span className="text-green-400">Copied</span>} */}
         </div>
       </div>
     </div>
   );
 }
+
+const prompt = <From extends string, To>(
+  schema: S.Schema<To, From, never>,
+  message: string,
+  onSuccess: (value: To) => void,
+) => {
+  const value = window.prompt(message);
+  if (value == null) return; // on cancel
+  const a = S.decodeUnknownEither(schema)(value);
+  if (a._tag === "Left") {
+    alert(formatError(a.left));
+    return;
+  }
+  onSuccess(a.right);
+};

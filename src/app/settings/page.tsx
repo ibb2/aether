@@ -38,6 +38,7 @@ export default function Settings() {
   };
 
   const nuke = () => {
+    window.localStorage.removeItem("analytics_allowed");
     evolu.resetOwner({ reload: true });
     // router.push("/app");
   };
