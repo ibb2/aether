@@ -54,20 +54,6 @@ export default function CopySecret() {
     }, 1000);
   };
 
-  // const updateMnemonic = () => {
-  //   console.log("Mnemonic", mnemonic);
-  //   parseMnemonic(mnemonic)
-  //     .pipe(Effect.runPromiseExit)
-  //     .then(
-  //       Exit.match({
-  //         onFailure: () => {},
-  //         onSuccess: (m) => {
-  //           evolu.restoreOwner(m);
-  //         },
-  //       }),
-  //     );
-  // };
-
   const handleRestoreOwnerClick = () => {
     prompt(NonEmptyString1000, "Your Mnemonic", (mnemonic: any) => {
       parseMnemonic(mnemonic)
