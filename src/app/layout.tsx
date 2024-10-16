@@ -4,6 +4,7 @@ import "./globals.css";
 import { PHProvider } from "./providers";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import dynamic from "next/dynamic";
+import ClientComponents from "@/components/Layout/ClientComponents";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,12 +32,12 @@ export const metadata: Metadata = {
 };
 
 // Dynamically import client-side components
-const ClientComponents = dynamic(
-  () => import("../components/Layout/ClientComponents"),
-  {
-    ssr: false,
-  },
-);
+// const ClientComponents = dynamic(
+//   () => import("../components/Layout/ClientComponents"),
+//   {
+//     ssr: false,
+//   },
+// );
 
 export default function RootLayout({
   children,

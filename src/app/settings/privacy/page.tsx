@@ -22,6 +22,14 @@ export default function Privacy() {
 
   const handleAnalytics = () => {};
 
+  const toggleSwitch = (state: boolean) => {
+    setSwitchState(state);
+    window.localStorage.setItem(
+      "analytics_allowed",
+      JSON.stringify(state ? 1 : 0),
+    );
+  };
+
   React.useEffect(() => {
     // Handles setting the user analytics
 
@@ -39,10 +47,6 @@ export default function Privacy() {
     // On switch change handle convert the bool val to int representation
     // This is then stored into the analytics_allowed value for persistance across refreshes.
     setAnalyticsEnabled(switchState ? 1 : 0);
-    window.localStorage.setItem(
-      "analytics_allowed",
-      JSON.stringify(analyticsEnabled ? 1 : 0),
-    );
     console.log("Analytics ", switchState, analyticsChoice, render);
   }, [switchState, analyticsEnabled, render]);
 
@@ -68,7 +72,7 @@ export default function Privacy() {
                   </div>
                   <Switch
                     checked={switchState}
-                    onCheckedChange={setSwitchState}
+                    onCheckedChange={() => toggleSwitch(!switchState)}
                   />
                 </div>
               </div>

@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import PrivacyConsent from "@/components/Consent/Privacy";
+import PostHogPageView from "@/app/PostHogPageView";
 
-const PostHogPageView = dynamic(() => import("../../app/PostHogPageView"), {
-  ssr: false,
-});
+// const PostHogPageView = dynamic(() => import("../../app/PostHogPageView"), {
+//   ssr: false,
+// });
 
 export default function ClientComponents({
   children,
