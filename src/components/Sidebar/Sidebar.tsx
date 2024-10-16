@@ -18,13 +18,13 @@ import {
   notesQuery,
   sectionsQuery,
 } from "@/db/queries";
-import { Button } from "../ui/Button";
 import {
   Diamond,
   File,
   FileIcon,
   Notebook,
   Settings,
+  Settings2,
   SquarePen,
 } from "lucide-react";
 import React from "react";
@@ -85,6 +85,8 @@ import FragmentNode from "./FragmentNode";
 import { TreeDataItem, TreeView } from "../tree-view";
 import useStateStore from "@/store/state";
 import useNoteStore from "@/store/note";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/Button/Button";
 
 export const Sidebar = memo(
   ({
@@ -100,12 +102,8 @@ export const Sidebar = memo(
     canvasRef: ReactSketchCanvasRef | null;
     // width: number;
   }) => {
-    // referees
-    const treeRef = React.useRef(null);
-    const fragmentTreeRef = React.useRef(null);
-
-    // Use resize obserer
-    const { ref, width, height } = useResizeObserver<HTMLDivElement>();
+    // router
+    const router = useRouter();
 
     const [notebooks, sections, notes] = useQueries([
       notebooksQuery,
@@ -217,19 +215,13 @@ export const Sidebar = memo(
       getData();
     }, [notebooks, sections, notes, fragments]);
 
-    const handlePotentialClose = useCallback(() => {
-      if (window.innerWidth < 1024) {
-        onClose();
-      }
-    }, [onClose]);
-
     const [notebookName, setNotebookName] = React.useState("");
     const [notebookOpen, onNotebookOpen] = React.useState(false);
 
     const [fragmentName, setFragmentName] = React.useState("");
     const [fragmentOpen, onFragmentOpen] = React.useState(false);
 
-    const { create, createOrUpdate } = useEvolu<Database>();
+    const { create } = useEvolu<Database>();
 
     const handler = () => {
       create("notebooks", {
@@ -250,25 +242,8 @@ export const Sidebar = memo(
       });
     };
 
-    // State
-    const [sectionDialog, onSectionDialog] = React.useState(false);
-    const [noteDialog, onNoteDialog] = React.useState(false);
-    const [sectionName, setSectionName] = React.useState("");
-    const [noteName, setNoteName] = React.useState("");
-
-    // References
-    const inputRef = React.useRef(null);
-
     // Store
     const setNote = useNoteStore((state) => state.setNote);
-
-    const { isInkEnabled, isPageSplit, setInkStatus, setPageSplit } =
-      useNoteStore((state) => ({
-        isInkEnabled: state.isInkEnabled,
-        isPageSplit: state.isPageSplit,
-        setInkStatus: state.setInkStatus,
-        setPageSplit: state.setPageSplit,
-      }));
 
     // Evolu
     const exportedDataQuery = React.useCallback(
@@ -293,10 +268,6 @@ export const Sidebar = memo(
       exportedDataQuery(),
       noteSettingsQuery(),
     ]);
-
-    // const [selectedSection, setSelectedSection] = React.useState(node.id);
-
-    const { update } = useEvolu<Database>();
 
     // Update selectNote to use the query results
     const selectNote = (item: TreeDataItem | undefined) => {
@@ -332,23 +303,6 @@ export const Sidebar = memo(
       }
     };
 
-    // const deleteNode = () => {
-    //   if (node.level !== 0) {
-    //     if (node.data.type === "section") {
-    //       update("sections", {
-    //         id: S.decodeSync(SectionId)(node.id),
-    //         isDeleted: true,
-    //       });
-    //     }
-    //     if (node.data.type === "note") {
-    //       update("notes", {
-    //         id: S.decodeSync(NoteId)(node.id),
-    //         isDeleted: true,
-    //       });
-    //     }
-    //   }
-    // };
-
     const windowClassName = cn(
       "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
       "dark:bg-black lg:dark:bg-black/30",
@@ -358,10 +312,10 @@ export const Sidebar = memo(
     );
 
     return (
-      <div className={cn(windowClassName, "px-5")} ref={ref}>
-        <div className="w-full min-h-svh overflow-hidden">
+      <div className={cn(windowClassName, "px-5")}>
+        <div className="w-full h-svh overflow-hidden">
           <div className="flex flex-col justify-between w-full h-full pb-5 overflow-auto min-h-svh">
-            <div className="flex flex-col gap-y-6">
+            <div className="flex justify-between flex-col gap-y-6">
               <div className="flex h-14 items-center justify-between">
                 <Link
                   href="/"
@@ -503,19 +457,18 @@ export const Sidebar = memo(
                 </div>
               </nav>
             </div>
-
-            <div>
-              <Link href={"/settings"}>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="mb-2 text-zinc-400 text-sm w-full text-left justify-start gap-x-2"
-                >
-                  <Settings />
-                  Settings
-                </Button>
-              </Link>
-            </div>
+            <Button
+              className="flex justify-start items-center"
+              onClick={(e) => {
+                e.preventDefault();
+                router.push("/settings");
+              }}
+            >
+              <>
+                <Settings />
+                <p>Settings</p>
+              </>
+            </Button>
           </div>
         </div>
       </div>

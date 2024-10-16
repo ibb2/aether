@@ -20,8 +20,6 @@ export default function Privacy() {
   const [switchState, setSwitchState] = React.useState<boolean>(true);
   const [analyticsEnabled, setAnalyticsEnabled] = React.useState(1);
 
-  const handleAnalytics = () => {};
-
   const toggleSwitch = (state: boolean) => {
     // On switch change handle convert the bool val to int representation
     // This is then stored into the analytics_allowed value for persistance across refreshes.

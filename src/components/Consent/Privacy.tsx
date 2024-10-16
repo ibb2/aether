@@ -35,11 +35,6 @@ export default function PrivacyConsent({
 
   useEffect(() => {
     try {
-      const privacyExistsInStorage =
-        window.localStorage.getItem("analytics_allowed");
-
-      if (privacyExistsInStorage) return;
-
       setIsOpen(true);
       if (document.cookie.includes("cookieConsent=true")) {
         if (!demo) {
@@ -53,6 +48,11 @@ export default function PrivacyConsent({
       // console.log("Error: ", e);
     }
   }, []);
+
+  const privacyExistsInStorage =
+    window.localStorage.getItem("analytics_allowed");
+
+  if (privacyExistsInStorage !== null) return;
 
   return variant != "small" ? (
     <div
