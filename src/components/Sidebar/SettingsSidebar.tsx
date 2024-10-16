@@ -46,7 +46,10 @@ export const SettingsSidebar = () => {
                 )}
                 asChild
               >
-                <Link href="/settings" className="w-full gap-2">
+                <Link
+                  href="/settings"
+                  className="flex items-center w-full gap-2"
+                >
                   <User />
                   Account
                 </Link>
@@ -67,12 +70,15 @@ export const SettingsSidebar = () => {
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start items-center",
+                  "w-full justify-start",
                   pathName === "/settings/privacy" && "bg-zinc-100",
                 )}
                 asChild
               >
-                <Link href="/settings/privacy" className="w-full gap-2">
+                <Link
+                  href="/settings/privacy"
+                  className="flex items-center w-full gap-2"
+                >
                   <EyeOff />
                   Privacy
                 </Link>
