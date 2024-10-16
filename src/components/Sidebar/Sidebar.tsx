@@ -458,6 +458,7 @@ export const Sidebar = memo(
               </nav>
             </div>
             <Button
+              variant="secondary"
               className="flex justify-start items-center"
               onClick={(e) => {
                 e.preventDefault();

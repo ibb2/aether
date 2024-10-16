@@ -15,7 +15,7 @@ export const SettingsSidebar = () => {
   );
 
   return (
-    <div className={cn(windowClassName, "px-5")}>
+    <div className={cn("px-5")}>
       <div className="w-full min-h-svh overflow-hidden">
         <div className="flex flex-col justify-between w-full h-full pb-5 overflow-auto min-h-svh">
           <div>
@@ -29,12 +29,12 @@ export const SettingsSidebar = () => {
               </Link>
             </div>
 
-            <nav className="grid items-start font-medium gap-y-1">
+            <nav className="grid items-start font-medium gap-y-2">
               <Button
                 variant="ghost"
                 className={cn(
                   "w-full justify-start items-center",
-                  pathName === "/settings" && "bg-zinc-100",
+                  pathName === "/settings" && "bg-slate-100 dark:bg-slate-900",
                 )}
                 asChild
               >
@@ -63,7 +63,8 @@ export const SettingsSidebar = () => {
                 variant="ghost"
                 className={cn(
                   "w-full justify-start",
-                  pathName === "/settings/privacy" && "bg-zinc-100",
+                  pathName === "/settings/privacy" &&
+                    "bg-slate-100 dark:bg-slate-900",
                 )}
                 asChild
               >
