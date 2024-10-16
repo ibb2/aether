@@ -27,7 +27,7 @@ export default function ClientComponents({
   return (
     <>
       <PostHogPageView />
-      <PrivacyConsent />
+      {/* <PrivacyConsent /> */}
       {children}
     </>
   );

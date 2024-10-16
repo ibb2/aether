@@ -59,7 +59,7 @@ export const SettingsSidebar = () => {
                   Personalisation
                 </Link>
               </Button> */}
-              <Button
+              {/* <Button
                 variant="ghost"
                 className={cn(
                   "w-full justify-start",
@@ -75,7 +75,7 @@ export const SettingsSidebar = () => {
                   <EyeOff />
                   Privacy
                 </Link>
-              </Button>
+              </Button> */}
             </nav>
           </div>
         </div>

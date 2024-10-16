@@ -15,25 +15,25 @@ if (typeof window !== "undefined") {
 export function PHProvider({ children }: { children: React.ReactNode }) {
   // Disable analytics solution from here
   // https://posthog.com/questions/how-can-i-disable-post-hog-on-certain-environments
-  const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean | null>(
-    null,
-  );
+  // const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean | null>(
+  //   null,
+  // );
 
-  useEffect(() => {
-    const enabled =
-      JSON.parse(localStorage.getItem("analytics_allowed")!) === 1;
-    setAnalyticsEnabled(enabled);
-  }, []);
+  // useEffect(() => {
+  //   const enabled =
+  //     JSON.parse(localStorage.getItem("analytics_allowed")!) === 1;
+  //   setAnalyticsEnabled(enabled);
+  // }, []);
 
-  if (analyticsEnabled === null) {
-    // Still determining if analytics are enabled
-    return <>{children}</>;
-  }
+  // if (analyticsEnabled === null) {
+  //   // Still determining if analytics are enabled
+  //   return <>{children}</>;
+  // }
 
-  if (!analyticsEnabled) {
-    // Analytics are disabled
-    return <>{children}</>;
-  }
+  // if (!analyticsEnabled) {
+  //   // Analytics are disabled
+  //   return <>{children}</>;
+  // }
 
   return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
 }
