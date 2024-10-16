@@ -52,7 +52,7 @@ export function TopNavbar() {
               Sign in
             </Button> */}
             <Button asChild>
-              <Link href="/app" className="flex">
+              <Link href="/app" className="flex items-center">
                 Get Started <ChevronRight />
               </Link>
             </Button>
