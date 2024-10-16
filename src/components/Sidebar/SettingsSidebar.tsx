@@ -46,12 +46,12 @@ export const SettingsSidebar = () => {
                 )}
                 asChild
               >
-                <Link href="#" className="w-full gap-2">
+                <Link href="/settings" className="w-full gap-2">
                   <User />
                   Account
                 </Link>
               </Button>
-              <Button
+              {/* <Button
                 variant="ghost"
                 className={cn(
                   "w-full justify-start items-center",
@@ -63,7 +63,7 @@ export const SettingsSidebar = () => {
                   <Brush />
                   Personalisation
                 </Link>
-              </Button>
+              </Button> */}
               <Button
                 variant="ghost"
                 className={cn(
