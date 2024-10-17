@@ -89,20 +89,30 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/Button/Button";
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
-  return items
-    .map((item) => {
-      const matchingChildren = item.children
-        ? searchTree(item.children, query)
-        : [];
-      if (
-        item.name.toLowerCase().includes(query.toLowerCase()) ||
-        matchingChildren.length > 0
-      ) {
-        return { ...item, children: matchingChildren };
-      }
-      return null;
-    })
-    .filter((item) => item !== null) as TreeDataItem[];
+  return (
+    items
+      .map((item) => {
+        // Search within children only if they exist
+        const matchingChildren = item.children
+          ? searchTree(item.children, query)
+          : [];
+
+        // Match the current item if its name contains the query, or if it has matching children
+        if (
+          item.name.toLowerCase().includes(query.toLowerCase()) ||
+          matchingChildren.length > 0
+        ) {
+          // If the item has children, return them; otherwise, return the item without adding `children`
+          return item.children
+            ? { ...item, children: matchingChildren }
+            : { ...item };
+        }
+
+        return null;
+      })
+      // Filter out items that do not match the search
+      .filter((item) => item !== null) as TreeDataItem[]
+  );
 }
 
 export const Sidebar = memo(
@@ -236,11 +246,10 @@ export const Sidebar = memo(
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
-      onSearching(true);
-      if (value.length === 0) setSearchTreeData(initialTreeData);
       setQuery(value);
       console.log("Search results", searchTree(treeData, value));
-      setSearchTreeData(searchTree(treeData, query));
+      setTreeData(searchTree(treeData, query));
+      if (value.length === 0) setTreeData(initialTreeData);
     };
 
     React.useEffect(() => {
@@ -354,8 +363,12 @@ export const Sidebar = memo(
             // console.log("clear");
           }
           if (editor) editor.commands.setContent(exportedData.jsonData!);
-          onSearching(false);
         }
+      }
+
+      if (item.type === "note") {
+        setTreeData(initialTreeData);
+        setQuery("");
       }
     };
 
@@ -508,7 +521,7 @@ export const Sidebar = memo(
                   </span>
                   {treeData !== undefined && (
                     <TreeView
-                      data={searching ? searchTreeData : treeData}
+                      data={treeData}
                       onSelectChange={(item) => {
                         selectNote(item);
                       }}
