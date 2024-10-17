@@ -88,6 +88,23 @@ import useNoteStore from "@/store/note";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/Button/Button";
 
+function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
+  return items
+    .map((item) => {
+      const matchingChildren = item.children
+        ? searchTree(item.children, query)
+        : [];
+      if (
+        item.name.toLowerCase().includes(query.toLowerCase()) ||
+        matchingChildren.length > 0
+      ) {
+        return { ...item, children: matchingChildren };
+      }
+      return null;
+    })
+    .filter((item) => item !== null) as TreeDataItem[];
+}
+
 export const Sidebar = memo(
   ({
     editor,
@@ -114,7 +131,11 @@ export const Sidebar = memo(
     const { rows: fragments } = useQuery(fragmentsQuery);
 
     // State
-    const [treeData, setTreeData] = React.useState();
+    const [initialTreeData, setInitialTreeData] = React.useState<any>();
+    const [treeData, setTreeData] = React.useState<any>();
+    const [query, setQuery] = React.useState("");
+    const [searching, onSearching] = React.useState<boolean>(false);
+    const [searchTreeData, setSearchTreeData] = React.useState<any>();
     const [fragmentsData, setFragmentsData] = React.useState<TreeDataItem[]>(
       [],
     );
@@ -189,11 +210,45 @@ export const Sidebar = memo(
       return normalizedData;
     };
 
+    // function searchTree(searchQuery: String) {
+    //   // Handles searching the tree for a value
+
+    //   if (treeData === undefined) {
+    //     onSearching(false);
+    //     return;
+    //   }
+
+    //   onSearching(true);
+
+    //   console.log(
+    //     "Search results",
+    //     treeData.filter((item) =>
+    //       item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    //     ),
+    //   );
+
+    //   setSearchTreeData(
+    //     treeData.filter((item) =>
+    //       item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    //     ),
+    //   );
+    // }
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      onSearching(true);
+      if (value.length === 0) setSearchTreeData(initialTreeData);
+      setQuery(value);
+      console.log("Search results", searchTree(treeData, value));
+      setSearchTreeData(searchTree(treeData, query));
+    };
+
     React.useEffect(() => {
       const getData = async () => {
         const transformedData = transformData(notebooks, sections, notes);
         const treeStructure = convertToTreeStructure(transformedData);
         setTreeData(treeStructure);
+        setInitialTreeData(treeStructure);
       };
 
       const getFragmentsData = async () => {
@@ -299,6 +354,7 @@ export const Sidebar = memo(
             // console.log("clear");
           }
           if (editor) editor.commands.setContent(exportedData.jsonData!);
+          onSearching(false);
         }
       }
     };
@@ -421,7 +477,13 @@ export const Sidebar = memo(
                   )}
                 </Dialog>
               </div>
-              <nav className="flex flex-col items-start w-full text-sm font-medium gap-y-4">
+              <nav className="flex flex-col items-start w-full text-sm font-medium gap-y-4 px-1">
+                <Input
+                  type="text"
+                  placeholder="Search notes"
+                  value={query}
+                  onChange={handleSearch}
+                />
                 <div className="w-full">
                   <span className="mb-2 text-zinc-400 text-sm">FRAGMENTS</span>
                   <div
@@ -446,7 +508,7 @@ export const Sidebar = memo(
                   </span>
                   {treeData !== undefined && (
                     <TreeView
-                      data={treeData}
+                      data={searching ? searchTreeData : treeData}
                       onSelectChange={(item) => {
                         selectNote(item);
                       }}
