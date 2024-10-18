@@ -40,3 +40,6 @@ next-env.d.ts
 # db
 aether*
 drizzle/
+
+# Million Lint
+.million
