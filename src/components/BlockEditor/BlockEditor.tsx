@@ -48,7 +48,7 @@ import useSidebarStore from "@/store/sidebar";
 import useStateStore from "@/store/state";
 import { useTheme } from "next-themes";
 import { parse, stringify, toJSON, fromJSON } from "flatted";
-import { settingQuery, settingsExists } from "@/db/queries";
+import { settingQuery } from "@/db/queries";
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
   const menuContainerRef = useRef(null);
@@ -104,8 +104,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     ydoc,
     provider,
   });
-
-  const leftSidebar = useSidebar();
 
   // Evolu
   const exportedDataQuery = evolu.createQuery((db) =>
@@ -259,15 +257,15 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     },
     onTransaction({ editor, transaction }) {
       // The editor state has changed.
-      if (id !== null) {
-        console.log("note id", noteId);
-        update("settings", {
-          id: settings.rows[0].id,
-          defaultPage: editor.getJSON(),
-          lastAccessedNote: noteId,
-          defaultPageExport: id,
-        });
-      }
+      // if (id !== null) {
+      //   console.log("note id", noteId);
+      //   update("settings", {
+      //     id: settings.rows[0].id,
+      //     defaultPage: editor.getJSON(),
+      //     lastAccessedNote: noteId,
+      //     defaultPageExport: id,
+      //   });
+      // }
     },
     onFocus({ editor, event }) {
       // The editor is focused.

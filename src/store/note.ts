@@ -9,11 +9,13 @@ interface NoteState {
   ink: any | null;
   isInkEnabled: boolean;
   isPageSplit: boolean;
+  items: any;
   setNote: (
     data: {},
     name: string,
     noteId: string & Brand<"Id"> & Brand<"Note">,
     id: string & Brand<"Id"> & Brand<"ExportedData">,
+    items: any,
   ) => void;
   setInk: (data: any) => void;
   setInkStatus: () => void;
@@ -28,12 +30,15 @@ const useNoteStore = create<NoteState>()((set) => ({
   ink: null,
   isInkEnabled: false,
   isPageSplit: false,
+  items: null,
+
   setNote: (
     data: {},
     name: string,
     noteId: string & Brand<"Id"> & Brand<"Note">,
     id: string & Brand<"Id"> & Brand<"ExportedData">,
-  ) => set(() => ({ data, name, noteId, id })),
+    items: any,
+  ) => set(() => ({ data, name, noteId, id, items })),
   setInk: (data: any) =>
     set(() => ({
       ink: data,

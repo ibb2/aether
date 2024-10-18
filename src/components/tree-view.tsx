@@ -478,15 +478,15 @@ const TreeNode = ({
     }
   };
 
-  React.useEffect(() => {
-    if (settings.row !== null) {
-      const noteId = settings.row.lastAccessedNote;
-      const exportedDataId = settings.row.defaultPageExport;
-      console.log("settings exist arborist", settings.row);
-      editor?.commands.setContent(settings.row.defaultPage);
-      defaultNote(noteId, exportedDataId);
-    }
-  }, [editor]);
+  // React.useEffect(() => {
+  //   if (settings.row !== null) {
+  //     const noteId = settings.row.lastAccessedNote;
+  //     const exportedDataId = settings.row.defaultPageExport;
+  //     console.log("settings exist arborist", settings.row);
+  //     editor?.commands.setContent(settings.row.defaultPage);
+  //     defaultNote(noteId, exportedDataId);
+  //   }
+  // }, [editor]);
 
   return (
     <Dialog>
@@ -795,51 +795,54 @@ const TreeLeaf = React.forwardRef<
       });
     };
 
-    const defaultNote = (
-      noteId: (string & Brand<"Id"> & Brand<"Note">) | null,
-      exportedDataId: (string & Brand<"Id"> & Brand<"ExportedData">) | null,
-    ) => {
-      // const noteId = S.decodeSync(NoteId)(node.id);
-      const exportedData = exportedDataRows.rows.find(
-        (row) => row.noteId === noteId!,
-      );
-      const noteSetting = noteSettings.rows.find(
-        (row) => row.noteId === noteId,
-      );
-      console.log("JSON Data, ", exportedData?.jsonData);
-      console.log("INK Data, ", exportedData?.inkData);
-
-      if (exportedData) {
-        setNote(
-          exportedData.jsonData!,
-          S.decodeSync(NonEmptyString50)(exportedData.noteId ?? "default"),
-          noteId!,
-          exportedData.id,
+    const defaultNote = React.useCallback(
+      (
+        noteId: (string & Brand<"Id"> & Brand<"Note">) | null,
+        exportedDataId: (string & Brand<"Id"> & Brand<"ExportedData">) | null,
+      ) => {
+        // const noteId = S.decodeSync(NoteId)(node.id);
+        const exportedData = exportedDataRows.rows.find(
+          (row) => row.noteId === noteId!,
         );
+        const noteSetting = noteSettings.rows.find(
+          (row) => row.noteId === noteId,
+        );
+        console.log("JSON Data, ", exportedData?.jsonData);
+        console.log("INK Data, ", exportedData?.inkData);
 
-        const ink = exportedData.inkData as unknown as CanvasPath[];
+        if (exportedData) {
+          setNote(
+            exportedData.jsonData!,
+            S.decodeSync(NonEmptyString50)(exportedData.noteId ?? "default"),
+            noteId!,
+            exportedData.id,
+          );
 
-        if (canvasRef && exportedData.inkData) {
-          canvasRef.resetCanvas();
-          canvasRef.loadPaths(ink);
+          const ink = exportedData.inkData as unknown as CanvasPath[];
+
+          if (canvasRef && exportedData.inkData) {
+            canvasRef.resetCanvas();
+            canvasRef.loadPaths(ink);
+          }
+          if (canvasRef && exportedData.inkData === null) {
+            canvasRef.resetCanvas();
+            // console.log("clear");
+          }
+          if (editor) editor.commands.setContent(exportedData.jsonData!);
         }
-        if (canvasRef && exportedData.inkData === null) {
-          canvasRef.resetCanvas();
-          // console.log("clear");
-        }
-        if (editor) editor.commands.setContent(exportedData.jsonData!);
-      }
-    };
+      },
+      [exportedDataRows, noteSettings, setNote, canvasRef, editor],
+    );
 
-    React.useEffect(() => {
-      if (settings.row !== null) {
-        const noteId = settings.row.lastAccessedNote;
-        const exportedDataId = settings.row.defaultPageExport;
-        console.log("settings exist arborist", settings.row);
-        editor?.commands.setContent(settings.row.defaultPage);
-        defaultNote(noteId, exportedDataId);
-      }
-    }, [editor]);
+    // React.useEffect(() => {
+    //   if (settings.row !== null) {
+    //     const noteId = settings.row.lastAccessedNote;
+    //     const exportedDataId = settings.row.defaultPageExport;
+    //     console.log("settings exist arborist", settings.row);
+    //     editor?.commands.setContent(settings.row.defaultPage);
+    //     defaultNote(noteId, exportedDataId);
+    //   }
+    // }, [editor, settings, defaultNote]);
 
     return (
       <Dialog>

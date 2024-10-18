@@ -1,13 +1,10 @@
 "use client";
 
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "../globals.css";
 import { EvoluProvider } from "@evolu/react";
 import { evolu } from "@/db/db";
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { Sidebar } from "@/components/Sidebar";
-import { Editor } from "@tiptap/react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -15,8 +12,9 @@ import {
 } from "@/components/ui/resizable";
 import useSidebarStore from "@/store/sidebar";
 import { ImperativePanelHandle } from "react-resizable-panels";
-import useStateStore from "@/store/state";
-import useResizeObserver from "use-resize-observer";
+
+// Memoize the Sidebar component
+const MemoizedSidebar = memo(Sidebar);
 
 export default function AppLayout({
   children, // will be a page or nested layout
@@ -46,18 +44,18 @@ export default function AppLayout({
     }),
   );
 
-  const { editor, canvasRef, setCanvasRef, setEditor } = useStateStore(
-    (state) => ({
-      editor: state.editor,
-      canvasRef: state.canvasRef,
-      setCanvasRef: state.setRef,
-      setEditor: state.setEditor,
-    }),
-  );
-
   React.useEffect(() => {
     setRef(panelRef);
   }, [panelRef, setRef]);
+
+  // Memoize the onResize function
+  const onResize = useCallback(
+    (s) => {
+      adjustSize(s);
+      setWidth(s * MULTIPLE);
+    },
+    [adjustSize, MULTIPLE]
+  );
 
   return (
     <EvoluProvider value={evolu}>
@@ -72,18 +70,11 @@ export default function AppLayout({
             defaultSize={20}
             collapsible
             maxSize={50}
-            onResize={(s) => {
-              adjustSize(s);
-              setWidth(s * MULTIPLE);
-            }}
+            onResize={onResize} // Use the memoized function
             ref={panelRef}
           >
-            <Sidebar
-              isOpen={open}
-              onClose={setOpen}
-              editor={editor!}
-              canvasRef={canvasRef.current}
-            />
+            {/* Use the memoized Sidebar */}
+            <MemoizedSidebar />
           </ResizablePanel>
         )}
         <ResizableHandle withHandle />

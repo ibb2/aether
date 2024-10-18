@@ -31,27 +31,6 @@ export default function Document({ params }: { params: { room: string } }) {
 
   const { room } = params;
 
-  // useEffect(() => {
-  //   // fetch data
-  //   const dataFetch = async () => {
-  //     const data = await (
-  //       await fetch("/api/collaboration", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       })
-  //     ).json();
-
-  //     const { token } = data;
-
-  //     // set state when the data received
-  //     setCollabToken(token);
-  //   };
-
-  //   dataFetch();
-  // }, []);
-
   const ydoc = useMemo(() => new YDoc(), []);
 
   useLayoutEffect(() => {
