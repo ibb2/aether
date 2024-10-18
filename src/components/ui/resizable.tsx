@@ -46,4 +46,6 @@ const ResizableHandle = React.memo(
     )
 )
 
+ResizableHandle.displayName = 'ResizableHandle'
+
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
