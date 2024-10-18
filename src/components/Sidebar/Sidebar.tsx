@@ -266,34 +266,7 @@ export const Sidebar = memo(() => {
         })
     }
 
-    // Store
     const setNote = useNoteStore((state) => state.setNote)
-
-    // Evolu
-    const exportedDataQuery = React.useCallback(
-        () =>
-            evolu.createQuery((db) =>
-                db
-                    .selectFrom('exportedData')
-                    .select('id')
-                    .select('jsonData')
-                    .select('noteId')
-                    .select('inkData')
-            ),
-        []
-    )
-    const noteSettingsQuery = React.useCallback(
-        () =>
-            evolu.createQuery((db) =>
-                db.selectFrom('noteSettings').selectAll()
-            ),
-        []
-    )
-
-    const [exportedDataRows, noteSettings] = useQueries([
-        exportedDataQuery(),
-        noteSettingsQuery(),
-    ])
 
     // Update selectNote to use the query results
     const selectNote = (item: TreeDataItem | undefined) => {
@@ -301,19 +274,8 @@ export const Sidebar = memo(() => {
 
         if (item.type !== 'note') return
 
-        const exportedData = exportedDataRows.rows.find(
-            (row) => row.noteId === item.id
-        )
-
-        if (exportedData) {
-            setNote(
-                exportedData.jsonData!,
-                S.decodeSync(NonEmptyString50)(exportedData.noteId ?? ''),
-                S.decodeSync(NoteId)(item.id),
-                exportedData.id,
-                item
-            )
-        }
+        console.log('Item', item)
+        setNote(item)
 
         if (item.type === 'note') {
             setTreeData(initialTreeData)

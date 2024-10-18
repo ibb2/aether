@@ -1,7 +1,7 @@
 'use client'
 
 import '../globals.css'
-import { EvoluProvider } from '@evolu/react'
+import { EvoluProvider, useQuery } from '@evolu/react'
 import { evolu } from '@/db/db'
 import React, { memo, useCallback } from 'react'
 import { Sidebar } from '@/components/Sidebar'
@@ -58,30 +58,28 @@ export default function AppLayout({
     )
 
     return (
-        <EvoluProvider value={evolu}>
-            <ResizablePanelGroup
-                direction="horizontal"
-                className="flex fixed h-full align-self self-start"
-                ref={menuContainerRef}
-            >
-                {/* Include shared UI here e.g. a header or sidebar */}
-                {open && (
-                    <ResizablePanel
-                        defaultSize={20}
-                        collapsible
-                        maxSize={50}
-                        onResize={onResize} // Use the memoized function
-                        ref={panelRef}
-                    >
-                        {/* Use the memoized Sidebar */}
-                        <MemoizedSidebar />
-                    </ResizablePanel>
-                )}
-                <ResizableHandle withHandle />
-                <ResizablePanel className="flex-1">
-                    <section className="h-full">{children}</section>
+        <ResizablePanelGroup
+            direction="horizontal"
+            className="flex fixed h-full align-self self-start"
+            ref={menuContainerRef}
+        >
+            {/* Include shared UI here e.g. a header or sidebar */}
+            {open && (
+                <ResizablePanel
+                    defaultSize={20}
+                    collapsible
+                    maxSize={50}
+                    onResize={onResize} // Use the memoized function
+                    ref={panelRef}
+                >
+                    {/* Use the memoized Sidebar */}
+                    <MemoizedSidebar />
                 </ResizablePanel>
-            </ResizablePanelGroup>
-        </EvoluProvider>
+            )}
+            <ResizableHandle withHandle />
+            <ResizablePanel className="flex-1">
+                <section className="h-full">{children}</section>
+            </ResizablePanel>
+        </ResizablePanelGroup>
     )
 }
