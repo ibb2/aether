@@ -12,7 +12,6 @@ import Link from 'next/link'
 import { EvoluProvider, useEvolu } from '@evolu/react'
 import { evolu } from '@/db/db'
 import React from 'react'
-import { render } from 'react-dom'
 
 export default function Hero() {
     const owner = evolu.getOwner()
