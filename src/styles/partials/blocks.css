@@ -9,6 +9,8 @@
   }
 
   /* Block Quote */
+ 
+
   figure[data-type='blockquoteFigure'] {
     @apply my-14 text-black dark:text-white;
   }
@@ -21,6 +23,9 @@
       & > * {
         @apply first:mt-0 last:mb-0;
       }
+      border-left: 3px solid lightslategray;
+      margin: 1.5rem 0;
+      padding-left: 1rem;
     }
   }
 

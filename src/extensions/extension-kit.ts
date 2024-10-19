@@ -80,7 +80,6 @@ export const ExtensionKit = ({
         dropcursor: false,
         heading: false,
         horizontalRule: false,
-        blockquote: false,
         // history: false,
         codeBlock: false,
     }),
@@ -164,7 +163,6 @@ export const ExtensionKit = ({
     SlashCommand,
     Focus,
     Figcaption,
-    BlockquoteFigure,
     Dropcursor.configure({
         width: 2,
         class: 'ProseMirror-dropcursor border-black',
