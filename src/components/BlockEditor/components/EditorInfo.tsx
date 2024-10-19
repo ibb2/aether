@@ -1,170 +1,139 @@
-import React from "react";
+import React from 'react'
 
-import { WebSocketStatus } from "@hocuspocus/provider";
-import { memo } from "react";
-import { EditorUser } from "../types";
-import { cn } from "../../../lib/utils";
-import { getConnectionText } from "../../../lib/utils/getConnectionText";
-import Tooltip from "../../ui/Tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { memo } from 'react'
+import { cn } from '../../../lib/utils'
 import {
-  DropdownMenuCheckboxItemProps,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@radix-ui/react-dropdown-menu";
+    DropdownMenuCheckboxItemProps,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+} from '@radix-ui/react-dropdown-menu'
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
-  ArrowLeft,
-  ArrowLeftFromLine,
-  ArrowRight,
-  ArrowRightToLine,
-  Cloud,
-  CreditCard,
-  Eraser,
-  Github,
-  Keyboard,
-  LifeBuoy,
-  LogIn,
-  LogOut,
-  Mail,
-  Menu,
-  MenuSquare,
-  MessageSquare,
-  Pen,
-  Plus,
-  PlusCircle,
-  Redo,
-  RefreshCcw,
-  Settings,
-  Settings2,
-  ToggleLeft,
-  ToggleRight,
-  Trash,
-  Undo,
-  User,
-  UserPlus,
-  Users,
-  X,
-} from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import Link from "next/link";
-import { ReactSketchCanvasRef } from "react-sketch-canvas";
-import { evolu } from "@/db/db";
-import { useQueries } from "@evolu/react";
-import useNoteStore from "@/store/note";
+    ArrowLeftFromLine,
+    ArrowRightToLine,
+    Eraser,
+    Pen,
+    Redo,
+    RefreshCcw,
+    Settings,
+    Settings2,
+    ToggleLeft,
+    ToggleRight,
+    Trash,
+    Undo,
+} from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+import Link from 'next/link'
+import { ReactSketchCanvasRef } from 'react-sketch-canvas'
+import useNoteStore from '@/store/note'
 
-type Checked = DropdownMenuCheckboxItemProps["checked"];
+type Checked = DropdownMenuCheckboxItemProps['checked']
 
 export type EditorInfoProps = {
-  characters: number;
-  words: number;
-  // collabState: WebSocketStatus;
-  // users: EditorUser[];
-  canvasRef: ReactSketchCanvasRef | null;
-  readOnly: boolean;
-  setReadOnly: any;
-};
+    characters: number
+    words: number
+    // collabState: WebSocketStatus;
+    // users: EditorUser[];
+    canvasRef: ReactSketchCanvasRef | null
+    readOnly: boolean
+    setReadOnly: any
+}
 
 export const EditorInfo = memo(
-  ({
-    characters,
-    words,
-    canvasRef,
-    readOnly,
-    setReadOnly,
-  }: EditorInfoProps) => {
-    const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-    const [showActivityBar, setShowActivityBar] =
-      React.useState<Checked>(false);
-    const [showPanel, setShowPanel] = React.useState<Checked>(false);
-    const [session, setSession] = React.useState<any>(null);
-    const [open, onOpen] = React.useState(false);
-    const [animate, onAnimate] = React.useState(false);
+    ({
+        characters,
+        words,
+        canvasRef,
+        readOnly,
+        setReadOnly,
+    }: EditorInfoProps) => {
+        const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
+        const [showActivityBar, setShowActivityBar] =
+            React.useState<Checked>(false)
+        const [showPanel, setShowPanel] = React.useState<Checked>(false)
+        const [session, setSession] = React.useState<any>(null)
+        const [open, onOpen] = React.useState(false)
+        const [animate, onAnimate] = React.useState(false)
 
-    const isInkEnabled = useNoteStore((state) => state.isInkEnabled);
-    const toggleInking = useNoteStore((state) => state.setInkStatus);
+        const isInkEnabled = useNoteStore((state) => state.isInkEnabled)
+        const toggleInking = useNoteStore((state) => state.setInkStatus)
 
-    // const noteSettingsQuery = React.useCallback(
-    //   () => evolu.createQuery((db) => db.selectFrom("noteSettings").selectAll()),
-    //   [],
-    // );
+        // const noteSettingsQuery = React.useCallback(
+        //   () => evolu.createQuery((db) => db.selectFrom("noteSettings").selectAll()),
+        //   [],
+        // );
 
-    // const [noteSettings] = useQueries([
-    //   noteSettingsQuery(),
-    // ])
+        // const [noteSettings] = useQueries([
+        //   noteSettingsQuery(),
+        // ])
 
-    // const disableInkForNote = () => {
-    //   const noteSetting = noteSettings.rows.find((row) => row.noteId === noteId);
-    // }
+        // const disableInkForNote = () => {
+        //   const noteSetting = noteSettings.rows.find((row) => row.noteId === noteId);
+        // }
 
-    const openSettings = () => {
-      onAnimate(true);
-      console.log(animate);
-      setTimeout(() => {
-        onAnimate(false);
-      }, 1000);
-    };
+        const openSettings = () => {
+            onAnimate(true)
+            console.log(animate)
+            setTimeout(() => {
+                onAnimate(false)
+            }, 1000)
+        }
 
-    const [eraseMode, setEraseMode] = React.useState(false);
+        const [eraseMode, setEraseMode] = React.useState(false)
 
-    const handleEraserClick = () => {
-      setEraseMode(true);
-      if (canvasRef) canvasRef.eraseMode(true);
-    };
+        const handleEraserClick = () => {
+            setEraseMode(true)
+            if (canvasRef) canvasRef.eraseMode(true)
+        }
 
-    const handlePenClick = () => {
-      setEraseMode(false);
-      if (canvasRef) canvasRef.eraseMode(false);
-    };
+        const handlePenClick = () => {
+            setEraseMode(false)
+            if (canvasRef) canvasRef.eraseMode(false)
+        }
 
-    const handleUndoClick = () => {
-      if (canvasRef) canvasRef.undo();
-    };
+        const handleUndoClick = () => {
+            if (canvasRef) canvasRef.undo()
+        }
 
-    const handleRedoClick = () => {
-      if (canvasRef) canvasRef.redo();
-    };
+        const handleRedoClick = () => {
+            if (canvasRef) canvasRef.redo()
+        }
 
-    const handleClearClick = () => {
-      if (canvasRef) canvasRef.clearCanvas();
-    };
+        const handleClearClick = () => {
+            if (canvasRef) canvasRef.clearCanvas()
+        }
 
-    const handleResetClick = () => {
-      if (canvasRef) canvasRef.resetCanvas();
-    };
+        const handleResetClick = () => {
+            if (canvasRef) canvasRef.resetCanvas()
+        }
 
-    const handleDisableCanvas = () => {
-      if (canvasRef) {
-        toggleInking();
-        // setReadOnly(!isInkEnabled);
-      }
-    };
+        const handleDisableCanvas = () => {
+            if (canvasRef) {
+                toggleInking()
+                // setReadOnly(!isInkEnabled);
+            }
+        }
 
-    React.useEffect(() => {
-      setReadOnly(!isInkEnabled);
-    }, [isInkEnabled, setReadOnly]);
+        React.useEffect(() => {
+            setReadOnly(!isInkEnabled)
+        }, [isInkEnabled, setReadOnly])
 
-    const customClass = cn(
-      "flex z-10",
-      open && "justify-between",
-      !open && "justify-end",
-    );
+        const customClass = cn(
+            'flex z-10',
+            open && 'justify-between',
+            !open && 'justify-end'
+        )
 
-    return (
-      <div className={customClass}>
-        {/* <div className="flex flex-col justify-center pr-4 mr-4 text-right border-r border-neutral-200 dark:border-neutral-800">
+        return (
+            <div className={customClass}>
+                {/* <div className="flex flex-col justify-center pr-4 mr-4 text-right border-r border-neutral-200 dark:border-neutral-800">
           <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
             {words} {words === 1 ? "word" : "words"}
           </div>
@@ -172,7 +141,7 @@ export const EditorInfo = memo(
             {characters} {characters === 1 ? "character" : "characters"}
           </div>
         </div> */}
-        {/* <div className="flex items-center gap-2 mr-2">
+                {/* <div className="flex items-center gap-2 mr-2">
         <div
           className={cn("w-2 h-2 rounded-full", {
             "bg-yellow-500 dark:bg-yellow-400": collabState === "connecting",
@@ -211,78 +180,106 @@ export const EditorInfo = memo(
         </div>
       )} */}
 
-        {open && (
-          <div className="flex flex-row gap-2 justify-between pr-4 mr-4 text-right duration-300 transition-all">
-            {/* <div className="d-flex gap-2 align-items-center "> */}
-            <Button
-              variant={eraseMode ? "outline" : "default"}
-              size="icon"
-              onClick={handlePenClick}
-            >
-              <Pen />
-            </Button>
-            <Button
-              variant={!eraseMode ? "outline" : "default"}
-              size="icon"
-              onClick={handleEraserClick}
-            >
-              <Eraser />
-            </Button>
-            <div className="vr" />
-            <Button variant="outline" size="icon" onClick={handleUndoClick}>
-              <Undo />
-            </Button>
-            <Button variant="outline" size="icon" onClick={handleRedoClick}>
-              <Redo />
-            </Button>
-            <Button variant="outline" size="icon" onClick={handleClearClick}>
-              <Trash />
-            </Button>
-            <Button variant="outline" size="icon" onClick={handleResetClick}>
-              <RefreshCcw />
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={handleDisableCanvas}
-              size="icon"
-              className="mr-2"
-            >
-              {isInkEnabled ? <ToggleRight /> : <ToggleLeft />}
-            </Button>
-          </div>
-        )}
-        <div className="flex flex-row justify-self-end">
-          <Button size="icon" variant="ghost" onClick={() => onOpen(!open)}>
-            {open ? <ArrowRightToLine /> : <ArrowLeftFromLine />}
-          </Button>
-          <div className="flex">
-            <div className="relative flex flex-row items-center ml-3 ">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  {/* <Avatar>
+                {open && (
+                    <div className="flex flex-row gap-2 justify-between pr-4 mr-4 text-right duration-300 transition-all">
+                        {/* <div className="d-flex gap-2 align-items-center "> */}
+                        <Button
+                            variant={eraseMode ? 'outline' : 'default'}
+                            size="icon"
+                            onClick={handlePenClick}
+                        >
+                            <Pen />
+                        </Button>
+                        <Button
+                            variant={!eraseMode ? 'outline' : 'default'}
+                            size="icon"
+                            onClick={handleEraserClick}
+                        >
+                            <Eraser />
+                        </Button>
+                        <div className="vr" />
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleUndoClick}
+                        >
+                            <Undo />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleRedoClick}
+                        >
+                            <Redo />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleClearClick}
+                        >
+                            <Trash />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleResetClick}
+                        >
+                            <RefreshCcw />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            onClick={handleDisableCanvas}
+                            size="icon"
+                            className="mr-2"
+                        >
+                            {isInkEnabled ? <ToggleRight /> : <ToggleLeft />}
+                        </Button>
+                    </div>
+                )}
+                <div className="flex flex-row justify-self-end">
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => onOpen(!open)}
+                    >
+                        {open ? <ArrowRightToLine /> : <ArrowLeftFromLine />}
+                    </Button>
+                    <div className="flex">
+                        <div className="relative flex flex-row items-center ml-3 ">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    {/* <Avatar>
                     <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar> */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openSettings()}
-                    className={cn(animate && "animate-spin")}
-                  >
-                    <Settings2 />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="p-2">
-                  <DropdownMenuLabel>Page Settings</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleDisableCanvas}
-                    className="flex items-center justify-between px-2"
-                  >
-                    Ink
-                    {isInkEnabled ? <ToggleRight /> : <ToggleLeft />}
-                  </DropdownMenuItem>
-                  {/* <DropdownMenuGroup>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => openSettings()}
+                                        className={cn(
+                                            animate && 'animate-spin'
+                                        )}
+                                    >
+                                        <Settings2 />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="p-2">
+                                    <DropdownMenuLabel>
+                                        Page Settings
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        onClick={handleDisableCanvas}
+                                        className="flex items-center justify-between px-2"
+                                    >
+                                        Ink
+                                        {isInkEnabled ? (
+                                            <ToggleRight />
+                                        ) : (
+                                            <ToggleLeft />
+                                        )}
+                                    </DropdownMenuItem>
+                                    {/* <DropdownMenuGroup>
                     <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <LogIn className="mr-2 h-4 w-4" />
                       <Link href="/login">Login</Link>
@@ -292,8 +289,8 @@ export const EditorInfo = memo(
                       <Link href="/signup">Sign up</Link>
                     </DropdownMenuItem>
                   </DropdownMenuGroup> */}
-                  <DropdownMenuGroup>
-                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5 cursor-pointer">
+                                    <DropdownMenuGroup>
+                                        {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5 cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                       <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
@@ -308,20 +305,22 @@ export const EditorInfo = memo(
                       <span>Billing</span>
                       <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                     </DropdownMenuItem> */}
-                    <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <Link href="/settings">
-                        <span>Settings</span>
-                      </Link>
-                      <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                                        <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
+                                            <Settings className="mr-2 h-4 w-4" />
+                                            <Link href="/settings">
+                                                <span>Settings</span>
+                                            </Link>
+                                            <DropdownMenuShortcut>
+                                                ⌘S
+                                            </DropdownMenuShortcut>
+                                        </DropdownMenuItem>
+                                        {/* <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <Keyboard className="mr-2 h-4 w-4" />
                       <span>Keyboard shortcuts</span>
                       <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
                     </DropdownMenuItem> */}
-                  </DropdownMenuGroup>
-                  {/* <DropdownMenuSeparator />
+                                    </DropdownMenuGroup>
+                                    {/* <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                     <DropdownMenuItem className="flex items-center px-1.5 py-0.5">
                       <Users className="mr-2 h-4 w-4" />
@@ -373,14 +372,14 @@ export const EditorInfo = memo(
                     <span>API</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator /> */}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    );
-  },
-);
+        )
+    }
+)
 
-EditorInfo.displayName = "EditorInfo";
+EditorInfo.displayName = 'EditorInfo'

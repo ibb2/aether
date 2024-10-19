@@ -70,7 +70,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     const { theme, setTheme } = useTheme()
 
     // Evolu
-    const { create, createOrUpdate, update } = useEvolu<Database>()
+    const { create, update } = useEvolu<Database>()
 
     // Zustand Stores
     const { setNote, item } = useNoteStore((state) => ({
@@ -105,8 +105,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 .select('inkData')
         )
     }, [])
-    // Use the query result here
 
+    // Use the query result here
     const [exportedData, settings] = useQueries([
         exportedDataQuery(),
         settingQuery,
