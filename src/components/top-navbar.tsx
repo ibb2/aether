@@ -3,83 +3,77 @@
  * @see https://v0.dev/t/xYHqD5MkVkT
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import Link from "next/link";
-import { Button } from "./ui/Button";
-import { JSX, SVGProps } from "react";
-import { ChevronRight, Cloud, Cloudy } from "lucide-react";
+import Link from 'next/link'
+import { Button } from './ui/Button'
+import { JSX, SVGProps } from 'react'
+import { ChevronRight, Cloud, Cloudy } from 'lucide-react'
 
 export function TopNavbar() {
-  return (
-    <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
-      <div className="w-full max-w-7xl px-4">
-        <div className="flex justify-between h-14 items-center">
-          <Link href="/" className="flex items-center" prefetch={false}>
-            <Cloud className="h-6 w-6" />
-            <span className="sr-only">Aether</span>
-          </Link>
-          <nav className="hidden md:flex gap-4">
-            <Link
-              href="/features"
-              className="font-medium flex items-center text-sm transition-colors hover:underline"
-              prefetch={false}
-            >
-              Features
-            </Link>
-            <Link
-              href="/pricing"
-              className="font-medium flex items-center text-sm transition-colors hover:underline"
-              prefetch={false}
-            >
-              Pricing
-            </Link>
-            {/* <Link
-              href="#"
-              className="font-medium flex items-center text-sm transition-colors hover:underline"
-              prefetch={false}
-            >
-              About
-            </Link> */}
-            <Link
-              href="#"
-              className="font-medium flex items-center text-sm transition-colors hover:underline"
-              prefetch={false}
-            >
-              Contact
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            {/* <Button variant="outline" size="sm">
-              Sign in
-            </Button> */}
-            <Button asChild>
-              <Link href="/app" className="flex items-center">
-                Get Started <ChevronRight />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
+    return (
+        <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
+            <div className="w-full max-w-7xl px-4">
+                <div className="flex justify-between h-14 items-center">
+                    <Link
+                        href="/"
+                        className="flex items-center"
+                        prefetch={false}
+                    >
+                        <Cloud className="h-6 w-6" />
+                        <span className="sr-only">Aether</span>
+                    </Link>
+                    <nav className="hidden md:flex gap-4">
+                        <Link
+                            href="/features"
+                            className="font-medium flex items-center text-sm transition-colors hover:underline"
+                            prefetch={false}
+                        >
+                            Features
+                        </Link>
+                        <Link
+                            href="/pricing"
+                            className="font-medium flex items-center text-sm transition-colors hover:underline"
+                            prefetch={false}
+                        >
+                            Pricing
+                        </Link>
+                        <Link
+                            href="#"
+                            className="font-medium flex items-center text-sm transition-colors hover:underline"
+                            prefetch={false}
+                        >
+                            Contact
+                        </Link>
+                    </nav>
+                    <div className="flex items-center gap-4">
+                        <Button asChild>
+                            <Link href="/app" className="flex items-center">
+                                Get Started <ChevronRight />
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    )
 }
 
 function MountainIcon(
-  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
+    props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
 ) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
-    </svg>
-  );
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+        </svg>
+    )
 }
