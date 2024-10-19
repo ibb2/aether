@@ -51,18 +51,20 @@ export default function Document({ params }: { params: { room: string } }) {
 
     const MemoizedBlockEditor = React.memo(BlockEditor)
 
+    const lightTheme = React.useMemo(() => {
+        return () => setTheme('light')
+    }, [setTheme])
+
+    const darkTheme = React.useMemo(() => {
+        return () => setTheme('dark')
+    }, [setTheme])
+
     const DarkModeSwitcher = createPortal(
         <Surface className="flex items-center gap-1 fixed bottom-6 right-6 z-[99999] p-1">
-            <Toolbar.Button
-                onClick={() => setTheme('light')}
-                active={theme === 'light'}
-            >
+            <Toolbar.Button onClick={lightTheme} active={theme === 'light'}>
                 <Icon name="Sun" />
             </Toolbar.Button>
-            <Toolbar.Button
-                onClick={() => setTheme('dark')}
-                active={theme === 'dark'}
-            >
+            <Toolbar.Button onClick={darkTheme} active={theme === 'dark'}>
                 <Icon name="Moon" />
             </Toolbar.Button>
         </Surface>,
@@ -70,13 +72,13 @@ export default function Document({ params }: { params: { room: string } }) {
     )
 
     return (
-        <EvoluProvider value={evolu}>
+        <>
             {DarkModeSwitcher}
             <MemoizedBlockEditor
                 hasCollab={hasCollab}
                 ydoc={ydoc}
                 provider={provider}
             />
-        </EvoluProvider>
+        </>
     )
 }
