@@ -289,12 +289,13 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
             ? (data.inkData as CanvasPath[])
             : null
 
-        if (canvasRef.current === null || ink === null) {
+        if (canvasRef.current === null) {
             return
         }
 
         canvasRef.current.resetCanvas()
         canvasRef.current.resetCanvas()
+        if (ink === null) return
         canvasRef.current.loadPaths(ink)
 
         customEditor?.commands.setContent(data.jsonData!)

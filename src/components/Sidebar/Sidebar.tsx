@@ -132,7 +132,7 @@ export const Sidebar = memo(() => {
     const [initialTreeData, setInitialTreeData] = React.useState<any>()
     const [treeData, setTreeData] = React.useState<any>()
     const [query, setQuery] = React.useState('')
-    const [fragmentsData, setFragmentsData] = React.useState<TreeDataItem[]>([])
+    const [fragmentsData, setFragmentsData] = React.useState<any>()
 
     // Make treeview data
     const convertToTreeStructure = (data) => {
@@ -229,6 +229,7 @@ export const Sidebar = memo(() => {
                 arr.push({
                     id: fragments[i].id,
                     name: S.decodeSync(S.String)(fragments[i].title!),
+                    type: 'fragment',
                 })
             }
 
@@ -272,15 +273,11 @@ export const Sidebar = memo(() => {
     const selectNote = (item: TreeDataItem | undefined) => {
         if (item === undefined) return
 
-        if (item.type !== 'note') return
+        if (item.type === 'section' || item.type === 'notebook') return
 
-        console.log('Item', item)
         setNote(item)
-
-        if (item.type === 'note') {
-            setTreeData(initialTreeData)
-            setQuery('')
-        }
+        setTreeData(initialTreeData)
+        setQuery('')
     }
 
     const windowClassName = cn(
