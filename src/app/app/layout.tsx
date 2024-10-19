@@ -52,9 +52,10 @@ export default function AppLayout({
     const onResize = useCallback(
         (s) => {
             adjustSize(s)
+            setRef(panelRef)
             setWidth(s * MULTIPLE)
         },
-        [adjustSize, MULTIPLE]
+        [adjustSize, MULTIPLE, setRef]
     )
 
     return (
@@ -62,6 +63,7 @@ export default function AppLayout({
             direction="horizontal"
             className="flex fixed h-full align-self self-start"
             ref={menuContainerRef}
+            autoSaveId={'settings-layout'}
         >
             {/* Include shared UI here e.g. a header or sidebar */}
             {open && (
