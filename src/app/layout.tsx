@@ -52,6 +52,12 @@ export default function RootLayout({
             className={`${inter.className} min-h-svh`}
             suppressHydrationWarning
         >
+            <head>
+                <script
+                    async
+                    src="https://js.stripe.com/v3/pricing-table.js"
+                ></script>
+            </head>
             <body className="flex min-h-svh items-center justify-center">
                 <PHProvider>
                     <EvoluProvider value={evolu}>
