@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { set } from 'react-hook-form'
 
 export default function SuccessPage() {
     const [status, setStatus] = useState('loading')
@@ -11,6 +12,8 @@ export default function SuccessPage() {
 
     useEffect(() => {
         if (sessionId) {
+            setStatus('ok')
+            console.log('sessionId', sessionId)
             fetchSessionStatus()
         }
     }, [sessionId])
