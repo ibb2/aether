@@ -152,7 +152,7 @@ export default function PricingSectionCards() {
                         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
                     }
                     client-reference-id={evolu.getOwner()?.id.toString()}
-                    success-url="http://localhost:3000/checkout/success"
+                    // success-url="http://localhost:3000/checkout/success"
                 ></stripe-pricing-table>
             </div>
             {/* End Pricing */}
