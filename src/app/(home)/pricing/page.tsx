@@ -147,12 +147,12 @@ export default function PricingSectionCards() {
             <TopNavbar />
             <div className="container py-24 lg:py-32">
                 <stripe-pricing-table
-                    pricing-table-id="prctbl_1QCCz6JBPSgR8cUzkv4U1nEi"
+                    pricing-table-id="prctbl_1QCy7ZJBPSgR8cUz1Czs38nu"
                     publishable-key={
                         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
                     }
                     client-reference-id={evolu.getOwner()?.id.toString()}
-                    return-url="http://localhost:3000/pricing"
+                    success-url="http://localhost:3000/checkout/success"
                 ></stripe-pricing-table>
             </div>
             {/* End Pricing */}
