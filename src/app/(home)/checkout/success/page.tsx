@@ -12,7 +12,7 @@ export default function SuccessPage() {
 
     useEffect(() => {
         if (sessionId) {
-            setStatus('ok')
+            // setStatus('ok')
             console.log('sessionId', sessionId)
             fetchSessionStatus()
         }
