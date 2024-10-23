@@ -19,7 +19,7 @@ export default function SuccessPage() {
     }, [sessionId])
 
     async function fetchSessionStatus() {
-        const response = await fetch('/api/check-session', {
+        const response = await fetch('/api/stripe/webhooks/check-session', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
