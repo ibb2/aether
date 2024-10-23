@@ -1,5 +1,7 @@
 'use client'
 
+import * as S from '@effect/schema/Schema'
+
 import { TopNavbar } from '@/components/top-navbar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/Button'
@@ -21,6 +23,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
+import { evolu } from '@/db/db'
 import { loadStripe } from '@stripe/stripe-js'
 import { CheckIcon, MinusIcon } from 'lucide-react'
 import React from 'react'
@@ -121,8 +124,22 @@ const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
 
+// If using TypeScript, add the following snippet to your file as well.
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            'stripe-pricing-table': React.DetailedHTMLProps<
+                React.HTMLAttributes<HTMLElement>,
+                HTMLElement
+            >
+        }
+    }
+}
+
 export default function PricingSectionCards() {
     const [monthly, onMonthly] = React.useState(true)
+
+    console.log(evolu.getOwner()?.id)
 
     return (
         <>
@@ -134,6 +151,8 @@ export default function PricingSectionCards() {
                     publishable-key={
                         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
                     }
+                    client-reference-id={evolu.getOwner()?.id.toString()}
+                    return-url="http://localhost:3000/pricing"
                 ></stripe-pricing-table>
             </div>
             {/* End Pricing */}
