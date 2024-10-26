@@ -11,6 +11,7 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@clerk/nextjs": "^6.0.2",
         "@evolu/react": "^8.2.0",
         "@fontsource/inter": "^5.0.20",
         "@hocuspocus/provider": "^2.13.5",
