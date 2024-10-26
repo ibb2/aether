@@ -6,6 +6,8 @@ import { ThemeProvider } from '@/components/providers/theme-provider'
 import dynamic from 'next/dynamic'
 import { EvoluProvider } from '@evolu/react'
 import { evolu } from '@/db/db'
+import { ClerkProvider } from '@clerk/nextjs'
+
 // import ClientComponents from "@/components/Layout/ClientComponents";
 
 const inter = Inter({ subsets: ['latin'] })
@@ -47,24 +49,26 @@ export default function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html
-            lang="en"
-            className={`${inter.className} min-h-svh`}
-            suppressHydrationWarning
-        >
-            <body className="flex min-h-svh items-center justify-center">
-                <PHProvider>
-                    <EvoluProvider value={evolu}>
-                        <ThemeProvider
-                            attribute="class"
-                            defaultTheme="system"
-                            enableSystem
-                        >
-                            <ClientComponents>{children}</ClientComponents>
-                        </ThemeProvider>
-                    </EvoluProvider>
-                </PHProvider>
-            </body>
-        </html>
+        <ClerkProvider>
+            <html
+                lang="en"
+                className={`${inter.className} min-h-svh`}
+                suppressHydrationWarning
+            >
+                <body className="flex min-h-svh items-center justify-center">
+                    <PHProvider>
+                        <EvoluProvider value={evolu}>
+                            <ThemeProvider
+                                attribute="class"
+                                defaultTheme="system"
+                                enableSystem
+                            >
+                                <ClientComponents>{children}</ClientComponents>
+                            </ThemeProvider>
+                        </EvoluProvider>
+                    </PHProvider>
+                </body>
+            </html>
+        </ClerkProvider>
     )
 }
