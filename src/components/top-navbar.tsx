@@ -46,10 +46,20 @@ export function TopNavbar() {
                     </nav>
                     <div className="flex items-center gap-4">
                         <Button asChild>
-                            <Link href="/app" className="flex items-center">
-                                Get Started <ChevronRight />
+                            <Link href="/login" className="flex items-center">
+                                Login
                             </Link>
                         </Button>
+                        <Button variant="secondary" asChild>
+                            <Link href="/login" className="flex items-center">
+                                Sign up
+                            </Link>
+                        </Button>
+                        {/* <Button asChild>
+                            <Link href="/app" className="flex items-center">
+                                Go to app <ChevronRight />
+                            </Link>
+                        </Button> */}
                     </div>
                 </div>
             </div>

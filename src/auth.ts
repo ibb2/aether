@@ -34,6 +34,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
     providers: [GitHub, Google, Resend],
     pages: {
-        signIn: '/sign-in',
+        signIn: '/login',
     },
 })
