@@ -26,14 +26,22 @@ export const providerMap = providers
     .filter((provider) => provider.id !== 'credentials')
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    debug: true,
     adapter: DrizzleAdapter(db, {
         usersTable: users,
         accountsTable: accounts,
         sessionsTable: sessions,
         verificationTokensTable: verificationTokens,
     }),
-    providers: [GitHub, Google, Resend],
+    providers: [
+        GitHub,
+        Google,
+        Resend({
+            from: 'noreply@aethernotes.ink',
+        }),
+    ],
     pages: {
         signIn: '/login',
+        verifyRequest: '/auth/verify-request', // Used to display message to user after email is sent
     },
 })

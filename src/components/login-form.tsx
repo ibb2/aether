@@ -12,6 +12,21 @@ import { Label } from '@/components/ui/label'
 import GoogleSignIn from './auth/sign-in-google'
 import GithubSignIn from './auth/sign-in-github'
 import { Button } from './ui/Button'
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form'
+import { AuthError } from 'next-auth'
+import { signIn } from '@/auth'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { ResendForm } from './auth/resend-form'
 
 export function LoginForm({
     callbackUrl,
@@ -28,33 +43,21 @@ export function LoginForm({
             </CardHeader>
             <CardContent>
                 <div className="grid gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            placeholder="m@example.com"
-                            required
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            <Link
-                                href="#"
-                                className="ml-auto inline-block text-sm underline"
-                            >
-                                Forgot your password?
-                            </Link>
+                    <ResendForm />
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t"></span>
                         </div>
-                        <Input id="password" type="password" required />
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">
+                                Or continue with
+                            </span>
+                        </div>
                     </div>
-                    <Button type="submit" className="w-full">
-                        Login
-                    </Button>
                     <GoogleSignIn callbackUrl={callbackUrl!} />
                     <GithubSignIn callbackUrl={callbackUrl!} />
                 </div>
+
                 <div className="mt-4 text-center text-sm">
                     Don&apos;t have an account?{' '}
                     <Link href="#" className="underline">
