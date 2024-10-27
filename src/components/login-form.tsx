@@ -52,8 +52,8 @@ export function LoginForm({
                     <Button type="submit" className="w-full">
                         Login
                     </Button>
-                    <GoogleSignIn callbackUrl={callbackUrl} />
-                    <GithubSignIn callbackUrl={callbackUrl} />
+                    <GoogleSignIn callbackUrl={callbackUrl!} />
+                    <GithubSignIn callbackUrl={callbackUrl!} />
                 </div>
                 <div className="mt-4 text-center text-sm">
                     Don&apos;t have an account?{' '}
