@@ -132,15 +132,15 @@ export default function Hero() {
                 </BoxReveal>
 
                 <BoxReveal boxColor={'#5046e6'} duration={0.5}>
-                    {ownerExists ? (
+                    {/* {ownerExists ? (
                         <Button className="mt-[1.6rem] bg-[#5046e6]" asChild>
                             <Link href="/app">Go to app</Link>
                         </Button>
-                    ) : (
-                        <Button className="mt-[1.6rem] bg-[#5046e6]" asChild>
-                            <Link href="/app">Get Started</Link>
-                        </Button>
-                    )}
+                    ) : ( */}
+                    <Button className="mt-[1.6rem] bg-[#5046e6]" asChild>
+                        <Link href="/app">Get Started</Link>
+                    </Button>
+                    {/* )} */}
                 </BoxReveal>
             </div>
         </EvoluProvider>

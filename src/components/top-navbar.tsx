@@ -7,8 +7,11 @@ import Link from 'next/link'
 import { Button } from './ui/Button'
 import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud, Cloudy } from 'lucide-react'
+import { auth } from '@/auth'
 
-export function TopNavbar() {
+export async function TopNavbar() {
+    const session = await auth()
+
     return (
         <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
             <div className="w-full max-w-7xl px-4">
@@ -45,21 +48,32 @@ export function TopNavbar() {
                         </Link>
                     </nav>
                     <div className="flex items-center gap-4">
-                        <Button asChild>
-                            <Link href="/login" className="flex items-center">
-                                Login
-                            </Link>
-                        </Button>
-                        <Button variant="secondary" asChild>
-                            <Link href="/login" className="flex items-center">
-                                Sign up
-                            </Link>
-                        </Button>
-                        {/* <Button asChild>
-                            <Link href="/app" className="flex items-center">
-                                Go to app <ChevronRight />
-                            </Link>
-                        </Button> */}
+                        {session?.user ? (
+                            <Button asChild>
+                                <Link href="/app" className="flex items-center">
+                                    Go to app <ChevronRight />
+                                </Link>
+                            </Button>
+                        ) : (
+                            <div className="flex">
+                                <Button asChild>
+                                    <Link
+                                        href="/login"
+                                        className="flex items-center"
+                                    >
+                                        Login
+                                    </Link>
+                                </Button>
+                                <Button variant="secondary" asChild>
+                                    <Link
+                                        href="/login"
+                                        className="flex items-center"
+                                    >
+                                        Sign up
+                                    </Link>
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

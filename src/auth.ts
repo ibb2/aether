@@ -44,4 +44,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: '/login',
         verifyRequest: '/auth/verify-request', // Used to display message to user after email is sent
     },
+    callbacks: {
+        authorized: async ({ request, auth }) => {
+            const url = request.nextUrl
+
+            if (url.pathname === '/app') {
+                // If the user is authenticated, allow access
+                return !!auth?.user
+            }
+
+            // For other paths, allow access by default (if desired)
+            return true
+        },
+    },
 })

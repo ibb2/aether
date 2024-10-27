@@ -88,6 +88,7 @@ import useNoteStore from '@/store/note'
 import { useRouter } from 'next/navigation'
 import { Button } from '../ui/Button/Button'
 import { useShallow } from 'zustand/react/shallow'
+import { signOut } from 'next-auth/react'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -462,19 +463,30 @@ export const Sidebar = memo(() => {
                             </div>
                         </nav>
                     </div>
-                    <Button
-                        variant="secondary"
-                        className="flex justify-start items-center"
-                        onClick={(e) => {
-                            e.preventDefault()
-                            router.push('/settings')
-                        }}
-                    >
-                        <>
-                            <Settings />
-                            <p>Settings</p>
-                        </>
-                    </Button>
+                    <div>
+                        <Button
+                            variant="secondary"
+                            className="flex justify-start items-center"
+                            onClick={(e) => {
+                                signOut()
+                            }}
+                        >
+                            <p>Signout</p>
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            className="flex justify-start items-center"
+                            onClick={(e) => {
+                                e.preventDefault()
+                                router.push('/settings')
+                            }}
+                        >
+                            <>
+                                <Settings />
+                                <p>Settings</p>
+                            </>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>
