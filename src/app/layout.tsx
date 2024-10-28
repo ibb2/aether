@@ -49,26 +49,24 @@ export default function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <ClerkProvider>
-            <html
-                lang="en"
-                className={`${inter.className} min-h-svh`}
-                suppressHydrationWarning
-            >
-                <body className="flex min-h-svh items-center justify-center">
-                    <PHProvider>
-                        <EvoluProvider value={evolu}>
-                            <ThemeProvider
-                                attribute="class"
-                                defaultTheme="system"
-                                enableSystem
-                            >
-                                <ClientComponents>{children}</ClientComponents>
-                            </ThemeProvider>
-                        </EvoluProvider>
-                    </PHProvider>
-                </body>
-            </html>
-        </ClerkProvider>
+        <html
+            lang="en"
+            className={`${inter.className} min-h-svh`}
+            suppressHydrationWarning
+        >
+            <body className="flex min-h-svh items-center justify-center">
+                <PHProvider>
+                    <EvoluProvider value={evolu}>
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="system"
+                            enableSystem
+                        >
+                            <ClientComponents>{children}</ClientComponents>
+                        </ThemeProvider>
+                    </EvoluProvider>
+                </PHProvider>
+            </body>
+        </html>
     )
 }

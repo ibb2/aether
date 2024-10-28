@@ -3,7 +3,6 @@ import GitHub from 'next-auth/providers/github'
 import Google from 'next-auth/providers/google'
 import Resend from 'next-auth/providers/resend'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import { db } from './db/drizzle/index'
 import {
     users,
     accounts,
@@ -11,6 +10,7 @@ import {
     verificationTokens,
 } from './db/drizzle/schema'
 import type { Provider } from 'next-auth/providers'
+import { db } from './db/drizzle'
 
 const providers: Provider[] = [GitHub, Resend, Google]
 

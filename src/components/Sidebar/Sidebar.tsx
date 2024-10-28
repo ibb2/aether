@@ -89,6 +89,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '../ui/Button/Button'
 import { useShallow } from 'zustand/react/shallow'
 import { signOut } from 'next-auth/react'
+import UserAvatar from '../auth/profile/UserAvatar'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
