@@ -28,7 +28,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { ResendForm } from './auth/resend-form'
 
-export function LoginForm({
+export function SignUpForm({
     callbackUrl,
 }: {
     callbackUrl: string | undefined
@@ -36,14 +36,14 @@ export function LoginForm({
     return (
         <Card className="mx-auto max-w-sm">
             <CardHeader>
-                <CardTitle className="text-2xl">Login</CardTitle>
+                <CardTitle className="text-2xl">Sign up</CardTitle>
                 <CardDescription>
-                    Enter your email below to login to your account
+                    Enter your email below to sign up for an account
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid gap-4">
-                    <ResendForm />
+                    <ResendForm signingUp={true} />
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                             <span className="w-full border-t"></span>
@@ -54,14 +54,14 @@ export function LoginForm({
                             </span>
                         </div>
                     </div>
-                    <GoogleSignIn callbackUrl={callbackUrl!} />
-                    <GithubSignIn callbackUrl={callbackUrl!} />
+                    <GoogleSignIn callbackUrl={callbackUrl!} signingUp={true} />
+                    <GithubSignIn callbackUrl={callbackUrl!} signingUp={true} />
                 </div>
 
                 <div className="mt-4 text-center text-sm">
-                    Don&apos;t have an account?{' '}
-                    <Link href="/sign-up" className="underline">
-                        Sign up
+                    Have and account?{' '}
+                    <Link href="/login" className="underline">
+                        Login
                     </Link>
                 </div>
             </CardContent>

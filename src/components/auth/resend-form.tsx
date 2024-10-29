@@ -19,7 +19,7 @@ const formSchema = z.object({
     email: z.string().email('Please enter a valid email address'),
 })
 
-export function ResendForm() {
+export function ResendForm({ signingUp }: { signingUp?: boolean }) {
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
@@ -103,7 +103,9 @@ export function ResendForm() {
                         ? 'Sending link...'
                         : status === 'success'
                           ? 'Check your email'
-                          : 'Login with Email'}
+                          : signingUp == true
+                            ? 'Sign up with Email'
+                            : 'Login with Email'}
                 </Button>
             </form>
         </Form>

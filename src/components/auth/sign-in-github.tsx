@@ -2,7 +2,13 @@ import { signIn } from '@/auth'
 import { Button } from '../ui/Button'
 import { AuthError } from 'next-auth'
 
-export default function GithubSignIn({ callbackUrl }: { callbackUrl: string }) {
+export default function GithubSignIn({
+    callbackUrl,
+    signingUp,
+}: {
+    callbackUrl: string
+    signingUp?: boolean
+}) {
     return (
         <form
             action={async () => {
@@ -31,7 +37,8 @@ export default function GithubSignIn({ callbackUrl }: { callbackUrl: string }) {
             }}
         >
             <Button variant="outline" className="w-full" type="submit">
-                Signin with GitHub
+                {signingUp == true ? 'Sign Up ' : 'Sign In '}
+                with GitHub
             </Button>
         </form>
     )

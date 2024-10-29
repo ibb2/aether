@@ -55,7 +55,7 @@ export async function TopNavbar() {
                                 </Link>
                             </Button>
                         ) : (
-                            <div className="flex">
+                            <div className="flex gap-x-2">
                                 <Button asChild>
                                     <Link
                                         href="/login"
@@ -66,7 +66,7 @@ export async function TopNavbar() {
                                 </Button>
                                 <Button variant="secondary" asChild>
                                     <Link
-                                        href="/login"
+                                        href="/sign-up"
                                         className="flex items-center"
                                     >
                                         Sign up

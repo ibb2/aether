@@ -88,8 +88,8 @@ import useNoteStore from '@/store/note'
 import { useRouter } from 'next/navigation'
 import { Button } from '../ui/Button/Button'
 import { useShallow } from 'zustand/react/shallow'
-import { signOut } from 'next-auth/react'
 import UserAvatar from '../auth/profile/UserAvatar'
+import { SignOut } from '../auth/sign-out'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -465,15 +465,7 @@ export const Sidebar = memo(() => {
                         </nav>
                     </div>
                     <div>
-                        <Button
-                            variant="secondary"
-                            className="flex justify-start items-center"
-                            onClick={(e) => {
-                                signOut()
-                            }}
-                        >
-                            <p>Signout</p>
-                        </Button>
+                        <SignOut />
                         <Button
                             variant="secondary"
                             className="flex justify-start items-center"

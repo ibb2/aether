@@ -45,6 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     pages: {
         signIn: '/login',
         verifyRequest: '/auth/verify-request', // Used to display message to user after email is sent
+        signOut: '/',
     },
     callbacks: {
         authorized: async ({ request, auth }) => {
