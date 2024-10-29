@@ -5,10 +5,31 @@ import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
 export async function POST(request) {
-    console.log('Post request')
-    const { email, evoluOwnerId } = await request.json()
-
     try {
+        const { email, evoluOwnerId } = await request.json()
+
+        // First, check if `evoluOwnerId` is already set for this user
+        const existingUser = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, email))
+
+        if (!existingUser) {
+            return NextResponse.json(
+                { success: false, error: 'User not found' },
+                { status: 404 }
+            )
+        }
+
+        // If `evoluOwnerId` is already set, do not update it
+        if (existingUser[0].evoluOwnerId) {
+            return NextResponse.json({
+                success: false,
+                message:
+                    'evoluOwnerId has already been set and cannot be updated again',
+            })
+        }
+
         await db
             .update(users)
             .set({ evoluOwnerId })
