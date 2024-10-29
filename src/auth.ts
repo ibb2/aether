@@ -11,6 +11,8 @@ import {
 } from './db/drizzle/schema'
 import type { Provider } from 'next-auth/providers'
 import { db } from './db/drizzle'
+import { evolu } from './db/db'
+import { eq } from 'drizzle-orm'
 
 const providers: Provider[] = [GitHub, Resend, Google]
 
