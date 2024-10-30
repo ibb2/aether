@@ -343,8 +343,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
     const reactSketchCanvasClass = cn(
         'absolute',
-        readOnly && 'z-0',
-        !readOnly && 'z-1'
+        readOnly && 'z-0'
+        // !readOnly && 'z-1'
     )
 
     const editorClass = cn(
