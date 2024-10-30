@@ -1,16 +1,42 @@
-import { signOut } from '@/auth'
+// import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '../ui/Button'
+import { signOut } from 'next-auth/react'
 
-export function SignOut() {
+export function SignOutDialog() {
     return (
-        <form
-            action={async () => {
-                'use server'
-                await signOut({
-                    redirectTo: '/',
-                })
-            }}
-        >
-            <button type="submit">Sign Out</button>
-        </form>
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline">Sign Out</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Sign Out</DialogTitle>
+                    <DialogDescription>
+                        Are you sure you want to sign out?.
+                    </DialogDescription>
+                </DialogHeader>
+                <Button
+                    variant="destructive"
+                    onClick={() =>
+                        signOut({
+                            redirectTo: '/',
+                        })
+                    }
+                >
+                    Sign Out
+                </Button>
+            </DialogContent>
+        </Dialog>
     )
 }

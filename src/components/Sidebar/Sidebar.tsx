@@ -89,7 +89,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '../ui/Button/Button'
 import { useShallow } from 'zustand/react/shallow'
 import UserAvatar from '../auth/profile/UserAvatar'
-import { SignOut } from '../auth/sign-out'
+import { SignOut, SignOutDialog } from '../auth/sign-out'
 import { signOut } from 'next-auth/react'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
@@ -466,7 +466,7 @@ export const Sidebar = memo(() => {
                         </nav>
                     </div>
                     <div>
-                        <Link href="/sign-out">Sign Out</Link>
+                        <SignOutDialog />
                         <Button
                             variant="secondary"
                             className="flex justify-start items-center"
