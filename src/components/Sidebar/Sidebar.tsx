@@ -90,7 +90,7 @@ import { useShallow } from 'zustand/react/shallow'
 import UserAvatar from '../auth/profile/UserAvatar'
 import { signOut } from 'next-auth/react'
 import { SignOutDialog } from '../auth/sign-out'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
