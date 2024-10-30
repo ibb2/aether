@@ -86,11 +86,11 @@ import { TreeDataItem, TreeView } from '../tree-view'
 import useStateStore from '@/store/state'
 import useNoteStore from '@/store/note'
 import { useRouter } from 'next/navigation'
-import { Button } from '../ui/Button/Button'
 import { useShallow } from 'zustand/react/shallow'
 import UserAvatar from '../auth/profile/UserAvatar'
-import { SignOut, SignOutDialog } from '../auth/sign-out'
 import { signOut } from 'next-auth/react'
+import { SignOutDialog } from '../auth/sign-out'
+import { Button } from '@/components/ui/Button'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
