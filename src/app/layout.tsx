@@ -6,9 +6,8 @@ import { ThemeProvider } from '@/components/providers/theme-provider'
 import dynamic from 'next/dynamic'
 import { EvoluProvider } from '@evolu/react'
 import { evolu } from '@/db/db'
-import { ClerkProvider } from '@clerk/nextjs'
-import { useEffect } from 'react'
-import { db } from '@/db/drizzle'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 // import ClientComponents from "@/components/Layout/ClientComponents";
 
@@ -68,6 +67,8 @@ export default function RootLayout({
                         </ThemeProvider>
                     </EvoluProvider>
                 </PHProvider>
+                <Analytics />
+                <SpeedInsights />
             </body>
         </html>
     )
