@@ -55,11 +55,11 @@ export function SignUpForm({
                         </div>
                     </div>
                     <GoogleSignIn
-                        callbackUrl="http://localhost:3000/"
+                        callbackUrl={callbackUrl ?? ''}
                         signingUp={true}
                     />
                     <GithubSignIn
-                        callbackUrl="http://localhost:3000/"
+                        callbackUrl={callbackUrl ?? ''}
                         signingUp={true}
                     />
                 </div>

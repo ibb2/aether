@@ -54,8 +54,8 @@ export function LoginForm({
                             </span>
                         </div>
                     </div>
-                    <GoogleSignIn callbackUrl="http://localhost:3000/" />
-                    <GithubSignIn callbackUrl="http://localhost:3000/" />
+                    <GoogleSignIn callbackUrl={callbackUrl ?? ''} />
+                    <GithubSignIn callbackUrl={callbackUrl ?? ''} />
                 </div>
 
                 <div className="mt-4 text-center text-sm">

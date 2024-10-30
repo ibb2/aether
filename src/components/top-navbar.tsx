@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Button } from './ui/Button'
 import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud, Cloudy } from 'lucide-react'
-import { auth } from '@/auth'
+import { auth, signIn } from '@/auth'
 
 export async function TopNavbar() {
     const session = await auth()
@@ -58,7 +58,7 @@ export async function TopNavbar() {
                             <div className="flex gap-x-2">
                                 <Button asChild>
                                     <Link
-                                        href="/login"
+                                        href="/login?callbackUrl=http://localhost:3000"
                                         className="flex items-center"
                                     >
                                         Login
@@ -66,7 +66,7 @@ export async function TopNavbar() {
                                 </Button>
                                 <Button variant="secondary" asChild>
                                     <Link
-                                        href="/sign-up"
+                                        href="/sign-up?callbackUrl=http://localhost:3000"
                                         className="flex items-center"
                                     >
                                         Sign up
