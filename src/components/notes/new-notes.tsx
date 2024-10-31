@@ -41,17 +41,29 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { NotebookId, SectionId } from '@/db/schema'
-import { useEvolu, NonEmptyString1000 } from '@evolu/react'
+import { useEvolu, NonEmptyString1000, useQueries } from '@evolu/react'
 import { Database } from '@/db/db'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '../ui/select'
+import { notebooksQuery, sectionsQuery, notesQuery } from '@/db/queries'
 
 type ItemType = 'note' | 'notebook' | 'section'
 
 export default function NewNotes() {
     const { create, update } = useEvolu<Database>()
 
-    const [notes, setNotes] = React.useState<string[]>([])
-    const [notebooks, setNotebooks] = React.useState<string[]>([])
-    const [sections, setSections] = React.useState<string[]>([])
+    const [notebooks, sections, notes] = useQueries([
+        notebooksQuery,
+        sectionsQuery,
+        notesQuery,
+    ])
+
+    const [selectedNotebook, setSelectedNotebook] = React.useState<string>('')
     const [isDialogOpen, setIsDialogOpen] = React.useState(false)
     const [newItemType, setNewItemType] = React.useState<ItemType>('note')
     const [newItemName, setNewItemName] = React.useState('')
@@ -62,11 +74,22 @@ export default function NewNotes() {
         setIsDialogOpen(true)
     }
 
+    // React.useEffect(() => {
+    //     if (notebooks === undefined || notebooks === null) return
+
+    //     if (notebooks.row !== null && notebooks.row.title !== null)
+    //         setSelectedNotebook(S.decodeSync(S.String)(notebooks.row.title))
+    // }, [notebooks])
+
     const addItem = () => {
         if (newItemName.trim() === '') return
 
         switch (newItemType) {
             case 'note':
+                create('notes', {
+                    title: S.decodeSync(NonEmptyString1000)(newItemName),
+                    notebookId: S.decodeSync(NotebookId)(selectedNotebook),
+                })
                 break
             case 'notebook':
                 create('notebooks', {
@@ -74,7 +97,6 @@ export default function NewNotes() {
                 })
                 break
             case 'section':
-                setSections([...sections, newItemName])
                 create('sections', {
                     title: S.decodeSync(NonEmptyString1000)(newItemName),
                     parentId: S.decodeSync(SectionId)(item.id),
@@ -134,6 +156,34 @@ export default function NewNotes() {
                                 className="col-span-3"
                             />
                         </div>
+                        {newItemType !== 'notebook' && (
+                            <div className="flex flex-col w-full gap-y-2">
+                                <Label htmlFor="name">Notebooks</Label>
+                                <Select
+                                    value={selectedNotebook}
+                                    onValueChange={setSelectedNotebook}
+                                >
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue
+                                            placeholder={
+                                                notebooks.row?.title ??
+                                                'Select a notebook...'
+                                            }
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {notebooks.rows.map((notebook) => (
+                                            <SelectItem
+                                                key={notebook.id}
+                                                value={notebook.id}
+                                            >
+                                                {notebook.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <Button onClick={addItem}>Add {newItemType}</Button>
