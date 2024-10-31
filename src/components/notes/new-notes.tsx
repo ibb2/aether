@@ -112,9 +112,17 @@ export default function NewNotes() {
 
         switch (newItemType) {
             case 'note':
+                if (selectedNotebook === null || selectedNotebook === undefined)
+                    return
+
                 create('notes', {
                     title: S.decodeSync(NonEmptyString1000)(newItemName),
                     notebookId: S.decodeSync(NotebookId)(selectedNotebook),
+                    sectionId:
+                        selectedSection === null ||
+                        selectedSection === undefined
+                            ? null
+                            : S.decodeSync(SectionId)(selectedSection),
                 })
                 break
             case 'notebook':
@@ -226,7 +234,7 @@ export default function NewNotes() {
                                 </Select>
                             </div>
                         )}
-                        {newItemType === 'section' && (
+                        {newItemType !== 'notebook' && (
                             <div className="flex flex-col w-full gap-y-2">
                                 <Label htmlFor="name">Section</Label>
                                 <Select

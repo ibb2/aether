@@ -345,8 +345,7 @@ export default function NavNotes() {
 function Tree({ item }: { item: any }) {
     console.log('Treedata item', item)
 
-    if (item.children === undefined)
-        console.log('Treedata children', 0, item.type)
+    if (item.children === undefined) console.log('Treedata children', 0, item)
 
     // const [name, ...items] = Array.isArray(item) ? item : [item]
 
