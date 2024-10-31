@@ -41,8 +41,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { NotebookId, SectionId } from '@/db/schema'
-import { useEvolu, NonEmptyString1000, useQueries } from '@evolu/react'
-import { Database } from '@/db/db'
+import {
+    useEvolu,
+    NonEmptyString1000,
+    useQueries,
+    cast,
+    useQuery,
+} from '@evolu/react'
+import { Database, evolu } from '@/db/db'
 import {
     Select,
     SelectContent,
@@ -51,6 +57,7 @@ import {
     SelectValue,
 } from '../ui/select'
 import { notebooksQuery, sectionsQuery, notesQuery } from '@/db/queries'
+import { eq } from 'drizzle-orm'
 
 type ItemType = 'note' | 'notebook' | 'section'
 
@@ -63,7 +70,26 @@ export default function NewNotes() {
         notesQuery,
     ])
 
-    const [selectedNotebook, setSelectedNotebook] = React.useState<string>('')
+    // const restrictedSectionsQuery = evolu.createQuery((db) =>
+    //     db
+    //         .selectFrom('sections')
+    //         .where('isDeleted', 'is not', cast(true))
+    //         .where(
+    //             'notebookId',
+    //             '==',
+    //             S.decodeSync(NotebookId)(selectedNotebook)
+    //         )
+    //         .selectAll()
+    // )
+
+    // const restrictedSections = useQuery(restrictedSectionsQuery)
+
+    const [selectedNotebook, setSelectedNotebook] = React.useState<
+        string | null
+    >()
+    const [selectedSection, setSelectedSection] = React.useState<
+        string | null
+    >()
     const [isDialogOpen, setIsDialogOpen] = React.useState(false)
     const [newItemType, setNewItemType] = React.useState<ItemType>('note')
     const [newItemName, setNewItemName] = React.useState('')
@@ -97,10 +123,19 @@ export default function NewNotes() {
                 })
                 break
             case 'section':
+                if (selectedNotebook === null) return
                 create('sections', {
                     title: S.decodeSync(NonEmptyString1000)(newItemName),
-                    parentId: S.decodeSync(SectionId)(item.id),
-                    notebookId: S.decodeSync(NotebookId)(item.notebookId),
+                    parentId:
+                        selectedSection === null ||
+                        selectedSection === undefined
+                            ? null
+                            : S.decodeSync(SectionId)(selectedSection),
+                    notebookId:
+                        selectedNotebook === null ||
+                        selectedNotebook === undefined
+                            ? null
+                            : S.decodeSync(NotebookId)(selectedNotebook),
                     isFolder: true,
                     isSection: true,
                 })
@@ -146,7 +181,7 @@ export default function NewNotes() {
                             Enter a name for your new {newItemType}.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-6 py-4">
                         <div className="flex flex-col w-full gap-y-2">
                             <Label htmlFor="name">Name</Label>
                             <Input
@@ -160,14 +195,21 @@ export default function NewNotes() {
                             <div className="flex flex-col w-full gap-y-2">
                                 <Label htmlFor="name">Notebooks</Label>
                                 <Select
-                                    value={selectedNotebook}
+                                    value={
+                                        selectedNotebook ??
+                                        notebooks.row?.title ??
+                                        ''
+                                    }
                                     onValueChange={setSelectedNotebook}
                                 >
-                                    <SelectTrigger className="w-[180px]">
+                                    <SelectTrigger>
                                         <SelectValue
                                             placeholder={
                                                 notebooks.row?.title ??
                                                 'Select a notebook...'
+                                            }
+                                            defaultValue={
+                                                notebooks.row?.title ?? ''
                                             }
                                         />
                                     </SelectTrigger>
@@ -178,6 +220,41 @@ export default function NewNotes() {
                                                 value={notebook.id}
                                             >
                                                 {notebook.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+                        {newItemType === 'section' && (
+                            <div className="flex flex-col w-full gap-y-2">
+                                <Label htmlFor="name">Section</Label>
+                                <Select
+                                    value={
+                                        selectedSection ??
+                                        sections.row?.title ??
+                                        ''
+                                    }
+                                    onValueChange={setSelectedSection}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue
+                                            placeholder={
+                                                sections.row?.title ??
+                                                'Select a section...'
+                                            }
+                                            defaultValue={
+                                                sections.row?.title ?? ''
+                                            }
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {sections.rows.map((section) => (
+                                            <SelectItem
+                                                key={section.id}
+                                                value={section.id}
+                                            >
+                                                {section.title}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
