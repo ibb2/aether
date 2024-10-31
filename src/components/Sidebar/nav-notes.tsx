@@ -344,19 +344,23 @@ export default function NavNotes() {
 
 function Tree({ item }: { item: any }) {
     console.log('Treedata item', item)
+
+    if (item.children === undefined)
+        console.log('Treedata children', 0, item.type)
+
     // const [name, ...items] = Array.isArray(item) ? item : [item]
 
-    // if (!items.length) {
-    //     return (
-    //         <SidebarMenuButton
-    //             isActive={name === 'button.tsx'}
-    //             className="data-[active=true]:bg-transparent"
-    //         >
-    //             <File />
-    //             {name}
-    //         </SidebarMenuButton>
-    //     )
-    // }
+    if (item.type === 'note') {
+        return (
+            <SidebarMenuButton
+                // isActive={name === 'button.tsx'}
+                className="data-[active=true]:bg-transparent"
+            >
+                <File />
+                {item.name}
+            </SidebarMenuButton>
+        )
+    }
 
     return (
         <SidebarMenuItem>
@@ -368,18 +372,24 @@ function Tree({ item }: { item: any }) {
                     <SidebarMenuButton>
                         <ChevronRight className="transition-transform" />
                         <Folder />
-                        {/* {name} */}
+                        {item.name}
                     </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    <SidebarMenuSub>
-                        {item.children.length > 0 && (
-                            <Tree key={item.id} item={item.children} />
-                        )}
-                        {/* {items.map((subItem, index) => (
+                    {item.children !== undefined && (
+                        <SidebarMenuSub>
+                            {item.children.length > 0 && (
+                                <>
+                                    {item.children.map((note) => (
+                                        <Tree key={note.id} item={note} />
+                                    ))}
+                                </>
+                            )}
+                            {/* {items.map((subItem, index) => (
                             <Tree key={index} item={subItem} />
                         ))} */}
-                    </SidebarMenuSub>
+                        </SidebarMenuSub>
+                    )}
                 </CollapsibleContent>
             </Collapsible>
         </SidebarMenuItem>
