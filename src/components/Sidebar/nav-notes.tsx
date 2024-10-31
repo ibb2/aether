@@ -251,6 +251,7 @@ export default function NavNotes() {
             const treeStructure = convertToTreeStructure(transformedData)
             setTreeData(treeStructure)
             setInitialTreeData(treeStructure)
+            console.log('Treedata transformed data', transformedData)
         }
 
         const getFragmentsData = async () => {
@@ -330,46 +331,54 @@ export default function NavNotes() {
     return (
         <div>
             <p>Notes </p>
-            {treeData.map((item) => (
-                <Tree key={item.id} item={item} />
-            ))}
+            {treeData !== undefined && (
+                <>
+                    {treeData.map((item) => (
+                        <Tree key={item.id} item={item} />
+                    ))}
+                </>
+            )}
         </div>
     )
 }
 
-function Tree({ item }: { item: string | any[] }) {
-    const [name, ...items] = Array.isArray(item) ? item : [item]
+function Tree({ item }: { item: any }) {
+    console.log('Treedata item', item)
+    // const [name, ...items] = Array.isArray(item) ? item : [item]
 
-    if (!items.length) {
-        return (
-            <SidebarMenuButton
-                isActive={name === 'button.tsx'}
-                className="data-[active=true]:bg-transparent"
-            >
-                <File />
-                {name}
-            </SidebarMenuButton>
-        )
-    }
+    // if (!items.length) {
+    //     return (
+    //         <SidebarMenuButton
+    //             isActive={name === 'button.tsx'}
+    //             className="data-[active=true]:bg-transparent"
+    //         >
+    //             <File />
+    //             {name}
+    //         </SidebarMenuButton>
+    //     )
+    // }
 
     return (
         <SidebarMenuItem>
             <Collapsible
                 className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
-                defaultOpen={name === 'components' || name === 'ui'}
+                // defaultOpen={name === 'components' || name === 'ui'}
             >
                 <CollapsibleTrigger asChild>
                     <SidebarMenuButton>
                         <ChevronRight className="transition-transform" />
                         <Folder />
-                        {name}
+                        {/* {name} */}
                     </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <SidebarMenuSub>
-                        {items.map((subItem, index) => (
+                        {item.children.length > 0 && (
+                            <Tree key={item.id} item={item.children} />
+                        )}
+                        {/* {items.map((subItem, index) => (
                             <Tree key={index} item={subItem} />
-                        ))}
+                        ))} */}
                     </SidebarMenuSub>
                 </CollapsibleContent>
             </Collapsible>

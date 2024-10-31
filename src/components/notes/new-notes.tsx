@@ -1,5 +1,7 @@
 'use client'
 
+import * as S from '@effect/schema/Schema'
+
 import * as React from 'react'
 import { Book, FileText, FolderPlus, Plus } from 'lucide-react'
 
@@ -38,10 +40,15 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { NotebookId, SectionId } from '@/db/schema'
+import { useEvolu, NonEmptyString1000 } from '@evolu/react'
+import { Database } from '@/db/db'
 
 type ItemType = 'note' | 'notebook' | 'section'
 
 export default function NewNotes() {
+    const { create, update } = useEvolu<Database>()
+
     const [notes, setNotes] = React.useState<string[]>([])
     const [notebooks, setNotebooks] = React.useState<string[]>([])
     const [sections, setSections] = React.useState<string[]>([])
@@ -60,13 +67,21 @@ export default function NewNotes() {
 
         switch (newItemType) {
             case 'note':
-                setNotes([...notes, newItemName])
                 break
             case 'notebook':
-                setNotebooks([...notebooks, newItemName])
+                create('notebooks', {
+                    title: S.decodeSync(NonEmptyString1000)(newItemName),
+                })
                 break
             case 'section':
                 setSections([...sections, newItemName])
+                create('sections', {
+                    title: S.decodeSync(NonEmptyString1000)(newItemName),
+                    parentId: S.decodeSync(SectionId)(item.id),
+                    notebookId: S.decodeSync(NotebookId)(item.notebookId),
+                    isFolder: true,
+                    isSection: true,
+                })
                 break
         }
 
@@ -110,10 +125,8 @@ export default function NewNotes() {
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">
-                                Name
-                            </Label>
+                        <div className="flex flex-col w-full gap-y-2">
+                            <Label htmlFor="name">Name</Label>
                             <Input
                                 id="name"
                                 value={newItemName}
