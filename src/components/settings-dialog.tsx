@@ -53,6 +53,7 @@ import PlaceholderContent from '@/components/Sidebar/settings/placeholder'
 import Profile from '@/components/Sidebar/settings/account/profile'
 import Danger from './Sidebar/settings/account/danger'
 import Sync from './Sidebar/settings/account/sync'
+import Appearance from './Sidebar/settings/general/apperances'
 
 const data = {
     nav: {
@@ -183,6 +184,8 @@ function getContentComponent(section: string) {
             return <Sync />
         case 'Danger':
             return <Danger />
+        case 'Appearance':
+            return <Appearance />
         case 'Messages & media':
             return <MessagesAndMediaContent />
         case 'Notifications':
