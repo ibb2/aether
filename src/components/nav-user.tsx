@@ -26,6 +26,7 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar'
 import { signOut } from 'next-auth/react'
+import { SettingsDialog } from './settings-dialog'
 
 export function NavUser({
     user,
@@ -103,9 +104,8 @@ export function NavUser({
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <BadgeCheck />
-                                Account
+                            <DropdownMenuItem asChild>
+                                <SettingsDialog />
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                                 <CreditCard />
