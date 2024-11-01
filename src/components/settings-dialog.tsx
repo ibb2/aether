@@ -62,12 +62,14 @@ const data = {
             { name: 'Billing', icon: ReceiptText },
             { name: 'Danger', icon: OctagonAlert },
         ],
+        general: [
+            { name: 'Appearance', icon: Paintbrush },
+            { name: 'Language & region', icon: Globe },
+        ],
         // { name: 'Notifications', icon: Bell },
         // { name: 'Navigation', icon: Menu },
         // { name: 'Home', icon: Home },
-        // { name: 'Appearance', icon: Paintbrush },
         // { name: 'Messages & media', icon: MessageCircle },
-        // { name: 'Language & region', icon: Globe },
         // { name: 'Accessibility', icon: Keyboard },
         // { name: 'Mark as read', icon: Check },
         // { name: 'Audio & video', icon: Video },
@@ -95,11 +97,11 @@ export function SettingsDialog() {
                 <SidebarProvider className="items-start">
                     <Sidebar collapsible="none" className="hidden md:flex">
                         <SidebarContent>
-                            {/* <SidebarGroup>
+                            <SidebarGroup>
                                 <SidebarGroupLabel>Account</SidebarGroupLabel>
                                 <SidebarGroupContent>
                                     <SidebarMenu>
-                                        {data.nav.map((item) => (
+                                        {data.nav.account.map((item) => (
                                             <SidebarMenuItem key={item.name}>
                                                 <SidebarMenuButton
                                                     asChild
@@ -117,12 +119,12 @@ export function SettingsDialog() {
                                         ))}
                                     </SidebarMenu>
                                 </SidebarGroupContent>
-                            </SidebarGroup> */}
+                            </SidebarGroup>
                             <SidebarGroup>
-                                <SidebarGroupLabel>Account</SidebarGroupLabel>
+                                <SidebarGroupLabel>General</SidebarGroupLabel>
                                 <SidebarGroupContent>
                                     <SidebarMenu>
-                                        {data.nav.account.map((item) => (
+                                        {data.nav.general.map((item) => (
                                             <SidebarMenuItem key={item.name}>
                                                 <SidebarMenuButton
                                                     asChild
