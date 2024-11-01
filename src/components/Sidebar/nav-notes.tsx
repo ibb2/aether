@@ -347,7 +347,8 @@ export default function NavNotes() {
 function Tree({ item }: { item: any }) {
     console.log('Treedata item', item)
 
-    if (item.children === undefined) console.log('Treedata children', 0, item)
+    if (item.children === undefined)
+        console.log('Treedata children', 0, item.type)
 
     if (item.type === 'note') {
         return (
@@ -384,9 +385,6 @@ function Tree({ item }: { item: any }) {
                                     ))}
                                 </>
                             )}
-                            {/* {items.map((subItem, index) => (
-                            <Tree key={index} item={subItem} />
-                        ))} */}
                         </SidebarMenuSub>
                     )}
                 </CollapsibleContent>

@@ -25,10 +25,13 @@ import {
     SidebarGroupLabel,
     SidebarInset,
     SidebarMenu,
+    SidebarMenuAction,
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
     SidebarProvider,
     SidebarRail,
     SidebarTrigger,
@@ -257,12 +260,19 @@ export default function NavFragmentNotes() {
         const getFragmentsData = async () => {
             console.info('fragments', fragments)
 
-            const arr = []
+            const arr: any = [
+                {
+                    id: 1,
+                    title: 'Fragment Notes',
+                    children: [],
+                    type: 'header',
+                },
+            ]
 
             for (let i = 0; i < fragments.length; i++) {
-                arr.push({
+                arr[0].children.push({
                     id: fragments[i].id,
-                    name: S.decodeSync(S.String)(fragments[i].title!),
+                    title: S.decodeSync(S.String)(fragments[i].title!),
                     type: 'fragment',
                 })
             }
@@ -331,6 +341,7 @@ export default function NavFragmentNotes() {
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Fragments</SidebarGroupLabel>
+
             <SidebarMenu>
                 {treeData !== undefined && (
                     <>
@@ -349,48 +360,58 @@ function Tree({ item }: { item: any }) {
 
     if (item.children === undefined) console.log('Treedata children', 0, item)
 
-    if (item.type === 'note') {
+    if (item.children === undefined && item.type === 'fragment') {
         return (
             <SidebarMenuButton
                 // isActive={name === 'button.tsx'}
                 className="data-[active=true]:bg-transparent"
             >
                 <File />
-                {item.name}
+                {item.title}
             </SidebarMenuButton>
         )
     }
 
     return (
-        <SidebarMenuItem>
-            <Collapsible
-                className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
-                // defaultOpen={name === 'components' || name === 'ui'}
-            >
+        <Collapsible key={item.id} asChild defaultOpen={true}>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={item.title}>
+                    <a href="#">
+                        <Diamond />
+                        <span>{item.title}</span>
+                    </a>
+                </SidebarMenuButton>
                 <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                        <ChevronRight className="transition-transform" />
-                        <Folder />
-                        {item.name}
-                    </SidebarMenuButton>
+                    <SidebarMenuAction className="data-[state=open]:rotate-90">
+                        <ChevronRight />
+                        <span className="sr-only">Toggle</span>
+                    </SidebarMenuAction>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                    {item.children !== undefined && (
-                        <SidebarMenuSub>
-                            {item.children.length > 0 && (
-                                <>
-                                    {item.children.map((note) => (
-                                        <Tree key={note.id} item={note} />
-                                    ))}
-                                </>
-                            )}
-                            {/* {items.map((subItem, index) => (
-                            <Tree key={index} item={subItem} />
-                        ))} */}
-                        </SidebarMenuSub>
-                    )}
+                    <SidebarMenuSub>
+                        {item.children.length > 0 && (
+                            <>
+                                {item.children.map(
+                                    (fragment: {
+                                        id: string
+                                        name: string
+                                        type: string
+                                    }) => (
+                                        <SidebarMenuSubItem key={item.id}>
+                                            <SidebarMenuSubButton asChild>
+                                                <Tree
+                                                    key={fragment.id}
+                                                    item={fragment}
+                                                />
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                    )
+                                )}
+                            </>
+                        )}
+                    </SidebarMenuSub>
                 </CollapsibleContent>
-            </Collapsible>
-        </SidebarMenuItem>
+            </SidebarMenuItem>
+        </Collapsible>
     )
 }
