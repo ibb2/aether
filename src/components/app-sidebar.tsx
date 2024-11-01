@@ -35,6 +35,7 @@ import NewNotes from './notes/new-notes'
 import NavFragmentNotes from './Sidebar/nav-fragment-notes'
 import favicon from '@/assets/favicon.ico'
 import Image from 'next/image'
+import { useSession } from 'next-auth/react'
 
 const data = {
     user: {
@@ -161,6 +162,10 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { data: session } = useSession()
+
+    console.log('Session data', session)
+
     return (
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
@@ -202,7 +207,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
-                <NavUser user={data.user} />
+                {session?.user && <NavUser user={session.user} />}
+                {/* <NavUser user={session} /> */}
             </SidebarFooter>
         </Sidebar>
     )

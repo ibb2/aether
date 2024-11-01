@@ -333,11 +333,6 @@ export default function NavFragmentNotes() {
         // isOpen && "w-full",
     )
 
-    console.log('Treedata 0', notebooks.row)
-    console.log('Treedata 1', sections.rows)
-    console.log('Treedata 2', notes.rows)
-    console.log('Treedata 3', treeData)
-
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Fragments</SidebarGroupLabel>
@@ -356,10 +351,6 @@ export default function NavFragmentNotes() {
 }
 
 function Tree({ item }: { item: any }) {
-    console.log('Treedata item', item)
-
-    if (item.children === undefined) console.log('Treedata children', 0, item)
-
     if (item.children === undefined && item.type === 'fragment') {
         return (
             <SidebarMenuButton

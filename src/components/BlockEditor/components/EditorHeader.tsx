@@ -41,8 +41,6 @@ export const EditorHeader = ({
         toggleSidebar: toggleSidebarProp,
     } = useSidebar()
 
-    console.log('isSidebarOpen', open)
-
     return (
         <header className="flex h-16 w-full shrink-0 items-center gap-2 z-10">
             <div className="flex w-full justify-between items-center gap-2 px-4">

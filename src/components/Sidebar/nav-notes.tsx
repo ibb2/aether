@@ -323,11 +323,6 @@ export default function NavNotes() {
         // isOpen && "w-full",
     )
 
-    console.log('Treedata 0', notebooks.row)
-    console.log('Treedata 1', sections.rows)
-    console.log('Treedata 2', notes.rows)
-    console.log('Treedata 3', treeData)
-
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Notes</SidebarGroupLabel>
@@ -345,11 +340,6 @@ export default function NavNotes() {
 }
 
 function Tree({ item }: { item: any }) {
-    console.log('Treedata item', item)
-
-    if (item.children === undefined)
-        console.log('Treedata children', 0, item.type)
-
     if (item.type === 'note') {
         return (
             <SidebarMenuButton
