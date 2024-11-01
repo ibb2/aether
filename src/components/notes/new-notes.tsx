@@ -40,7 +40,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { NotebookId, SectionId } from '@/db/schema'
+import { FragmentId, NotebookId, SectionId } from '@/db/schema'
 import {
     useEvolu,
     NonEmptyString1000,
@@ -56,7 +56,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from '../ui/select'
-import { notebooksQuery, sectionsQuery, notesQuery } from '@/db/queries'
+import {
+    notebooksQuery,
+    sectionsQuery,
+    notesQuery,
+    fragmentsQuery,
+    fragmentsQuery2,
+} from '@/db/queries'
 import { eq } from 'drizzle-orm'
 
 type ItemType = 'note' | 'notebook' | 'section'
@@ -64,9 +70,10 @@ type ItemType = 'note' | 'notebook' | 'section'
 export default function NewNotes() {
     const { create, update } = useEvolu<Database>()
 
-    const [notebooks, sections, notes] = useQueries([
+    const [notebooks, sections, fragments, notes] = useQueries([
         notebooksQuery,
         sectionsQuery,
+        fragmentsQuery2,
         notesQuery,
     ])
 
@@ -112,8 +119,30 @@ export default function NewNotes() {
 
         switch (newItemType) {
             case 'note':
-                if (selectedNotebook === null || selectedNotebook === undefined)
+                if (
+                    selectedNotebook === null ||
+                    selectedNotebook === undefined
+                ) {
+                    const { id: noteId } = create('notes', {
+                        title: S.decodeSync(NonEmptyString1000)(newItemName),
+                        isFragment: true,
+                    })
+
+                    try {
+                        update('fragments', {
+                            id: fragments.row?.id,
+                            notesId: [
+                                ...(fragments.row?.notesId ?? []),
+                                noteId,
+                            ],
+                        })
+                    } catch (e) {
+                        create('fragments', {
+                            notesId: [noteId],
+                        })
+                    }
                     return
+                }
 
                 create('notes', {
                     title: S.decodeSync(NonEmptyString1000)(newItemName),

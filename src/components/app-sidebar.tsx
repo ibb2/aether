@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/sidebar'
 import NavNotes from './Sidebar/nav-notes'
 import NewNotes from './notes/new-notes'
+import NavFragmentNotes from './Sidebar/nav-fragment-notes'
 
 const data = {
     user: {
@@ -185,6 +186,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
+                <NavFragmentNotes />
                 <NavNotes />
                 <NavMain items={data.navMain} />
                 <NavProjects projects={data.projects} />

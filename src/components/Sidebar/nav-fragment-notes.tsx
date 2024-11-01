@@ -150,7 +150,7 @@ function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     )
 }
 
-export default function NavNotes() {
+export default function NavFragmentNotes() {
     const router = useRouter()
 
     const [notebooks, sections, notes] = useQueries([
@@ -330,11 +330,11 @@ export default function NavNotes() {
 
     return (
         <SidebarGroup>
-            <SidebarGroupLabel>Notes</SidebarGroupLabel>
+            <SidebarGroupLabel>Fragments</SidebarGroupLabel>
             <SidebarMenu>
                 {treeData !== undefined && (
                     <>
-                        {treeData.map((item) => (
+                        {fragmentsData.map((item) => (
                             <Tree key={item.id} item={item} />
                         ))}
                     </>
