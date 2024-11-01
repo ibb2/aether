@@ -186,11 +186,6 @@ function getContentComponent(section: string) {
             return <Danger />
         case 'Appearance':
             return <Appearance />
-        case 'Messages & media':
-            return <MessagesAndMediaContent />
-        case 'Notifications':
-            return <NotificationsContent />
-        // Add more cases for other sections
         default:
             return <PlaceholderContent />
     }
