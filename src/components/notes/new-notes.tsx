@@ -187,7 +187,7 @@ export default function NewNotes() {
         <div className="h-full">
             <DropdownMenu>
                 <DropdownMenuTrigger className="" asChild>
-                    <Button variant="outline" className="h-full">
+                    <Button variant="ghost" className="h-full">
                         <Plus />
                     </Button>
                 </DropdownMenuTrigger>

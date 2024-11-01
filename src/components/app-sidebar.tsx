@@ -4,6 +4,7 @@ import * as React from 'react'
 import {
     BookOpen,
     Bot,
+    Cloud,
     Command,
     Frame,
     LifeBuoy,
@@ -32,6 +33,8 @@ import {
 import NavNotes from './Sidebar/nav-notes'
 import NewNotes from './notes/new-notes'
 import NavFragmentNotes from './Sidebar/nav-fragment-notes'
+import favicon from '@/assets/favicon.ico'
+import Image from 'next/image'
 
 const data = {
     user: {
@@ -166,14 +169,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuButton size="lg" asChild>
                             <a href="#">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Command className="size-4" />
+                                    {/* <Cloud className="size-4" /> */}
+                                    <Image
+                                        width={24}
+                                        height={24}
+                                        src={favicon}
+                                        alt="Favicon"
+                                    />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">
-                                        Acme Inc
+                                        Aether Notes
                                     </span>
                                     <span className="truncate text-xs">
-                                        Enterprise
+                                        Solutions
                                     </span>
                                 </div>
                             </a>
@@ -188,8 +197,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent>
                 <NavFragmentNotes />
                 <NavNotes />
-                <NavMain items={data.navMain} />
-                <NavProjects projects={data.projects} />
+                {/* <NavMain items={data.navMain} />
+                <NavProjects projects={data.projects} /> */}
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
