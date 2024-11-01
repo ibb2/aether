@@ -12,8 +12,12 @@ import {
     Lock,
     Menu,
     MessageCircle,
+    OctagonAlert,
     Paintbrush,
+    ReceiptText,
+    RefreshCw,
     Settings,
+    User2,
     Video,
 } from 'lucide-react'
 
@@ -38,32 +42,44 @@ import {
     SidebarContent,
     SidebarGroup,
     SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarProvider,
 } from '@/components/ui/sidebar'
 import { DropdownMenuItem } from './ui/dropdown-menu'
+import PlaceholderContent from '@/components/Sidebar/settings/placeholder'
+import Profile from '@/components/Sidebar/settings/account/profile'
+import Danger from './Sidebar/settings/account/danger'
+import Sync from './Sidebar/settings/account/sync'
 
 const data = {
-    nav: [
-        { name: 'Notifications', icon: Bell },
-        { name: 'Navigation', icon: Menu },
-        { name: 'Home', icon: Home },
-        { name: 'Appearance', icon: Paintbrush },
-        { name: 'Messages & media', icon: MessageCircle },
-        { name: 'Language & region', icon: Globe },
-        { name: 'Accessibility', icon: Keyboard },
-        { name: 'Mark as read', icon: Check },
-        { name: 'Audio & video', icon: Video },
-        { name: 'Connected accounts', icon: Link },
-        { name: 'Privacy & visibility', icon: Lock },
-        { name: 'Advanced', icon: Settings },
-    ],
+    nav: {
+        account: [
+            { name: 'Profile', icon: User2 },
+            { name: 'Sync', icon: RefreshCw },
+            { name: 'Billing', icon: ReceiptText },
+            { name: 'Danger', icon: OctagonAlert },
+        ],
+        // { name: 'Notifications', icon: Bell },
+        // { name: 'Navigation', icon: Menu },
+        // { name: 'Home', icon: Home },
+        // { name: 'Appearance', icon: Paintbrush },
+        // { name: 'Messages & media', icon: MessageCircle },
+        // { name: 'Language & region', icon: Globe },
+        // { name: 'Accessibility', icon: Keyboard },
+        // { name: 'Mark as read', icon: Check },
+        // { name: 'Audio & video', icon: Video },
+        // { name: 'Connected accounts', icon: Link },
+        // { name: 'Privacy & visibility', icon: Lock },
+        // { name: 'Advanced', icon: Settings },
+    },
 }
 
 export function SettingsDialog() {
     const [open, setOpen] = React.useState(false)
+    const [tab, setTab] = React.useState('Profile')
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -79,17 +95,41 @@ export function SettingsDialog() {
                 <SidebarProvider className="items-start">
                     <Sidebar collapsible="none" className="hidden md:flex">
                         <SidebarContent>
-                            <SidebarGroup>
+                            {/* <SidebarGroup>
+                                <SidebarGroupLabel>Account</SidebarGroupLabel>
                                 <SidebarGroupContent>
                                     <SidebarMenu>
                                         {data.nav.map((item) => (
                                             <SidebarMenuItem key={item.name}>
                                                 <SidebarMenuButton
                                                     asChild
-                                                    isActive={
-                                                        item.name ===
-                                                        'Messages & media'
-                                                    }
+                                                    isActive={item.name === tab}
+                                                    onClick={() => {
+                                                        setTab(item.name)
+                                                    }}
+                                                >
+                                                    <a href="#">
+                                                        <item.icon />
+                                                        <span>{item.name}</span>
+                                                    </a>
+                                                </SidebarMenuButton>
+                                            </SidebarMenuItem>
+                                        ))}
+                                    </SidebarMenu>
+                                </SidebarGroupContent>
+                            </SidebarGroup> */}
+                            <SidebarGroup>
+                                <SidebarGroupLabel>Account</SidebarGroupLabel>
+                                <SidebarGroupContent>
+                                    <SidebarMenu>
+                                        {data.nav.account.map((item) => (
+                                            <SidebarMenuItem key={item.name}>
+                                                <SidebarMenuButton
+                                                    asChild
+                                                    isActive={item.name === tab}
+                                                    onClick={() => {
+                                                        setTab(item.name)
+                                                    }}
                                                 >
                                                     <a href="#">
                                                         <item.icon />
@@ -116,7 +156,7 @@ export function SettingsDialog() {
                                         <BreadcrumbSeparator className="hidden md:block" />
                                         <BreadcrumbItem>
                                             <BreadcrumbPage>
-                                                Messages & media
+                                                {tab}
                                             </BreadcrumbPage>
                                         </BreadcrumbItem>
                                     </BreadcrumbList>
@@ -124,16 +164,29 @@ export function SettingsDialog() {
                             </div>
                         </header>
                         <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
-                            {Array.from({ length: 10 }).map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="aspect-video max-w-3xl rounded-xl bg-muted/50"
-                                />
-                            ))}
+                            {getContentComponent(tab)}
                         </div>
                     </main>
                 </SidebarProvider>
             </DialogContent>
         </Dialog>
     )
+}
+
+function getContentComponent(section: string) {
+    switch (section) {
+        case 'Profile':
+            return <Profile />
+        case 'Sync':
+            return <Sync />
+        case 'Danger':
+            return <Danger />
+        case 'Messages & media':
+            return <MessagesAndMediaContent />
+        case 'Notifications':
+            return <NotificationsContent />
+        // Add more cases for other sections
+        default:
+            return <PlaceholderContent />
+    }
 }

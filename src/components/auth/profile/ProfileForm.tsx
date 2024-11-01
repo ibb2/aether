@@ -113,7 +113,7 @@ export default function ProfileForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                     control={form.control}
                     name="username"
@@ -124,9 +124,10 @@ export default function ProfileForm() {
                                 <Input placeholder="shadcn" {...field} />
                             </FormControl>
                             <FormDescription>
-                                This is your public display name. It can be your
+                                This is your public display name.
+                                {/* It can be your
                                 real name or a pseudonym. You can only change
-                                this once every 30 days.
+                                this once every 30 days. */}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
