@@ -121,7 +121,8 @@ import { useShallow } from 'zustand/react/shallow'
 import UserAvatar from '../auth/profile/UserAvatar'
 import { signOut } from 'next-auth/react'
 import { SignOutDialog } from '../auth/sign-out'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
+import { ContextMenu } from '../ui/context-menu'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -304,11 +305,8 @@ export default function NavNotes() {
     const setNote = useNoteStore((state) => state.setNote)
 
     // Update selectNote to use the query results
-    const selectNote = (item: TreeDataItem | undefined) => {
-        if (item === undefined) return
-
-        if (item.type === 'section' || item.type === 'notebook') return
-
+    const selectNote = (item) => {
+        console.log('select item')
         setNote(item)
         setTreeData(initialTreeData)
         setQuery('')
@@ -330,7 +328,11 @@ export default function NavNotes() {
                 {treeData !== undefined && (
                     <>
                         {treeData.map((item) => (
-                            <Tree key={item.id} item={item} />
+                            <Tree
+                                key={item.id}
+                                item={item}
+                                selectNote={selectNote}
+                            />
                         ))}
                     </>
                 )}
@@ -339,11 +341,12 @@ export default function NavNotes() {
     )
 }
 
-function Tree({ item }: { item: any }) {
+function Tree({ item, selectNote }: { item: any; selectNote: any }) {
     if (item.type === 'note') {
         return (
             <SidebarMenuButton
                 // isActive={name === 'button.tsx'}
+                onClick={() => selectNote(item)}
                 className="data-[active=true]:bg-transparent"
             >
                 <File />
@@ -371,7 +374,11 @@ function Tree({ item }: { item: any }) {
                             {item.children.length > 0 && (
                                 <>
                                     {item.children.map((note) => (
-                                        <Tree key={note.id} item={note} />
+                                        <Tree
+                                            key={note.id}
+                                            item={note}
+                                            selectNote={selectNote}
+                                        />
                                     ))}
                                 </>
                             )}

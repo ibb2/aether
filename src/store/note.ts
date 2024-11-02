@@ -10,8 +10,8 @@ interface NoteState {
     ink: any | null
     isInkEnabled: boolean
     isPageSplit: boolean
-    item: TreeDataItem | null
-    setNote: (item: TreeDataItem | null) => void
+    item: any
+    setNote: (item: any) => void
     setInk: (data: any) => void
     setInkStatus: () => void
     setPageSplit: () => void

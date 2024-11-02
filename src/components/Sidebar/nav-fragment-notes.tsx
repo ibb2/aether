@@ -314,11 +314,8 @@ export default function NavFragmentNotes() {
     const setNote = useNoteStore((state) => state.setNote)
 
     // Update selectNote to use the query results
-    const selectNote = (item: TreeDataItem | undefined) => {
-        if (item === undefined) return
-
-        if (item.type === 'section' || item.type === 'notebook') return
-
+    const selectNote = (item: any) => {
+        console.log('item', item)
         setNote(item)
         setTreeData(initialTreeData)
         setQuery('')
@@ -340,8 +337,12 @@ export default function NavFragmentNotes() {
             <SidebarMenu>
                 {treeData !== undefined && (
                     <>
-                        {fragmentsData.map((item) => (
-                            <Tree key={item.id} item={item} />
+                        {fragmentsData.map((item: any) => (
+                            <Tree
+                                key={item.id}
+                                item={item}
+                                selectNote={selectNote}
+                            />
                         ))}
                     </>
                 )}
@@ -350,12 +351,15 @@ export default function NavFragmentNotes() {
     )
 }
 
-function Tree({ item }: { item: any }) {
+function Tree({ item, selectNote }: { item: any; selectNote: any }) {
     if (item.children === undefined && item.type === 'fragment') {
         return (
             <SidebarMenuButton
                 // isActive={name === 'button.tsx'}
                 className="data-[active=true]:bg-transparent"
+                onClick={() => {
+                    selectNote(item)
+                }}
             >
                 <File />
                 {item.title}
@@ -393,6 +397,7 @@ function Tree({ item }: { item: any }) {
                                                 <Tree
                                                     key={fragment.id}
                                                     item={fragment}
+                                                    selectNote={selectNote}
                                                 />
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>

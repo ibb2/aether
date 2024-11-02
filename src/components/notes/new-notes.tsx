@@ -40,7 +40,12 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { FragmentId, NotebookId, SectionId } from '@/db/schema'
+import {
+    FragmentId,
+    NonEmptyString50,
+    NotebookId,
+    SectionId,
+} from '@/db/schema'
 import {
     useEvolu,
     NonEmptyString1000,
@@ -64,6 +69,7 @@ import {
     fragmentsQuery2,
 } from '@/db/queries'
 import { eq } from 'drizzle-orm'
+import { initialContent } from '@/lib/data/initialContent'
 
 type ItemType = 'note' | 'notebook' | 'section'
 
@@ -123,9 +129,17 @@ export default function NewNotes() {
                     selectedNotebook === null ||
                     selectedNotebook === undefined
                 ) {
-                    const { id: noteId } = create('notes', {
+                    const { id: fragmentNoteId } = create('notes', {
                         title: S.decodeSync(NonEmptyString1000)(newItemName),
                         isFragment: true,
+                    })
+
+                    create('exportedData', {
+                        noteId: fragmentNoteId,
+                        jsonExportedName: S.decodeSync(NonEmptyString50)(
+                            `doc_${fragmentNoteId}`
+                        ),
+                        jsonData: initialContent,
                     })
 
                     try {
@@ -133,18 +147,18 @@ export default function NewNotes() {
                             id: fragments.row?.id,
                             notesId: [
                                 ...(fragments.row?.notesId ?? []),
-                                noteId,
+                                fragmentNoteId,
                             ],
                         })
                     } catch (e) {
                         create('fragments', {
-                            notesId: [noteId],
+                            notesId: [fragmentNoteId],
                         })
                     }
                     return
                 }
 
-                create('notes', {
+                const { id: noteId } = create('notes', {
                     title: S.decodeSync(NonEmptyString1000)(newItemName),
                     notebookId: S.decodeSync(NotebookId)(selectedNotebook),
                     sectionId:
@@ -152,6 +166,14 @@ export default function NewNotes() {
                         selectedSection === undefined
                             ? null
                             : S.decodeSync(SectionId)(selectedSection),
+                })
+
+                create('exportedData', {
+                    noteId: noteId,
+                    jsonExportedName: S.decodeSync(NonEmptyString50)(
+                        `doc_${noteId}`
+                    ),
+                    jsonData: initialContent,
                 })
                 break
             case 'notebook':
