@@ -110,7 +110,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Database, evolu } from '@/db/db'
-import { NonEmptyString50, NoteId } from '@/db/schema'
+import { NonEmptyString50, NoteId, SectionId } from '@/db/schema'
 import { initialContent } from '@/lib/data/initialContent'
 import FragmentNode from './FragmentNode'
 import { TreeDataItem, TreeView } from '../tree-view'
@@ -122,7 +122,14 @@ import UserAvatar from '../auth/profile/UserAvatar'
 import { signOut } from 'next-auth/react'
 import { SignOutDialog } from '../auth/sign-out'
 import { Button } from '@/components/ui/Button'
-import { ContextMenu } from '../ui/context-menu'
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuGroup,
+    ContextMenuItem,
+    ContextMenuSeparator,
+    ContextMenuTrigger,
+} from '../ui/context-menu'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -281,7 +288,7 @@ export default function NavNotes() {
     const [fragmentName, setFragmentName] = React.useState('')
     const [fragmentOpen, onFragmentOpen] = React.useState(false)
 
-    const { create } = useEvolu<Database>()
+    const { create, update } = useEvolu<Database>()
 
     const handler = () => {
         create('notebooks', {
@@ -312,6 +319,22 @@ export default function NavNotes() {
         setQuery('')
     }
 
+    const deleteNode = (item) => {
+        if (item.type === 'section') {
+            update('sections', {
+                id: S.decodeSync(SectionId)(item.id),
+                isDeleted: true,
+            })
+        }
+    }
+
+    const deleteNote = (item) => {
+        update('notes', {
+            id: S.decodeSync(NoteId)(item.id),
+            isDeleted: true,
+        })
+    }
+
     const windowClassName = cn(
         'bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all',
         'dark:bg-black lg:dark:bg-black/30',
@@ -332,6 +355,8 @@ export default function NavNotes() {
                                 key={item.id}
                                 item={item}
                                 selectNote={selectNote}
+                                deleteNode={deleteNode}
+                                deleteNote={deleteNote}
                             />
                         ))}
                     </>
@@ -341,51 +366,189 @@ export default function NavNotes() {
     )
 }
 
-function Tree({ item, selectNote }: { item: any; selectNote: any }) {
+function Tree({
+    item,
+    selectNote,
+    deleteNode,
+    deleteNote,
+}: {
+    item: any
+    selectNote: (item: any) => void
+    deleteNode: (item: any) => void
+    deleteNote: (item: any) => void
+}) {
+    const [dialogType, setDialogType] = React.useState<string>('')
+
+    const { update } = useEvolu<Database>()
+
     if (item.type === 'note') {
         return (
-            <SidebarMenuButton
-                // isActive={name === 'button.tsx'}
-                onClick={() => selectNote(item)}
-                className="data-[active=true]:bg-transparent"
-            >
-                <File />
-                {item.name}
-            </SidebarMenuButton>
+            <ContextMenu>
+                <ContextMenuTrigger asChild>
+                    <SidebarMenuButton
+                        // isActive={name === 'button.tsx'}
+                        onClick={() => selectNote(item)}
+                        className="data-[active=true]:bg-transparent"
+                    >
+                        <File />
+                        {item.name}
+                    </SidebarMenuButton>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                    <ContextMenuGroup>
+                        <ContextMenuItem
+                            onSelect={(e) => {
+                                setDialogType('rename')
+                                e.preventDefault()
+                                console.log('notebook and section ', item)
+                            }}
+                        >
+                            <span>Rename</span>
+                        </ContextMenuItem>
+                    </ContextMenuGroup>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem
+                        onSelect={(e) => {
+                            setDialogType('section')
+                            e.preventDefault()
+                        }}
+                    >
+                        <span>New Section</span>
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                        onSelect={(e) => {
+                            setDialogType('note')
+                            e.preventDefault()
+                        }}
+                    >
+                        <span>New Note</span>
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem onSelect={() => deleteNote(item)}>
+                        <span>Delete</span>
+                    </ContextMenuItem>
+                    {/* <NotesContextMenu type={dialogType} /> */}
+                </ContextMenuContent>
+            </ContextMenu>
         )
     }
 
     return (
-        <SidebarMenuItem>
-            <Collapsible
-                className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
-                // defaultOpen={name === 'components' || name === 'ui'}
+        <ContextMenu>
+            <SidebarMenuItem>
+                <Collapsible
+                    className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
+                    // defaultOpen={name === 'components' || name === 'ui'}
+                >
+                    <CollapsibleTrigger asChild>
+                        <ContextMenuTrigger asChild>
+                            <SidebarMenuButton>
+                                <ChevronRight className="transition-transform" />
+                                <Folder />
+                                {item.name}
+                            </SidebarMenuButton>
+                        </ContextMenuTrigger>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        {item.children !== undefined && (
+                            <SidebarMenuSub>
+                                {item.children.length > 0 && (
+                                    <>
+                                        {item.children.map((note) => (
+                                            <Tree
+                                                key={note.id}
+                                                item={note}
+                                                selectNote={selectNote}
+                                                deleteNode={deleteNode}
+                                                deleteNote={deleteNote}
+                                            />
+                                        ))}
+                                    </>
+                                )}
+                            </SidebarMenuSub>
+                        )}
+                    </CollapsibleContent>
+                </Collapsible>
+                <ContextMenuContent>
+                    <ContextMenuGroup>
+                        <ContextMenuItem
+                            onSelect={(e) => {
+                                setDialogType('rename')
+                                e.preventDefault()
+                                console.log('notebook and section ', item)
+                            }}
+                        >
+                            <span>Rename</span>
+                        </ContextMenuItem>
+                    </ContextMenuGroup>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem
+                        onSelect={(e) => {
+                            setDialogType('section')
+                            e.preventDefault()
+                        }}
+                    >
+                        <span>New Section</span>
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                        onSelect={(e) => {
+                            setDialogType('note')
+                            e.preventDefault()
+                        }}
+                    >
+                        <span>New Note</span>
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem onSelect={(e) => deleteNode(item)}>
+                        <span>Delete</span>
+                    </ContextMenuItem>
+                </ContextMenuContent>
+            </SidebarMenuItem>
+        </ContextMenu>
+    )
+}
+
+function NotesContextMenu({ type }: { type: string }) {
+    return (
+        <ContextMenuContent>
+            <ContextMenuGroup>
+                <ContextMenuItem
+                    onSelect={(e) => {
+                        setDialogType('rename')
+                        e.preventDefault()
+                        console.log('notebook and section ', item)
+                    }}
+                >
+                    <span>Rename</span>
+                </ContextMenuItem>
+            </ContextMenuGroup>
+            <ContextMenuSeparator />
+            <ContextMenuItem
+                onSelect={(e) => {
+                    setDialogType('section')
+                    e.preventDefault()
+                }}
             >
-                <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                        <ChevronRight className="transition-transform" />
-                        <Folder />
-                        {item.name}
-                    </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                    {item.children !== undefined && (
-                        <SidebarMenuSub>
-                            {item.children.length > 0 && (
-                                <>
-                                    {item.children.map((note) => (
-                                        <Tree
-                                            key={note.id}
-                                            item={note}
-                                            selectNote={selectNote}
-                                        />
-                                    ))}
-                                </>
-                            )}
-                        </SidebarMenuSub>
-                    )}
-                </CollapsibleContent>
-            </Collapsible>
-        </SidebarMenuItem>
+                <span>New Section</span>
+            </ContextMenuItem>
+            <ContextMenuItem
+                onSelect={(e) => {
+                    setDialogType('note')
+                    e.preventDefault()
+                }}
+            >
+                <span>New Note</span>
+            </ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem
+                onSelect={(e) => {
+                    deleteNode(item)
+                    e.preventDefault()
+                }}
+            >
+                <span>Delete</span>
+            </ContextMenuItem>
+            <NotesContextMenu type={dialogType} />
+        </ContextMenuContent>
     )
 }

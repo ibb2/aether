@@ -30,12 +30,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import NavNotes from './Sidebar/nav-notes'
-import NewNotes from './notes/new-notes'
-import NavFragmentNotes from './Sidebar/nav-fragment-notes'
+import NavNotes from '@/components/Sidebar/nav-notes'
+import NavFragmentNotes from '@/components/Sidebar/nav-fragment-notes'
 import favicon from '@/assets/favicon.ico'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
+import NewNotes from './dialogs/notes/new-notes'
 
 const data = {
     user: {

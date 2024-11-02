@@ -8,6 +8,7 @@ import { Book, FileText, FolderPlus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -73,7 +74,7 @@ import { initialContent } from '@/lib/data/initialContent'
 
 type ItemType = 'note' | 'notebook' | 'section'
 
-export default function NewNotes() {
+export default function NotesContextMenu({ type }: { type: string }) {
     const { create, update } = useEvolu<Database>()
 
     const [notebooks, sections, fragments, notes] = useQueries([
@@ -205,127 +206,152 @@ export default function NewNotes() {
         setNewItemName('')
     }
 
+    return <div className="h-full">{getDialog(type)}</div>
+}
+
+function getDialog(type: string) {
+    switch (type) {
+        case 'renameSection':
+            return renameDialogComponent()
+        default:
+            return undefined
+    }
+}
+
+function renameDialogComponent() {
     return (
-        <div className="h-full">
-            <DropdownMenu>
-                <DropdownMenuTrigger className="" asChild>
-                    <Button variant="ghost" className="h-full">
-                        <Plus />
+        <DialogContent
+            className="sm:max-w-[425px]"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+        >
+            <DialogHeader>
+                <DialogTitle>Rename Section</DialogTitle>
+                <DialogDescription>New title.</DialogDescription>
+            </DialogHeader>
+            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                    type="text"
+                    id="name"
+                    placeholder={item.name}
+                    value={currentName}
+                    onChange={(e) => setCurrentName(e.target.value)}
+                />
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button
+                        variant="secondary"
+                        onClick={() => onRenameDialog(false)}
+                    >
+                        Cancel
                     </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="right">
-                    <DropdownMenuItem onSelect={() => openDialog('note')}>
-                        <FileText className="mr-2 h-4 w-4" />
-                        New Note
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => openDialog('notebook')}>
-                        <Book className="mr-2 h-4 w-4" />
-                        New Notebook
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => openDialog('section')}>
-                        <FolderPlus className="mr-2 h-4 w-4" />
-                        New Section
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            Add New{' '}
-                            {newItemType.charAt(0).toUpperCase() +
-                                newItemType.slice(1)}
-                        </DialogTitle>
-                        <DialogDescription>
-                            Enter a name for your new {newItemType}.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-6 py-4">
-                        <div className="flex flex-col w-full gap-y-2">
-                            <Label htmlFor="name">Name</Label>
-                            <Input
-                                id="name"
-                                value={newItemName}
-                                onChange={(e) => setNewItemName(e.target.value)}
-                                className="col-span-3"
-                            />
-                        </div>
-                        {newItemType !== 'notebook' && (
-                            <div className="flex flex-col w-full gap-y-2">
-                                <Label htmlFor="name">Notebooks</Label>
-                                <Select
-                                    value={
-                                        selectedNotebook ??
-                                        notebooks.row?.title ??
-                                        ''
-                                    }
-                                    onValueChange={setSelectedNotebook}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue
-                                            placeholder={
-                                                notebooks.row?.title ??
-                                                'Select a notebook...'
-                                            }
-                                            defaultValue={
-                                                notebooks.row?.title ?? ''
-                                            }
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {notebooks.rows.map((notebook) => (
-                                            <SelectItem
-                                                key={notebook.id}
-                                                value={notebook.id}
-                                            >
-                                                {notebook.title}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
-                        {newItemType !== 'notebook' && (
-                            <div className="flex flex-col w-full gap-y-2">
-                                <Label htmlFor="name">Section</Label>
-                                <Select
-                                    value={
-                                        selectedSection ??
-                                        sections.row?.title ??
-                                        ''
-                                    }
-                                    onValueChange={setSelectedSection}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue
-                                            placeholder={
-                                                sections.row?.title ??
-                                                'Select a section...'
-                                            }
-                                            defaultValue={
-                                                sections.row?.title ?? ''
-                                            }
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {sections.rows.map((section) => (
-                                            <SelectItem
-                                                key={section.id}
-                                                value={section.id}
-                                            >
-                                                {section.title}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
-                    </div>
-                    <DialogFooter>
-                        <Button onClick={addItem}>Add {newItemType}</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div>
+                </DialogClose>
+                <DialogClose asChild>
+                    <Button
+                        type="submit"
+                        onClick={() => {
+                            renameSection(currentName)
+                            onRenameDialog(false)
+                        }}
+                    >
+                        Update
+                    </Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
+    )
+}
+
+function sectionDialogComponent() {
+    return (
+        <DialogContent
+            className="sm:max-w-[425px]"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+        >
+            <DialogHeader>
+                <DialogTitle>New Section</DialogTitle>
+                <DialogDescription>
+                    Organise your thoughts and ideas.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                    type="text"
+                    id="name"
+                    placeholder="new section"
+                    onChange={(e) => setSectionName(e.target.value)}
+                />
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button
+                        variant="secondary"
+                        onClick={() => onSectionDialog(false)}
+                    >
+                        Cancel
+                    </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                    <Button
+                        type="submit"
+                        onClick={() => {
+                            newSection()
+                            onSectionDialog(false)
+                        }}
+                    >
+                        Create
+                    </Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
+    )
+}
+
+function noteDialogComponent() {
+    return (
+        <DialogContent
+            className="sm:max-w-[425px]"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+        >
+            <DialogHeader>
+                <DialogTitle>New Note</DialogTitle>
+                <DialogDescription>A blank slate.</DialogDescription>
+            </DialogHeader>
+            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                    type="text"
+                    id="name"
+                    placeholder="new note"
+                    onChange={(e) => setNoteName(e.target.value)}
+                />
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button
+                        variant="secondary"
+                        onClick={() => onNoteDialog(false)}
+                    >
+                        Cancel
+                    </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                    <Button
+                        type="submit"
+                        onClick={() => {
+                            newNote()
+                            onNoteDialog(false)
+                        }}
+                    >
+                        Create
+                    </Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
     )
 }
