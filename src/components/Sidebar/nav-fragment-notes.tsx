@@ -125,6 +125,15 @@ import UserAvatar from '../auth/profile/UserAvatar'
 import { signOut } from 'next-auth/react'
 import { SignOutDialog } from '../auth/sign-out'
 import { Button } from '@/components/ui/button'
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuGroup,
+    ContextMenuItem,
+    ContextMenuSeparator,
+} from '../ui/context-menu'
+import NotesContextMenu from '../dialogs/notes/context-menu'
+import { ContextMenuTrigger } from '@radix-ui/react-context-menu'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -290,7 +299,7 @@ export default function NavFragmentNotes() {
     const [fragmentName, setFragmentName] = React.useState('')
     const [fragmentOpen, onFragmentOpen] = React.useState(false)
 
-    const { create } = useEvolu<Database>()
+    const { create, update } = useEvolu<Database>()
 
     const handler = () => {
         create('notebooks', {
@@ -321,14 +330,12 @@ export default function NavFragmentNotes() {
         setQuery('')
     }
 
-    const windowClassName = cn(
-        'bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all',
-        'dark:bg-black lg:dark:bg-black/30',
-        'min-h-svh',
-        'w-full'
-        // !isOpen && "border-r-transparent",
-        // isOpen && "w-full",
-    )
+    const deleteNote = (item) => {
+        update('notes', {
+            id: S.decodeSync(NoteId)(item.id),
+            isDeleted: true,
+        })
+    }
 
     return (
         <SidebarGroup>
@@ -342,6 +349,7 @@ export default function NavFragmentNotes() {
                                 key={item.id}
                                 item={item}
                                 selectNote={selectNote}
+                                deleteNote={deleteNote}
                             />
                         ))}
                     </>
@@ -351,19 +359,61 @@ export default function NavFragmentNotes() {
     )
 }
 
-function Tree({ item, selectNote }: { item: any; selectNote: any }) {
+function Tree({
+    item,
+    selectNote,
+    deleteNote,
+}: {
+    item: any
+    selectNote: any
+    deleteNote: (item: any) => void
+}) {
+    const [dialogType, setDialogType] = React.useState<string>('')
+
+    const { update } = useEvolu<Database>()
+    const [openDialog, setOpenDialog] = React.useState<boolean>(false)
+
     if (item.children === undefined && item.type === 'fragment') {
         return (
-            <SidebarMenuButton
-                // isActive={name === 'button.tsx'}
-                className="data-[active=true]:bg-transparent"
-                onClick={() => {
-                    selectNote(item)
-                }}
-            >
-                <File />
-                {item.title}
-            </SidebarMenuButton>
+            <ContextMenu>
+                <ContextMenuTrigger>
+                    <SidebarMenuButton
+                        // isActive={name === 'button.tsx'}
+                        className="data-[active=true]:bg-transparent"
+                        onClick={() => {
+                            selectNote(item)
+                        }}
+                    >
+                        <File />
+                        {item.title}
+                    </SidebarMenuButton>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                    <ContextMenuGroup>
+                        <ContextMenuItem
+                            onSelect={(e) => {
+                                setDialogType('rename')
+                                setOpenDialog(true)
+                                e.preventDefault()
+                            }}
+                        >
+                            <span>Rename</span>
+                        </ContextMenuItem>
+                    </ContextMenuGroup>
+                    <ContextMenuSeparator />
+                    <ContextMenuGroup>
+                        <ContextMenuItem onSelect={() => deleteNote(item)}>
+                            <span>Delete</span>
+                        </ContextMenuItem>
+                    </ContextMenuGroup>
+                    <NotesContextMenu
+                        type={dialogType}
+                        open={openDialog}
+                        setOpen={setOpenDialog}
+                        item={item}
+                    />
+                </ContextMenuContent>
+            </ContextMenu>
         )
     }
 
@@ -398,6 +448,7 @@ function Tree({ item, selectNote }: { item: any; selectNote: any }) {
                                                     key={fragment.id}
                                                     item={fragment}
                                                     selectNote={selectNote}
+                                                    deleteNote={deleteNote}
                                                 />
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
