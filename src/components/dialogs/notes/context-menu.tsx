@@ -232,7 +232,7 @@ export default function NotesContextMenu({
     const rename = (newName: string) => {
         setCurrentName('')
 
-        if (item.type === 'note') {
+        if (item.type === 'note' || item.type === 'fragment') {
             update('notes', {
                 id: S.decodeSync(NoteId)(item.id),
                 title: S.decodeSync(NonEmptyString1000)(newName),
