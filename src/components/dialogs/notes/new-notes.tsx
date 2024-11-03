@@ -175,6 +175,14 @@ export default function NewNotes() {
                     ),
                     jsonData: initialContent,
                 })
+
+                create('noteSettings', {
+                    noteId: noteId,
+                    pageType: 1,
+                    isInkEnabled: cast(true),
+                    isPageSplit: cast(false),
+                })
+
                 break
             case 'notebook':
                 create('notebooks', {
