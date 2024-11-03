@@ -270,6 +270,7 @@ export default function NotesContextMenu({
         setOpen(false)
     }
 
+    // Handle creating a new note
     const newNote = (noteName: string) => {
         let newNote: NoteId
 
@@ -302,6 +303,8 @@ export default function NotesContextMenu({
             isInkEnabled: cast(true),
             isPageSplit: cast(false),
         })
+
+        setOpen(false)
     }
 
     return (
@@ -313,7 +316,8 @@ export default function NotesContextMenu({
                     currentName,
                     setCurrentName,
                     rename,
-                    newSection
+                    newSection,
+                    newNote
                 )}
             </div>
         </Dialog>
@@ -326,7 +330,8 @@ function getDialog(
     currentName: any,
     setCurrentName: React.Dispatch<any>,
     rename: (newName: string) => void,
-    newSection: (sectionName: string) => void
+    newSection: (sectionName: string) => void,
+    newNote: (noteName: string) => void
 ) {
     switch (type) {
         case 'rename':
@@ -342,6 +347,13 @@ function getDialog(
                 currentName,
                 setCurrentName,
                 newSection
+            )
+        case 'note':
+            return noteDialogComponent(
+                item,
+                currentName,
+                setCurrentName,
+                newNote
             )
         default:
             return undefined
@@ -441,7 +453,12 @@ function sectionDialogComponent(
     )
 }
 
-function noteDialogComponent() {
+function noteDialogComponent(
+    item: any,
+    currentName: any,
+    setCurrentName: React.Dispatch<any>,
+    newNote: (noteName: string) => void
+) {
     return (
         <DialogContent
             className="sm:max-w-[425px]"
@@ -458,24 +475,18 @@ function noteDialogComponent() {
                     type="text"
                     id="name"
                     placeholder="new note"
-                    onChange={(e) => setNoteName(e.target.value)}
+                    onChange={(e) => setCurrentName(e.target.value)}
                 />
             </div>
             <DialogFooter>
-                <DialogClose asChild>
-                    <Button
-                        variant="secondary"
-                        onClick={() => onNoteDialog(false)}
-                    >
-                        Cancel
-                    </Button>
+                <DialogClose>
+                    <Button variant="secondary">Cancel</Button>
                 </DialogClose>
-                <DialogClose asChild>
+                <DialogClose>
                     <Button
                         type="submit"
                         onClick={() => {
-                            newNote()
-                            onNoteDialog(false)
+                            newNote(currentName)
                         }}
                     >
                         Create
