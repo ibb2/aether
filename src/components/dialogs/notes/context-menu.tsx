@@ -1,11 +1,9 @@
 'use client'
 
 import * as S from '@effect/schema/Schema'
-
 import * as React from 'react'
-import { Book, FileText, FolderPlus, Notebook, Plus } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import {
     Dialog,
     DialogClose,
@@ -14,66 +12,13 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarProvider,
-    SidebarRail,
-    SidebarTrigger,
-} from '@/components/ui/sidebar'
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-    FragmentId,
-    NonEmptyString50,
-    NotebookId,
-    NoteId,
-    SectionId,
-} from '@/db/schema'
-import {
-    useEvolu,
-    NonEmptyString1000,
-    useQueries,
-    cast,
-    useQuery,
-} from '@evolu/react'
-import { Database, evolu } from '@/db/db'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
-import {
-    notebooksQuery,
-    sectionsQuery,
-    notesQuery,
-    fragmentsQuery,
-    fragmentsQuery2,
-} from '@/db/queries'
-import { eq } from 'drizzle-orm'
+import { NonEmptyString50, NotebookId, NoteId, SectionId } from '@/db/schema'
+import { useEvolu, NonEmptyString1000, cast } from '@evolu/react'
+import { Database } from '@/db/db'
 import { initialContent } from '@/lib/data/initialContent'
-
-type ItemType = 'note' | 'notebook' | 'section'
 
 export default function NotesContextMenu({
     type,
@@ -86,148 +31,14 @@ export default function NotesContextMenu({
     item: any
     setOpen: (open: boolean) => void
 }) {
-    const [sectionDialog, onSectionDialog] = React.useState(false)
-    const [noteDialog, onNoteDialog] = React.useState(false)
-    const [renameDialog, onRenameDialog] = React.useState(false)
-    const [sectionName, setSectionName] = React.useState('')
-    const [noteName, setNoteName] = React.useState('')
-
     const { create, update } = useEvolu<Database>()
 
-    const [notebooks, sections, fragments, notes] = useQueries([
-        notebooksQuery,
-        sectionsQuery,
-        fragmentsQuery2,
-        notesQuery,
-    ])
-
-    // const restrictedSectionsQuery = evolu.createQuery((db) =>
-    //     db
-    //         .selectFrom('sections')
-    //         .where('isDeleted', 'is not', cast(true))
-    //         .where(
-    //             'notebookId',
-    //             '==',
-    //             S.decodeSync(NotebookId)(selectedNotebook)
-    //         )
-    //         .selectAll()
-    // )
-
-    // const restrictedSections = useQuery(restrictedSectionsQuery)
-
-    const [selectedNotebook, setSelectedNotebook] = React.useState<
-        string | null
-    >()
-    const [selectedSection, setSelectedSection] = React.useState<
-        string | null
-    >()
-    const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-    const [newItemType, setNewItemType] = React.useState<ItemType>('note')
-    const [newItemName, setNewItemName] = React.useState('')
-
-    const openDialog = (type: ItemType) => {
-        setNewItemType(type)
-        setNewItemName('')
-        setIsDialogOpen(true)
-    }
-
-    // React.useEffect(() => {
-    //     if (notebooks === undefined || notebooks === null) return
-
-    //     if (notebooks.row !== null && notebooks.row.title !== null)
-    //         setSelectedNotebook(S.decodeSync(S.String)(notebooks.row.title))
-    // }, [notebooks])
-
-    const addItem = () => {
-        if (newItemName.trim() === '') return
-
-        switch (newItemType) {
-            case 'note':
-                if (
-                    selectedNotebook === null ||
-                    selectedNotebook === undefined
-                ) {
-                    const { id: fragmentNoteId } = create('notes', {
-                        title: S.decodeSync(NonEmptyString1000)(newItemName),
-                        isFragment: true,
-                    })
-
-                    create('exportedData', {
-                        noteId: fragmentNoteId,
-                        jsonExportedName: S.decodeSync(NonEmptyString50)(
-                            `doc_${fragmentNoteId}`
-                        ),
-                        jsonData: initialContent,
-                    })
-
-                    try {
-                        update('fragments', {
-                            id: fragments.row?.id,
-                            notesId: [
-                                ...(fragments.row?.notesId ?? []),
-                                fragmentNoteId,
-                            ],
-                        })
-                    } catch (e) {
-                        create('fragments', {
-                            notesId: [fragmentNoteId],
-                        })
-                    }
-                    return
-                }
-
-                const { id: noteId } = create('notes', {
-                    title: S.decodeSync(NonEmptyString1000)(newItemName),
-                    notebookId: S.decodeSync(NotebookId)(selectedNotebook),
-                    sectionId:
-                        selectedSection === null ||
-                        selectedSection === undefined
-                            ? null
-                            : S.decodeSync(SectionId)(selectedSection),
-                })
-
-                create('exportedData', {
-                    noteId: noteId,
-                    jsonExportedName: S.decodeSync(NonEmptyString50)(
-                        `doc_${noteId}`
-                    ),
-                    jsonData: initialContent,
-                })
-                break
-            case 'notebook':
-                create('notebooks', {
-                    title: S.decodeSync(NonEmptyString1000)(newItemName),
-                })
-                break
-            case 'section':
-                if (selectedNotebook === null) return
-                create('sections', {
-                    title: S.decodeSync(NonEmptyString1000)(newItemName),
-                    parentId:
-                        selectedSection === null ||
-                        selectedSection === undefined
-                            ? null
-                            : S.decodeSync(SectionId)(selectedSection),
-                    notebookId:
-                        selectedNotebook === null ||
-                        selectedNotebook === undefined
-                            ? null
-                            : S.decodeSync(NotebookId)(selectedNotebook),
-                    isFolder: true,
-                    isSection: true,
-                })
-                break
-        }
-
-        setIsDialogOpen(false)
-        setNewItemName('')
-    }
-
     // Handling renaming of notebooks, sections and notes
+    const [currentName, setCurrentName] = React.useState<string>('')
 
-    const [currentName, setCurrentName] = React.useState(
-        item.type === 'note' ? item.name : ''
-    )
+    React.useEffect(() => {
+        setCurrentName(type === 'rename' ? item.name || item.title : '')
+    }, [type, item])
 
     const rename = (newName: string) => {
         setCurrentName('')
@@ -255,7 +66,7 @@ export default function NotesContextMenu({
         setOpen(false)
     }
 
-    // new section
+    // Related to creating new sections
     const newSection = (sectionName: string) => {
         setCurrentName('')
 
