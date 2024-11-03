@@ -86,6 +86,12 @@ export default function NotesContextMenu({
     item: any
     setOpen: (open: boolean) => void
 }) {
+    const [sectionDialog, onSectionDialog] = React.useState(false)
+    const [noteDialog, onNoteDialog] = React.useState(false)
+    const [renameDialog, onRenameDialog] = React.useState(false)
+    const [sectionName, setSectionName] = React.useState('')
+    const [noteName, setNoteName] = React.useState('')
+
     const { create, update } = useEvolu<Database>()
 
     const [notebooks, sections, fragments, notes] = useQueries([
@@ -219,7 +225,9 @@ export default function NotesContextMenu({
 
     // Handling renaming of notebooks, sections and notes
 
-    const [currentName, setCurrentName] = React.useState(item.name)
+    const [currentName, setCurrentName] = React.useState(
+        item.type === 'note' ? item.name : ''
+    )
 
     const rename = (newName: string) => {
         setCurrentName('')
@@ -247,10 +255,66 @@ export default function NotesContextMenu({
         setOpen(false)
     }
 
+    // new section
+    const newSection = (sectionName: string) => {
+        setCurrentName('')
+
+        create('sections', {
+            title: S.decodeSync(NonEmptyString1000)(sectionName),
+            parentId: S.decodeSync(SectionId)(item.id),
+            notebookId: S.decodeSync(NotebookId)(item.notebookId ?? item.id),
+            isFolder: true,
+            isSection: true,
+        })
+
+        setOpen(false)
+    }
+
+    const newNote = (noteName: string) => {
+        let newNote: NoteId
+
+        if (item.type === 'notebook') {
+            const { id: noteId } = create('notes', {
+                title: S.decodeSync(NonEmptyString1000)(noteName),
+                notebookId: S.decodeSync(NotebookId)(item.id),
+            })
+
+            newNote = noteId
+        } else {
+            const { id: noteId } = create('notes', {
+                title: S.decodeSync(NonEmptyString1000)(noteName),
+                notebookId: S.decodeSync(NotebookId)(item.notebookId),
+                sectionId: S.decodeSync(SectionId)(item.id),
+            })
+
+            newNote = noteId
+        }
+
+        create('exportedData', {
+            noteId: newNote,
+            jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
+            jsonData: initialContent,
+        })
+
+        create('noteSettings', {
+            noteId: newNote,
+            pageType: 1,
+            isInkEnabled: cast(true),
+            isPageSplit: cast(false),
+        })
+    }
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <div className="h-full">
-                {getDialog(type, item, currentName, setCurrentName, rename)}
+                {getDialog(
+                    type,
+                    item,
+                    currentName,
+                    setCurrentName,
+                    rename,
+                    newSection
+                )}
             </div>
         </Dialog>
     )
@@ -261,7 +325,8 @@ function getDialog(
     item: any,
     currentName: any,
     setCurrentName: React.Dispatch<any>,
-    rename: (newName: string) => void
+    rename: (newName: string) => void,
+    newSection: (sectionName: string) => void
 ) {
     switch (type) {
         case 'rename':
@@ -270,6 +335,13 @@ function getDialog(
                 currentName,
                 setCurrentName,
                 rename
+            )
+        case 'section':
+            return sectionDialogComponent(
+                item,
+                currentName,
+                setCurrentName,
+                newSection
             )
         default:
             return undefined
@@ -321,7 +393,12 @@ function renameDialogComponent(
     )
 }
 
-function sectionDialogComponent() {
+function sectionDialogComponent(
+    item: any,
+    currentName: any,
+    setCurrentName: React.Dispatch<any>,
+    newSection: (sectionName: string) => void
+) {
     return (
         <DialogContent
             className="sm:max-w-[425px]"
@@ -331,7 +408,7 @@ function sectionDialogComponent() {
             <DialogHeader>
                 <DialogTitle>New Section</DialogTitle>
                 <DialogDescription>
-                    Organise your thoughts and ideas.
+                    Organize your thoughts and ideas.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
@@ -340,24 +417,20 @@ function sectionDialogComponent() {
                     type="text"
                     id="name"
                     placeholder="new section"
-                    onChange={(e) => setSectionName(e.target.value)}
+                    value={currentName}
+                    onChange={(e) => setCurrentName(e.target.value)}
                 />
             </div>
             <DialogFooter>
-                <DialogClose asChild>
-                    <Button
-                        variant="secondary"
-                        onClick={() => onSectionDialog(false)}
-                    >
-                        Cancel
-                    </Button>
+                <DialogClose>
+                    <Button variant="secondary">Cancel</Button>
                 </DialogClose>
-                <DialogClose asChild>
+                <DialogClose>
                     <Button
                         type="submit"
                         onClick={() => {
-                            newSection()
-                            onSectionDialog(false)
+                            console.log('new section', item)
+                            newSection(currentName)
                         }}
                     >
                         Create

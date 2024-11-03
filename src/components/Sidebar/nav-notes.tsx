@@ -409,26 +409,11 @@ function Tree({
                         </ContextMenuItem>
                     </ContextMenuGroup>
                     <ContextMenuSeparator />
-                    <ContextMenuItem
-                        onSelect={(e) => {
-                            setDialogType('section')
-                            e.preventDefault()
-                        }}
-                    >
-                        <span>New Section</span>
-                    </ContextMenuItem>
-                    <ContextMenuItem
-                        onSelect={(e) => {
-                            setDialogType('note')
-                            e.preventDefault()
-                        }}
-                    >
-                        <span>New Note</span>
-                    </ContextMenuItem>
-                    <ContextMenuSeparator />
-                    <ContextMenuItem onSelect={() => deleteNote(item)}>
-                        <span>Delete</span>
-                    </ContextMenuItem>
+                    <ContextMenuGroup>
+                        <ContextMenuItem onSelect={() => deleteNote(item)}>
+                            <span>Delete</span>
+                        </ContextMenuItem>
+                    </ContextMenuGroup>
                     <NotesContextMenu
                         type={dialogType}
                         open={openDialog}
@@ -492,6 +477,7 @@ function Tree({
                     <ContextMenuItem
                         onSelect={(e) => {
                             setDialogType('section')
+                            setOpenDialog(true)
                             e.preventDefault()
                         }}
                     >
@@ -500,6 +486,7 @@ function Tree({
                     <ContextMenuItem
                         onSelect={(e) => {
                             setDialogType('note')
+                            setOpenDialog(true)
                             e.preventDefault()
                         }}
                     >
