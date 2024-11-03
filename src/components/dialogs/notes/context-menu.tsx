@@ -3,7 +3,7 @@
 import * as S from '@effect/schema/Schema'
 
 import * as React from 'react'
-import { Book, FileText, FolderPlus, Plus } from 'lucide-react'
+import { Book, FileText, FolderPlus, Notebook, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -45,6 +45,7 @@ import {
     FragmentId,
     NonEmptyString50,
     NotebookId,
+    NoteId,
     SectionId,
 } from '@/db/schema'
 import {
@@ -61,7 +62,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '../ui/select'
+} from '@/components/ui/select'
 import {
     notebooksQuery,
     sectionsQuery,
@@ -74,7 +75,17 @@ import { initialContent } from '@/lib/data/initialContent'
 
 type ItemType = 'note' | 'notebook' | 'section'
 
-export default function NotesContextMenu({ type }: { type: string }) {
+export default function NotesContextMenu({
+    type,
+    open,
+    item,
+    setOpen,
+}: {
+    type: string
+    open: boolean
+    item: any
+    setOpen: (open: boolean) => void
+}) {
     const { create, update } = useEvolu<Database>()
 
     const [notebooks, sections, fragments, notes] = useQueries([
@@ -206,27 +217,79 @@ export default function NotesContextMenu({ type }: { type: string }) {
         setNewItemName('')
     }
 
-    return <div className="h-full">{getDialog(type)}</div>
+    // Handling renaming of notebooks, sections and notes
+
+    const [currentName, setCurrentName] = React.useState(item.name)
+
+    const rename = (newName: string) => {
+        setCurrentName('')
+
+        if (item.type === 'note') {
+            update('notes', {
+                id: S.decodeSync(NoteId)(item.id),
+                title: S.decodeSync(NonEmptyString1000)(newName),
+            })
+        }
+        if (item.type === 'section') {
+            update('sections', {
+                id: S.decodeSync(SectionId)(item.id),
+                title: S.decodeSync(NonEmptyString1000)(newName),
+            })
+        }
+
+        if (item.type === 'notebook') {
+            update('notebooks', {
+                id: S.decodeSync(NotebookId)(item.id),
+                title: S.decodeSync(NonEmptyString1000)(newName),
+            })
+        }
+
+        setOpen(false)
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <div className="h-full">
+                {getDialog(type, item, currentName, setCurrentName, rename)}
+            </div>
+        </Dialog>
+    )
 }
 
-function getDialog(type: string) {
+function getDialog(
+    type: string,
+    item: any,
+    currentName: any,
+    setCurrentName: React.Dispatch<any>,
+    rename: (newName: string) => void
+) {
     switch (type) {
-        case 'renameSection':
-            return renameDialogComponent()
+        case 'rename':
+            return renameDialogComponent(
+                item,
+                currentName,
+                setCurrentName,
+                rename
+            )
         default:
             return undefined
     }
 }
 
-function renameDialogComponent() {
+function renameDialogComponent(
+    item: any,
+    currentName: any,
+    setCurrentName: React.Dispatch<any>,
+    rename: (newName: string) => void
+) {
     return (
         <DialogContent
-            className="sm:max-w-[425px]"
+            className="sm:max-w-[425px] z-[60]"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
         >
             <DialogHeader>
-                <DialogTitle>Rename Section</DialogTitle>
+                <DialogTitle>Rename {item.type.toUpperCase()}</DialogTitle>
                 <DialogDescription>New title.</DialogDescription>
             </DialogHeader>
             <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
@@ -240,20 +303,14 @@ function renameDialogComponent() {
                 />
             </div>
             <DialogFooter>
-                <DialogClose asChild>
-                    <Button
-                        variant="secondary"
-                        onClick={() => onRenameDialog(false)}
-                    >
-                        Cancel
-                    </Button>
+                <DialogClose>
+                    <Button variant="secondary">Cancel</Button>
                 </DialogClose>
                 <DialogClose asChild>
                     <Button
                         type="submit"
                         onClick={() => {
-                            renameSection(currentName)
-                            onRenameDialog(false)
+                            rename(currentName)
                         }}
                     >
                         Update

@@ -130,6 +130,7 @@ import {
     ContextMenuSeparator,
     ContextMenuTrigger,
 } from '../ui/context-menu'
+import NotesContextMenu from '../dialogs/notes/context-menu'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -380,6 +381,7 @@ function Tree({
     const [dialogType, setDialogType] = React.useState<string>('')
 
     const { update } = useEvolu<Database>()
+    const [openDialog, setOpenDialog] = React.useState<boolean>(false)
 
     if (item.type === 'note') {
         return (
@@ -399,8 +401,8 @@ function Tree({
                         <ContextMenuItem
                             onSelect={(e) => {
                                 setDialogType('rename')
+                                setOpenDialog(true)
                                 e.preventDefault()
-                                console.log('notebook and section ', item)
                             }}
                         >
                             <span>Rename</span>
@@ -427,7 +429,12 @@ function Tree({
                     <ContextMenuItem onSelect={() => deleteNote(item)}>
                         <span>Delete</span>
                     </ContextMenuItem>
-                    {/* <NotesContextMenu type={dialogType} /> */}
+                    <NotesContextMenu
+                        type={dialogType}
+                        open={openDialog}
+                        setOpen={setOpenDialog}
+                        item={item}
+                    />
                 </ContextMenuContent>
             </ContextMenu>
         )
@@ -474,8 +481,8 @@ function Tree({
                         <ContextMenuItem
                             onSelect={(e) => {
                                 setDialogType('rename')
+                                setOpenDialog(true)
                                 e.preventDefault()
-                                console.log('notebook and section ', item)
                             }}
                         >
                             <span>Rename</span>
@@ -502,53 +509,59 @@ function Tree({
                     <ContextMenuItem onSelect={(e) => deleteNode(item)}>
                         <span>Delete</span>
                     </ContextMenuItem>
+                    <NotesContextMenu
+                        type={dialogType}
+                        open={openDialog}
+                        setOpen={setOpenDialog}
+                        item={item}
+                    />
                 </ContextMenuContent>
             </SidebarMenuItem>
         </ContextMenu>
     )
 }
 
-function NotesContextMenu({ type }: { type: string }) {
-    return (
-        <ContextMenuContent>
-            <ContextMenuGroup>
-                <ContextMenuItem
-                    onSelect={(e) => {
-                        setDialogType('rename')
-                        e.preventDefault()
-                        console.log('notebook and section ', item)
-                    }}
-                >
-                    <span>Rename</span>
-                </ContextMenuItem>
-            </ContextMenuGroup>
-            <ContextMenuSeparator />
-            <ContextMenuItem
-                onSelect={(e) => {
-                    setDialogType('section')
-                    e.preventDefault()
-                }}
-            >
-                <span>New Section</span>
-            </ContextMenuItem>
-            <ContextMenuItem
-                onSelect={(e) => {
-                    setDialogType('note')
-                    e.preventDefault()
-                }}
-            >
-                <span>New Note</span>
-            </ContextMenuItem>
-            <ContextMenuSeparator />
-            <ContextMenuItem
-                onSelect={(e) => {
-                    deleteNode(item)
-                    e.preventDefault()
-                }}
-            >
-                <span>Delete</span>
-            </ContextMenuItem>
-            <NotesContextMenu type={dialogType} />
-        </ContextMenuContent>
-    )
-}
+// function NotesContextMenu({ type }: { type: string }) {
+//     return (
+//         <ContextMenuContent>
+//             <ContextMenuGroup>
+//                 <ContextMenuItem
+//                     onSelect={(e) => {
+//                         setDialogType('rename')
+//                         e.preventDefault()
+//                         console.log('notebook and section ', item)
+//                     }}
+//                 >
+//                     <span>Rename</span>
+//                 </ContextMenuItem>
+//             </ContextMenuGroup>
+//             <ContextMenuSeparator />
+//             <ContextMenuItem
+//                 onSelect={(e) => {
+//                     setDialogType('section')
+//                     e.preventDefault()
+//                 }}
+//             >
+//                 <span>New Section</span>
+//             </ContextMenuItem>
+//             <ContextMenuItem
+//                 onSelect={(e) => {
+//                     setDialogType('note')
+//                     e.preventDefault()
+//                 }}
+//             >
+//                 <span>New Note</span>
+//             </ContextMenuItem>
+//             <ContextMenuSeparator />
+//             <ContextMenuItem
+//                 onSelect={(e) => {
+//                     deleteNode(item)
+//                     e.preventDefault()
+//                 }}
+//             >
+//                 <span>Delete</span>
+//             </ContextMenuItem>
+//             <NotesContextMenu type={dialogType} />
+//         </ContextMenuContent>
+//     )
+// }
