@@ -1,5 +1,5 @@
 import { signIn } from '@/auth'
-import { Button } from '.@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { AuthError } from 'next-auth'
 
 export default function GoogleSignIn({

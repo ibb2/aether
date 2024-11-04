@@ -3,7 +3,7 @@
 import { CookieIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { Button } from '.@/components/ui/button'
+import { Button } from '@/components/ui/button'
 
 export default function CookieConsent({
     variant = 'default',

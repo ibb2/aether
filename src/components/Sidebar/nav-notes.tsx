@@ -4,42 +4,22 @@ import * as React from 'react'
 import { ChevronRight, File, Folder } from 'lucide-react'
 
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import { Separator } from '@/components/ui/separator'
 import {
-    Sidebar,
-    SidebarContent,
     SidebarGroup,
-    SidebarGroupContent,
     SidebarGroupLabel,
-    SidebarInset,
     SidebarMenu,
-    SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSub,
-    SidebarProvider,
-    SidebarRail,
-    SidebarTrigger,
 } from '@/components/ui/sidebar'
 
 import * as S from '@effect/schema/Schema'
 
 import { cn } from '@/lib/utils'
-import { memo, useCallback } from 'react'
-import { Editor } from '@tiptap/react'
-import { NotebookDialog } from '../dialogs/notebook'
 import {
     NonEmptyString1000,
     useEvolu,
@@ -52,76 +32,12 @@ import {
     notesQuery,
     sectionsQuery,
 } from '@/db/queries'
-import {
-    Diamond,
-    FileIcon,
-    Notebook,
-    Settings,
-    Settings2,
-    SquarePen,
-} from 'lucide-react'
-import Link from 'next/link'
-import { ReactSketchCanvasRef } from 'react-sketch-canvas'
-import Node from '@/components/Sidebar/Arborist'
-import useResizeObserver from 'use-resize-observer'
-import { Popover, PopoverTrigger } from '.@/components/ui/popover'
-import { PopoverContent } from '@radix-ui/react-popover'
-import { Label } from '.@/components/ui/label'
-import { Input } from '.@/components/ui/input'
-import {
-    Cloud,
-    CreditCard,
-    Github,
-    Keyboard,
-    LifeBuoy,
-    LogOut,
-    Mail,
-    MessageSquare,
-    Plus,
-    PlusCircle,
-    User,
-    UserPlus,
-    Users,
-} from 'lucide-react'
 
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog'
-
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Database, evolu } from '@/db/db'
+import { Database } from '@/db/db'
 import { NonEmptyString50, NoteId, SectionId } from '@/db/schema'
 import { initialContent } from '@/lib/data/initialContent'
-import FragmentNode from './FragmentNode'
-import { TreeDataItem, TreeView } from '../tree-view'
-import useStateStore from '@/store/state'
 import useNoteStore from '@/store/note'
 import { useRouter } from 'next/navigation'
-import { useShallow } from 'zustand/react/shallow'
-import UserAvatar from '../auth/profile/UserAvatar'
-import { signOut } from 'next-auth/react'
-import { SignOutDialog } from '../auth/sign-out'
-import { Button } from '@/components/ui/button'
 import {
     ContextMenu,
     ContextMenuContent,
@@ -129,7 +45,7 @@ import {
     ContextMenuItem,
     ContextMenuSeparator,
     ContextMenuTrigger,
-} from '.@/components/ui/context-menu'
+} from '@/components/ui/context-menu'
 import NotesContextMenu from '../dialogs/notes/context-menu'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {

@@ -10,7 +10,7 @@ import * as S from '@effect/schema/Schema'
 import { formatError } from '@effect/schema/TreeFormatter'
 
 import { Input } from '@/components/ui/input'
-import { Button } from '.@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import React from 'react'
 import { evolu } from '@/db/db'
 import { cn } from '@/lib/utils'

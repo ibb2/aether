@@ -11,7 +11,7 @@ import {
     FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from '.@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 

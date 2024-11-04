@@ -4,7 +4,7 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 import { Input } from '@/components/ui/input'
-import { Button } from '.@/components/ui/button'
+import { Button } from '@/components/ui/button'
 
 export default function Copy() {
     return (

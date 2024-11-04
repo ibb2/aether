@@ -2,7 +2,7 @@
 
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/hooks/use-toast'
-import { Button } from '.@/components/ui/button'
+import { Button } from '@/components/ui/button'
 
 export function PrivacyToast() {
     const { toast } = useToast()

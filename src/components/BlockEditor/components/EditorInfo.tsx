@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { memo } from 'react'
-import { cn } from '../../../lib/utils'
 import {
     DropdownMenuCheckboxItemProps,
     DropdownMenuGroup,
@@ -33,6 +32,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useNoteStore from '@/store/note'
+import { cn } from '@/lib/utils'
 
 type Checked = DropdownMenuCheckboxItemProps['checked']
 
