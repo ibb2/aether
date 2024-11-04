@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import GoogleSignIn from './auth/sign-in-google'
 import GithubSignIn from './auth/sign-in-github'
-import { Button } from './ui/Button'
+import { Button } from '@/components/ui/button'
 import {
     Form,
     FormControl,

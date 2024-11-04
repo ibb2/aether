@@ -48,7 +48,7 @@ import {
     SidebarMenuItem,
     SidebarProvider,
 } from '@/components/ui/sidebar'
-import { DropdownMenuItem } from './ui/dropdown-menu'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import PlaceholderContent from '@/components/Sidebar/settings/placeholder'
 import Profile from '@/components/Sidebar/settings/account/profile'
 import Danger from './Sidebar/settings/account/danger'

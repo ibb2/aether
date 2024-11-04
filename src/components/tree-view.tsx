@@ -37,9 +37,9 @@ import {
     SectionId,
     SectionsTable,
 } from '@/db/schema'
-import { Label } from './ui/label'
-import { Input } from './ui/input'
-import { Button } from './ui/Button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import {
     notebooksQuery,
     notesQuery,

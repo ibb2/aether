@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { ArrowLeft, Brush, EyeOff, User, User2 } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from '../ui/Button'
+import { Button } from '.@/components/ui/button'
 import { usePathname, useRouter } from 'next/navigation'
 
 export const SettingsSidebar = () => {

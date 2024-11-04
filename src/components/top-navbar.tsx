@@ -4,7 +4,7 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 import Link from 'next/link'
-import { Button } from './ui/Button'
+import { Button } from '@/components/ui/button'
 import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud, Cloudy } from 'lucide-react'
 import { auth, signIn } from '@/auth'

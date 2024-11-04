@@ -64,10 +64,10 @@ import Link from 'next/link'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import Node from '@/components/Sidebar/Arborist'
 import useResizeObserver from 'use-resize-observer'
-import { Popover, PopoverTrigger } from '../ui/popover'
+import { Popover, PopoverTrigger } from '.@/components/ui/popover'
 import { PopoverContent } from '@radix-ui/react-popover'
-import { Label } from '../ui/label'
-import { Input } from '../ui/input'
+import { Label } from '.@/components/ui/label'
+import { Input } from '.@/components/ui/input'
 import {
     Cloud,
     CreditCard,
@@ -129,7 +129,7 @@ import {
     ContextMenuItem,
     ContextMenuSeparator,
     ContextMenuTrigger,
-} from '../ui/context-menu'
+} from '.@/components/ui/context-menu'
 import NotesContextMenu from '../dialogs/notes/context-menu'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {

@@ -12,7 +12,7 @@ import {
     RefreshCw,
 } from 'lucide-react'
 import TypingAnimation from '../magicui/typing-animation'
-import { Button } from '../ui/Button'
+import { Button } from '.@/components/ui/button'
 import Link from 'next/link'
 
 export async function Action() {
