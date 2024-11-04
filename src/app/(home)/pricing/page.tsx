@@ -4,8 +4,17 @@ import * as S from '@effect/schema/Schema'
 
 import { TopNavbar } from '@/components/top-navbar'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
     Card,
     CardContent,
     CardDescription,
@@ -29,6 +38,14 @@ import { CheckIcon, MinusIcon } from 'lucide-react'
 import React from 'react'
 
 interface PlanFeature {
+    type: string
+    features: {
+        name: string
+        free: boolean
+        startup: boolean
+        team: boolean
+        enterprise: boolean
+    }[]
     type: string
     features: {
         name: string

@@ -278,7 +278,9 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     React.useEffect(() => {
         if (item === null) return
 
-        const data = exportedData.rows.find((row) => row.noteId === item.id)
+        const data = exportedData.rows.find(
+            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
+        )
 
         if (data === undefined || data === null) return
 
@@ -343,8 +345,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
     const reactSketchCanvasClass = cn(
         'absolute',
-        readOnly && 'z-0',
-        !readOnly && 'z-1'
+        readOnly && 'z-0'
+        // !readOnly && 'z-1'
     )
 
     const editorClass = cn(

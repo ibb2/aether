@@ -21,6 +21,8 @@ import { EvoluProvider } from '@evolu/react'
 import { evolu } from '@/db/db'
 import { useTheme } from 'next-themes'
 import React from 'react'
+import { useSession } from 'next-auth/react'
+import { db } from '@/db/drizzle'
 
 export default function Document({ params }: { params: { room: string } }) {
     const { theme, setTheme } = useTheme()
@@ -33,6 +35,25 @@ export default function Document({ params }: { params: { room: string } }) {
     const { room } = params
 
     const ydoc = useMemo(() => new YDoc(), [])
+
+    const { data: session } = useSession()
+
+    useEffect(() => {
+        if (session?.user) {
+            // Send Evolu ID and NextAuth user ID to your Turso DB via an API route
+
+            fetch('/api/evolu', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: session.user.email,
+                    evoluOwnerId: evolu.getOwner()?.id,
+                }),
+            })
+        }
+    }, [session?.user])
 
     useLayoutEffect(() => {
         if (hasCollab && collabToken) {
