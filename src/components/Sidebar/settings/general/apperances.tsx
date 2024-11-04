@@ -1,7 +1,7 @@
 'use client'
 
 import CopySecret from '@/components/copy/CopySecret'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import {
     Card,
     CardContent,

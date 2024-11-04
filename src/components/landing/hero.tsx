@@ -3,7 +3,7 @@
 import BoxReveal from '@/components/magicui/box-reveal'
 import DotPattern from '@/components/magicui/dot-pattern'
 import { TopNavbar } from '@/components/top-navbar'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import HeroImage from './image'
 import { useTheme } from 'next-themes'

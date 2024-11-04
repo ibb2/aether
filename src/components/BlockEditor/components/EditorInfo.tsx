@@ -29,7 +29,7 @@ import {
     Trash,
     Undo,
 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useNoteStore from '@/store/note'

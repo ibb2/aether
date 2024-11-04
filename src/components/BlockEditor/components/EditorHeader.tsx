@@ -6,7 +6,7 @@ import { Toolbar } from '@/components/ui/Toolbar'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 
 export type EditorHeaderProps = {
     isSidebarOpen?: boolean
