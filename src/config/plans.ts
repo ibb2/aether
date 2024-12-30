@@ -52,11 +52,11 @@ export const PLANS: { BASIC: FreePlan; PLUS: PaidPlan; PROFFESSIONAL: PaidPlan }
     price: {
       monthly: {
         amount: 9.99,
-        priceId: 'price_1QCCl5JBPSgR8cUzOtdy8y1f',
+        priceId: 'price_1Qbjt5JBPSgR8cUzFYeMf0Vy',
       },
       yearly: {
         amount: 99.99,
-        priceId: 'price_1QCvcaJBPSgR8cUzxgy6Htuo',
+        priceId: 'price_1QbjtVJBPSgR8cUzhTrXryYc',
       }
     },
     features: [
