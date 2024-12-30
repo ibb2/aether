@@ -18,16 +18,21 @@ export default async function BillingPage() {
 
   const [subscription] = await db.select().from(subscriptions).where(eq(subscriptions.userId, session.user.id));
 
-  let currentPlan = PLANS.FREE;
+  let currentPlan: any = PLANS.BASIC;
   let portalUrl = null;
 
   if (subscription) {
     // Find the plan based on the priceId
     const isYearly = subscription.interval === 'year';
 
-    if (subscription.priceId === PLANS.BASIC.price.yearly.priceId ||
-      subscription.priceId === PLANS.BASIC.price.monthly.priceId) {
-      currentPlan = PLANS.BASIC;
+    if (subscription.priceId === PLANS.PLUS.price.yearly.priceId ||
+      subscription.priceId === PLANS.PLUS.price.monthly.priceId) {
+      currentPlan = PLANS.PLUS;
+    }
+
+    if (subscription.priceId === PLANS.PROFFESSIONAL.price.yearly.priceId ||
+      subscription.priceId === PLANS.PROFFESSIONAL.price.monthly.priceId) {
+      currentPlan = PLANS.PROFFESSIONAL;
     }
 
     // Create Stripe portal session
