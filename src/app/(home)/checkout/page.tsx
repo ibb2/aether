@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import {
@@ -11,12 +13,21 @@ const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
 
-const Checkout = ({ fetchClientSecret }) => {
-    const options = { fetchClientSecret }
+interface CheckoutProps {
+    fetchClientSecret: () => Promise<string>;
+}
+
+export default function Checkout({ fetchClientSecret }: CheckoutProps) {
+    const options = { clientSecret: fetchClientSecret }
 
     return (
-        <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
-            <EmbeddedCheckout />
-        </EmbeddedCheckoutProvider>
+        <div className="w-full max-w-md mx-auto">
+            <EmbeddedCheckoutProvider
+                stripe={stripePromise}
+                options={options}
+            >
+                <EmbeddedCheckout />
+            </EmbeddedCheckoutProvider>
+        </div>
     )
 }
