@@ -36,6 +36,9 @@ export type ExportedDataId = typeof ExportedDataId.Type;
 export const SettingId = id("Setting");
 export type SettingId = typeof SettingId.Type;
 
+export const SubscriptionId = id("Subscription");
+export type SubscriptionId = typeof SubscriptionId.Type;
+
 // Custom Datatypes
 export const NonEmptyString50 = String.pipe(
   S.minLength(1),
@@ -85,6 +88,7 @@ export const UsersTable = table({
   email: NonEmptyString50,
   premium: SqliteBoolean,
   dob: NonEmptyString50,
+  stripeCustomerId: S.NullOr(NonEmptyString50),
 });
 export type UsersTable = typeof UsersTable.Type;
 
@@ -159,3 +163,15 @@ export const SettingsTable = table({
 });
 
 export type SettingsTable = typeof SettingsTable.Type;
+
+export const SubscriptionsTable = table({
+  id: SubscriptionId,
+  userId: UserId,
+  stripeSubscriptionId: NonEmptyString50,
+  status: NonEmptyString50,
+  priceId: NonEmptyString50,
+  currentPeriodStart: NonEmptyString50,
+  currentPeriodEnd: NonEmptyString50,
+  cancelAtPeriodEnd: SqliteBoolean,
+});
+export type SubscriptionsTable = typeof SubscriptionsTable.Type;

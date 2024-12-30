@@ -27,11 +27,14 @@ import {
 } from '@/components/ui/sidebar'
 import { signOut } from 'next-auth/react'
 import { SettingsDialog } from './settings-dialog'
+import Link from 'next/link'
 
 export function NavUser({
     user,
+    subscription,
 }: {
     user: { name: string; email: string; image: string }
+    subscription?: { status: string } | null
 }) {
     const { isMobile } = useSidebar()
 
@@ -92,30 +95,39 @@ export function NavUser({
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <Sparkles />
-                                Upgrade to Pro
-                            </DropdownMenuItem>
+                            {!subscription ? (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/pricing" className="flex w-full items-center">
+                                        <Sparkles className="h-4 w-4" />
+                                        Upgrade to Pro
+                                    </Link>
+                                </DropdownMenuItem>
+                            ) : (
+                                <DropdownMenuItem asChild>
+                                    <Link href="/pricing" className="flex w-full items-center">
+                                        <Sparkles className="h-4 w-4" />
+                                        Upgraded
+                                    </Link>
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem asChild>
                                 <SettingsDialog />
                             </DropdownMenuItem>
-                            {/* <DropdownMenuItem>
-                                <CreditCard />
-                                Billing
+                            <DropdownMenuItem asChild>
+                                <Link href="/settings/billing" className="flex w-full items-center">
+                                    <CreditCard className="h-4 w-4" />
+                                    Billing
+                                </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Bell />
-                                Notifications
-                            </DropdownMenuItem> */}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             onClick={() => signOut({ redirectTo: '/' })}
                         >
-                            <LogOut />
+                            <LogOut className="h-4 w-4" />
                             Log out
                         </DropdownMenuItem>
                     </DropdownMenuContent>

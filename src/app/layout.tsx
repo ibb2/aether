@@ -8,6 +8,7 @@ import { EvoluProvider } from '@evolu/react'
 import { evolu } from '@/db/db'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { SessionProvider } from 'next-auth/react'
 
 // import ClientComponents from "@/components/Layout/ClientComponents";
 
@@ -63,15 +64,17 @@ export default function RootLayout({
             </head>
             <body className="flex min-h-svh items-center justify-center">
                 <PHProvider>
-                    <EvoluProvider value={evolu}>
-                        <ThemeProvider
-                            attribute="class"
-                            defaultTheme="system"
-                            enableSystem
-                        >
-                            <ClientComponents>{children}</ClientComponents>
-                        </ThemeProvider>
-                    </EvoluProvider>
+                    <SessionProvider >
+                        <EvoluProvider value={evolu}>
+                            <ThemeProvider
+                                attribute="class"
+                                defaultTheme="system"
+                                enableSystem
+                            >
+                                <ClientComponents>{children}</ClientComponents>
+                            </ThemeProvider>
+                        </EvoluProvider>
+                    </SessionProvider>
                 </PHProvider>
                 <Analytics />
                 <SpeedInsights />

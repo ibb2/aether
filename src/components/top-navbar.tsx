@@ -3,14 +3,16 @@
  * @see https://v0.dev/t/xYHqD5MkVkT
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
+'use client';
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { JSX, SVGProps } from 'react'
-import { ChevronRight, Cloud, Cloudy } from 'lucide-react'
-import { auth, signIn } from '@/auth'
+import { ChevronRight, Cloud } from 'lucide-react'
+import { useSession } from "next-auth/react"
 
-export async function TopNavbar() {
-    const session = await auth()
+export function TopNavbar() {
+    const { data: session } = useSession()
 
     return (
         <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
@@ -81,9 +83,7 @@ export async function TopNavbar() {
     )
 }
 
-function MountainIcon(
-    props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
-) {
+function MountainIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}

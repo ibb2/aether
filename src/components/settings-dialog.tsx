@@ -5,6 +5,7 @@ import {
     BadgeCheck,
     Bell,
     Check,
+    CreditCard,
     Globe,
     Home,
     Keyboard,
@@ -54,13 +55,22 @@ import Profile from '@/components/Sidebar/settings/account/profile'
 import Danger from './Sidebar/settings/account/danger'
 import Sync from './Sidebar/settings/account/sync'
 import Appearance from './Sidebar/settings/general/apperances'
+import { BillingSettings } from './settings/billing-settings'
 
 const data = {
     nav: {
         account: [
-            { name: 'Profile', icon: User2 },
+            {
+                name: 'Profile',
+                icon: User2,
+                description: 'Manage your profile settings',
+            },
+            {
+                name: 'Billing',
+                icon: CreditCard,
+                description: 'Manage your subscription and billing',
+            },
             { name: 'Sync', icon: RefreshCw },
-            { name: 'Billing', icon: ReceiptText },
             { name: 'Danger', icon: OctagonAlert },
         ],
         general: [
@@ -180,13 +190,13 @@ function getContentComponent(section: string) {
     switch (section) {
         case 'Profile':
             return <Profile />
+        case 'Billing':
+            return <BillingSettings className="p-6" />
         case 'Sync':
             return <Sync />
         case 'Danger':
             return <Danger />
-        case 'Appearance':
-            return <Appearance />
         default:
-            return <PlaceholderContent />
+            return null
     }
 }

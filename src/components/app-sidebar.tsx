@@ -35,6 +35,8 @@ import NavFragmentNotes from '@/components/Sidebar/nav-fragment-notes'
 import favicon from '@/assets/favicon.ico'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import NewNotes from './dialogs/notes/new-notes'
 
 const data = {
@@ -161,13 +163,21 @@ const data = {
     ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar() {
     const { data: session } = useSession()
-
-    console.log('Session data', session)
+    const [subscription, setSubscription] = useState<{ status: string } | null>(null)
+    
+    useEffect(() => {
+        if (session?.user) {
+            fetch('/api/subscription')
+                .then(res => res.json())
+                .then(data => setSubscription(data))
+                .catch(err => console.error('Error fetching subscription:', err))
+        }
+    }, [session?.user])
 
     return (
-        <Sidebar variant="inset" {...props}>
+        <Sidebar variant="inset">
             <SidebarHeader>
                 <SidebarMenu className="flex flex-row items-center w-full">
                     <SidebarMenuItem className="flex flex-row w-full items-center gap-x-2">
@@ -207,7 +217,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
-                {session?.user && <NavUser user={session.user} />}
+                {session?.user && <NavUser user={session.user} subscription={subscription} />}
                 {/* <NavUser user={session} /> */}
             </SidebarFooter>
         </Sidebar>

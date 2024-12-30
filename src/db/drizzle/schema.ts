@@ -10,6 +10,7 @@ export const users = sqliteTable('user', {
     email: text('email').unique(),
     emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
     image: text('image'),
+    stripeCustomerId: text('stripeCustomerId'),
 })
 
 export const accounts = sqliteTable(
@@ -81,3 +82,20 @@ export const authenticators = sqliteTable(
         }),
     })
 )
+
+export const subscriptions = sqliteTable('subscription', {
+    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    userId: text('userId')
+        .notNull()
+        .references(() => users.id, { onDelete: 'cascade' }),
+    status: text('status').notNull(),
+    priceId: text('priceId').notNull(),
+    interval: text('interval').notNull(),
+    stripeCustomerId: text('stripeCustomerId').notNull(),
+    stripeSubscriptionId: text('stripeSubscriptionId').notNull(),
+    currentPeriodStart: integer('currentPeriodStart', { mode: 'timestamp_ms' }).notNull(),
+    currentPeriodEnd: integer('currentPeriodEnd', { mode: 'timestamp_ms' }).notNull(),
+    createdAt: integer('createdAt', { mode: 'timestamp_ms' }).$defaultFn(() => new Date()), // Use `new Date()`
+    updatedAt: integer('updatedAt', { mode: 'timestamp_ms' }).$defaultFn(() => new Date()), // Use `new Date()`
+});
+
