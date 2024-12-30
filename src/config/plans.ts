@@ -21,29 +21,49 @@ interface PaidPlan extends BasePlan {
 
 type Plan = FreePlan | PaidPlan;
 
-export const PLANS: { FREE: FreePlan; BASIC: PaidPlan } = {
-  FREE: {
-    name: 'Free',
-    price: 0,
-    features: ['1 user', 'Basic features', 'Community support'],
-  },
+export const PLANS: { BASIC: FreePlan; PLUS: PaidPlan; PROFFESSIONAL: PaidPlan } = {
   BASIC: {
     name: 'Basic',
+    price: 0,
+    features: ['1 user', '0.5 GB storage (1 MB per file)'],
+  },
+  PLUS: {
+    name: 'Plus',
     price: {
       monthly: {
-        amount: 15,
+        amount: 4.99,
         priceId: 'price_1QCCl5JBPSgR8cUzOtdy8y1f',
       },
       yearly: {
-        amount: 150,
+        amount: 49.99,
         priceId: 'price_1QCvcaJBPSgR8cUzxgy6Htuo',
       }
     },
     features: [
-      'All Free features',
-      'Priority support',
-      'Advanced analytics',
-      'Custom solutions'
+      'All Basic features',
+      '2 GB storage (1 MB per file)',
+      'Version History',
+      'Collaboration',
+      'Knowledge-graph'
+    ],
+  },
+  PROFFESSIONAL: {
+    name: 'Pro',
+    price: {
+      monthly: {
+        amount: 9.99,
+        priceId: 'price_1QCCl5JBPSgR8cUzOtdy8y1f',
+      },
+      yearly: {
+        amount: 99.99,
+        priceId: 'price_1QCvcaJBPSgR8cUzxgy6Htuo',
+      }
+    },
+    features: [
+      'All Plus features',
+      '10 GB storage (5 MB per file)',
+      'Advanced search (OCR, handwriting, etc.)',
+      'Publishing',
     ],
   },
 };

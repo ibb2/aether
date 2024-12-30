@@ -2,22 +2,13 @@
 
 import { TopNavbar } from '@/components/top-navbar'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { CheckIcon } from 'lucide-react'
 import { useSession } from "next-auth/react"
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { PLANS } from '@/config/plans'
+import { PricingCard } from '@/components/pricing/pricing-card'
 
 export default function PricingSectionCards() {
     const { data: session } = useSession()
@@ -88,71 +79,21 @@ export default function PricingSectionCards() {
                     <Label htmlFor="billing-period" className="relative ms-3">
                         Annual
                         <span className="absolute -top-10 start-auto -end-28">
-                            <Badge className="mt-3 uppercase">Save up to 10%</Badge>
+                            <Badge className="mt-3 uppercase">Save up to 20%</Badge>
                         </span>
                     </Label>
                 </div>
 
-                <div className="mt-12 grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-                    {/* Free Plan */}
-                    <Card>
-                        <CardHeader className="text-center pb-2">
-                            <CardTitle className="mb-7">{PLANS.FREE.name}</CardTitle>
-                            <span className="font-bold text-5xl">Free</span>
-                        </CardHeader>
-                        <CardDescription className="text-center">Forever free</CardDescription>
-                        <CardContent>
-                            <ul className="mt-7 space-y-2.5 text-sm">
-                                {PLANS.FREE.features.map((feature, index) => (
-                                    <li key={index} className="flex space-x-2">
-                                        <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                                        <span className="text-muted-foreground">{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                        <CardFooter>
-                            <Button className="w-full" variant={'outline'}>
-                                Get Started
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                    {/* Basic Plan */}
-                    <Card>
-                        <CardHeader className="text-center pb-2">
-                            <CardTitle className="mb-7">{PLANS.BASIC.name}</CardTitle>
-                            <span className="font-bold text-5xl">
-                                ${isYearly ? PLANS.BASIC.price.yearly.amount : PLANS.BASIC.price.monthly.amount}
-                            </span>
-                            <span className="text-sm font-normal text-muted-foreground">
-                                /{isYearly ? 'year' : 'month'}
-                            </span>
-                        </CardHeader>
-                        <CardDescription className="text-center">Best for professionals</CardDescription>
-                        <CardContent>
-                            <ul className="mt-7 space-y-2.5 text-sm">
-                                {PLANS.BASIC.features.map((feature, index) => (
-                                    <li key={index} className="flex space-x-2">
-                                        <CheckIcon className="flex-shrink-0 mt-0.5 h-4 w-4" />
-                                        <span className="text-muted-foreground">{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                        <CardFooter>
-                            <Button
-                                className="w-full"
-                                onClick={() => handleSubscribe(
-                                    isYearly
-                                        ? PLANS.BASIC.price.yearly.priceId
-                                        : PLANS.BASIC.price.monthly.priceId
-                                )}
-                            >
-                                {!session?.user ? 'Sign in to upgrade' : 'Upgrade to Basic'}
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    {Object.values(PLANS).map((plan) => (
+                        <PricingCard
+                            key={plan.name}
+                            plan={plan}
+                            isYearly={isYearly}
+                            onSubscribe={handleSubscribe}
+                            isSignedIn={!!session?.user}
+                        />
+                    ))}
                 </div>
             </div>
         </>
