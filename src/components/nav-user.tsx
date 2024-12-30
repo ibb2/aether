@@ -104,7 +104,7 @@ export function NavUser({
                                 </DropdownMenuItem>
                             ) : (
                                 <DropdownMenuItem asChild>
-                                    <Link href="/pricing" className="flex w-full items-center">
+                                    <Link href="" className="flex w-full items-center">
                                         <Sparkles className="h-4 w-4" />
                                         Upgraded
                                     </Link>

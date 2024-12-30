@@ -32,7 +32,7 @@ export function BillingSettings({ className }: BillingSettingsProps) {
         const res = await fetch('/api/subscription')
         const data = await res.json()
         setSubscription(data)
-        
+
         if (data?.stripeCustomerId) {
           const portalRes = await fetch('/api/stripe/portal', {
             method: 'POST',
@@ -58,10 +58,10 @@ export function BillingSettings({ className }: BillingSettingsProps) {
 
   const currentPlan = subscription
     ? Object.values(PLANS).find(
-        plan =>
-          plan.price.monthly.priceId === subscription.priceId ||
-          plan.price.yearly.priceId === subscription.priceId
-      ) || PLANS.FREE
+      plan =>
+        (plan.price !== 0 && plan.price.monthly.priceId === subscription.priceId) ||
+        (plan.price !== 0 && plan.price.yearly.priceId === subscription.priceId)
+    ) || PLANS.FREE
     : PLANS.FREE
 
   if (loading) {
