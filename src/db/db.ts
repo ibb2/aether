@@ -43,4 +43,6 @@ export type Database = typeof Database.Type
 
 export const evolu = createEvolu(Database, {
     indexes,
+    syncUrl: 'http://localhost:4000',
+    minimumLogLevel: 'trace',
 })

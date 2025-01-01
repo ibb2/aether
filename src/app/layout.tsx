@@ -64,7 +64,7 @@ export default function RootLayout({
             </head>
             <body className="flex min-h-svh items-center justify-center">
                 <PHProvider>
-                    <SessionProvider >
+                    <SessionProvider>
                         <EvoluProvider value={evolu}>
                             <ThemeProvider
                                 attribute="class"
