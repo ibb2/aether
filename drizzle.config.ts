@@ -13,7 +13,7 @@ const authToken =
         ? undefined!
         : process.env.TURSO_AUTH_TOKEN!
 
-console.log('Development?', process.env.NODE_ENV)
+console.log('Development?', process.env.VERCEL_ENV)
 console.log('another url', url)
 
 export default defineConfig({
