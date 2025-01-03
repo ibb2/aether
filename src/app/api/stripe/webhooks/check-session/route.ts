@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const stripe = new Stripe(
+    process.env.NODE_ENV === 'development'
+        ? process.env.STRIPE_TEST_SECRET_KEY!
+        : process.env.STRIPE_SECRET_KEY!
+)
 
 export async function POST(request) {
     const { sessionId } = await request.json()
