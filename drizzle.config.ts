@@ -3,10 +3,12 @@ import * as dotenv from 'dotenv'
 
 dotenv.config({ path: '.env.local' })
 
+console.log('👋 Hello')
+
 const url =
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
         ? process.env.DATABASE_URL!
-        : process.env.TURSO_DATABASE_URL!
+        : process.env.NEXT_PUBLIC_TURSO_DATABASE_URL!
 
 const authToken =
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
