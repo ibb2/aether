@@ -4,14 +4,17 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local' })
 
 const url =
-    process.env.NODE_ENV === 'development'
+    process.env.VERCEL_ENV === 'development'
         ? process.env.DATABASE_URL!
         : process.env.TURSO_DATABASE_URL!
 
 const authToken =
-    process.env.NODE_ENV === 'development'
-        ? process.env.DATABASE_AUTH_TOKEN!
-        : process.env.TURSO_AUTH_TOKEN
+    process.env.VERCEL_ENV === 'development'
+        ? undefined!
+        : process.env.TURSO_AUTH_TOKEN!
+
+console.log('Development?', process.env.NODE_ENV)
+console.log('another url', url)
 
 export default defineConfig({
     schema: './src/db/drizzle/schema.ts',
