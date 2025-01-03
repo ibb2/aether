@@ -3,12 +3,17 @@
  * @see https://v0.dev/t/xYHqD5MkVkT
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
+'use client';
+
 import Link from 'next/link'
-import { Button } from './ui/Button'
+import { Button } from '@/components/ui/button'
 import { JSX, SVGProps } from 'react'
-import { ChevronRight, Cloud, Cloudy } from 'lucide-react'
+import { ChevronRight, Cloud } from 'lucide-react'
+import { useSession } from "next-auth/react"
 
 export function TopNavbar() {
+    const { data: session } = useSession()
+
     return (
         <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
             <div className="w-full max-w-7xl px-4">
@@ -45,11 +50,32 @@ export function TopNavbar() {
                         </Link>
                     </nav>
                     <div className="flex items-center gap-4">
-                        <Button asChild>
-                            <Link href="/app" className="flex items-center">
-                                Get Started <ChevronRight />
-                            </Link>
-                        </Button>
+                        {session?.user ? (
+                            <Button asChild>
+                                <Link href="/app" className="flex items-center">
+                                    Go to app <ChevronRight />
+                                </Link>
+                            </Button>
+                        ) : (
+                            <div className="flex gap-x-2">
+                                <Button asChild>
+                                    <Link
+                                        href="/login?callbackUrl=http://localhost:3000"
+                                        className="flex items-center"
+                                    >
+                                        Login
+                                    </Link>
+                                </Button>
+                                <Button variant="secondary" asChild>
+                                    <Link
+                                        href="/sign-up?callbackUrl=http://localhost:3000"
+                                        className="flex items-center"
+                                    >
+                                        Sign up
+                                    </Link>
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -57,9 +83,7 @@ export function TopNavbar() {
     )
 }
 
-function MountainIcon(
-    props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
-) {
+function MountainIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}

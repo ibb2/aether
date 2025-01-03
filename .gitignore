@@ -39,7 +39,7 @@ next-env.d.ts
 
 # db
 aether*
-drizzle/
+dev.*
 
 # Million Lint
 .million

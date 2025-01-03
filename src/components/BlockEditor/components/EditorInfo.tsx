@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { memo } from 'react'
-import { cn } from '../../../lib/utils'
 import {
     DropdownMenuCheckboxItemProps,
     DropdownMenuGroup,
@@ -29,10 +28,11 @@ import {
     Trash,
     Undo,
 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useNoteStore from '@/store/note'
+import { cn } from '@/lib/utils'
 
 type Checked = DropdownMenuCheckboxItemProps['checked']
 
@@ -185,14 +185,14 @@ export const EditorInfo = memo(
                         {/* <div className="d-flex gap-2 align-items-center "> */}
                         <Button
                             variant={eraseMode ? 'outline' : 'default'}
-                            size="icon"
+                            size="sm"
                             onClick={handlePenClick}
                         >
                             <Pen />
                         </Button>
                         <Button
                             variant={!eraseMode ? 'outline' : 'default'}
-                            size="icon"
+                            size="sm"
                             onClick={handleEraserClick}
                         >
                             <Eraser />
@@ -200,28 +200,28 @@ export const EditorInfo = memo(
                         <div className="vr" />
                         <Button
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             onClick={handleUndoClick}
                         >
                             <Undo />
                         </Button>
                         <Button
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             onClick={handleRedoClick}
                         >
                             <Redo />
                         </Button>
                         <Button
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             onClick={handleClearClick}
                         >
                             <Trash />
                         </Button>
                         <Button
                             variant="outline"
-                            size="icon"
+                            size="sm"
                             onClick={handleResetClick}
                         >
                             <RefreshCcw />
@@ -229,7 +229,7 @@ export const EditorInfo = memo(
                         <Button
                             variant="ghost"
                             onClick={handleDisableCanvas}
-                            size="icon"
+                            size="sm"
                             className="mr-2"
                         >
                             {isInkEnabled ? <ToggleRight /> : <ToggleLeft />}
@@ -238,7 +238,7 @@ export const EditorInfo = memo(
                 )}
                 <div className="flex flex-row justify-self-end">
                     <Button
-                        size="icon"
+                        size="sm"
                         variant="ghost"
                         onClick={() => onOpen(!open)}
                     >
@@ -254,7 +254,7 @@ export const EditorInfo = memo(
                   </Avatar> */}
                                     <Button
                                         variant="ghost"
-                                        size="icon"
+                                        size="sm"
                                         onClick={() => openSettings()}
                                         className={cn(
                                             animate && 'animate-spin'
