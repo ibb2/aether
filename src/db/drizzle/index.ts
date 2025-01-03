@@ -1,7 +1,6 @@
 /*
-  This is client code for future reference, e.g. NEXT_PUBLIC needed.
+  This is client code for future reference  e.g.
 */
-
 import { drizzle } from 'drizzle-orm/libsql'
 import { createClient } from '@libsql/client'
 import * as dotenv from 'dotenv'
