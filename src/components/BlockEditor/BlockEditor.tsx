@@ -261,15 +261,14 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
     const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
 
-    // React.useEffect(() => {
-    //     if (load === 0) {
-    //         // getInitialData(editor);
-    //         canvasRef.current?.loadPaths(ink)
-    //         onLoad(1)
-    //         console.log('Loaded... ', load)
-    //     }
-    //     if (canvasRef.current) debouncedInkSave(canvasRef.current)
-    // }, [debouncedInkSave, load])
+    React.useEffect(() => {
+        if (load === 0) {
+            // getInitialData(editor);
+            canvasRef.current?.loadPaths(ink)
+            onLoad(1)
+        }
+        if (canvasRef.current) debouncedInkSave(canvasRef.current)
+    }, [debouncedInkSave, load])
 
     React.useEffect(() => {
         if (item === null) return
@@ -279,9 +278,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         )
 
         if (data === undefined || data === null) return
-
-        console.log('JSON Data, ', data.jsonData)
-        console.log('INK Data, ', data.inkData)
 
         const ink = Array.isArray(data.inkData)
             ? (data.inkData as CanvasPath[])
@@ -329,15 +325,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         }
         changeExistingStrokeColor()
     }, [theme])
-
-    const windowClassName = cn(
-        // "bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all",
-        // "dark:bg-black lg:dark:bg-black/30",
-        'min-h-svh'
-        // !leftSidebar.isOpen && "border-r-transparent",
-        // leftSidebar.isOpen &&
-        //   "w-80 border-r border-r-neutral-200 dark:border-r-neutral-800",
-    )
 
     const reactSketchCanvasClass = cn(
         'absolute',
@@ -394,7 +381,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 onChange={() => {
                     // Save function in here, handles all points.
                     if (canvasRef.current) {
-                        console.log('Updating...')
                         debouncedInkSave(canvasRef.current)
                     }
                 }}
