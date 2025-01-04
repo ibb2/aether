@@ -43,3 +43,6 @@ dev.*
 
 # Million Lint
 .million
+
+# npm
+.npmrc
