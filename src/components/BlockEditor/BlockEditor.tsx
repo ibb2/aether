@@ -127,34 +127,102 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     //     // await canvasRef.current?.loadPaths(inkData!);
     // }
 
+    const customEditor = useEditor({
+        extensions: [
+            ...ExtensionKit({
+                provider,
+            }),
+        ],
+        onBeforeCreate({ editor }) {
+            // Before the view is created.
+        },
+        onCreate({ editor }) {
+            // The editor is ready.
+        },
+        onUpdate({ editor }) {
+            debouncedSave(editor)
+        },
+        onSelectionUpdate({ editor }) {
+            // The selection has changed.
+        },
+        onTransaction({ editor, transaction }) {
+            // The editor state has changed.
+        },
+        onFocus({ editor, event }) {
+            // The editor is focused.
+        },
+        onBlur({ editor, event }) {
+            // The editor isn't focused anymore.
+        },
+        onDestroy() {
+            // The editor is being destroyed.
+        },
+    })
+
     const saveData = React.useCallback(
-        // Handles saving the data of notes.
-        // Gets the exported data row matching the note
-        // Then updates row with the new data
-
         (editor: Editor) => {
-            if (item === null) return
-
+            if (item === null || !editor) return
             const data = exportedData.rows.find((row) => row.noteId === item.id)
-
             if (data === undefined || data === null) return
 
-            console.log('Big Data', data)
+            // Store selection before update
+            const { from, to } = editor.state.selection
 
-            if (editor) {
-                const updatedData = editor.getJSON()
-                console.log('id save', item.id)
-                const updateId = update('exportedData', {
-                    id: data.id,
-                    jsonData: updatedData,
-                })
-                console.log('update id', updateId)
-                console.info('Debouncing...')
-                setLastSaveTime(Date.now())
-            }
+            const content = editor.getJSON()
+            update('exportedData', {
+                id: data.id,
+                jsonData: content,
+            })
+
+            // Restore selection after update
+            requestAnimationFrame(() => {
+                if (editor.isFocused) {
+                    editor.commands.setTextSelection({ from, to })
+                }
+            })
+
+            setLastSaveTime(Date.now())
         },
         [item, exportedData.rows, update]
     )
+
+    const debouncedSave = useDebouncedCallback(saveData, 2000)
+
+    // Single effect to handle all content updates
+    React.useEffect(() => {
+        if (!customEditor || !item) return
+        const data = exportedData.rows.find(
+            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
+        )
+        if (!data?.jsonData) return
+
+        // Store selection
+        const { from, to } = customEditor.state.selection
+
+        // Update content with preservation options
+        customEditor.commands.setContent(data.jsonData, false, {
+            preserveWhitespace: 'full',
+        })
+
+        // Restore selection
+        requestAnimationFrame(() => {
+            if (customEditor.isFocused) {
+                customEditor.commands.setTextSelection({ from, to })
+            }
+        })
+
+        // Handle ink data
+        if (canvasRef.current) {
+            const ink = Array.isArray(data.inkData)
+                ? (data.inkData as CanvasPath[])
+                : null
+
+            canvasRef.current.resetCanvas()
+            if (ink) {
+                canvasRef.current.loadPaths(ink)
+            }
+        }
+    }, [customEditor, item, exportedData.rows])
 
     const transformCanvasPaths = (data): CanvasPathSchema[] => {
         return data.map((path) => ({
@@ -191,89 +259,17 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         [item, exportedData.rows, lastInkedSaveTime, update]
     )
 
-    const debouncedSave = useDebouncedCallback(saveData, 2000)
     const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
 
-    React.useEffect(() => {
-        if (load === 0) {
-            // getInitialData(editor);
-            canvasRef.current?.loadPaths(ink)
-            onLoad(1)
-            console.log('Loaded... ', load)
-        }
-        if (canvasRef.current) debouncedInkSave(canvasRef.current)
-    }, [debouncedInkSave, load])
-
-    const customEditor = useEditor({
-        extensions: [
-            ...ExtensionKit({
-                provider,
-            }),
-        ],
-        // content: data,
-        onBeforeCreate({ editor }) {
-            // Before the view is created.
-        },
-        onCreate({ editor }) {
-            // The editor is ready.
-            // if (exportedDataRows[0] !== undefined) getInitialData(editor)
-            // if (settings.row !== null) {
-            //     console.log('not null', settings.row)
-            //     editor.commands.setContent(settings.row.defaultPage)
-            //     if (settings.row.lastAccessedNote !== null) {
-            //         setNote(
-            //             settings.row.defaultPage!,
-            //             S.decodeSync(NonEmptyString50)(
-            //                 settings.row.lastAccessedNote!
-            //             ),
-            //             settings.row.lastAccessedNote!,
-            //             settings.row.defaultPageExport!,
-            //             null
-            //         )
-            //     }
-            //     console.log(
-            //         'Length',
-            //         settings.row.lastAccessedNote,
-            //         settings.row.lastAccessedNote?.length
-            //     )
-            // }
-            // console.log('on create')
-        },
-        onUpdate({ editor }) {
-            // The content has changed.
-            // Content does not seem to be the content of the editor
-            // Update as of 9/7/2024 it seems that yes infact this works as expected?
-            // Unsure of the issue that caused it to fail.
-            if (debouncedSave) {
-                debouncedSave(editor)
-            }
-        },
-        onSelectionUpdate({ editor }) {
-            // The selection has changed.
-        },
-        onTransaction({ editor, transaction }) {
-            // The editor state has changed.
-            // if (id !== null) {
-            //   console.log("note id", noteId);
-            //   update("settings", {
-            //     id: settings.rows[0].id,
-            //     defaultPage: editor.getJSON(),
-            //     lastAccessedNote: noteId,
-            //     defaultPageExport: id,
-            //   });
-            // }
-        },
-        onFocus({ editor, event }) {
-            // The editor is focused.
-            console.log('focus...')
-        },
-        onBlur({ editor, event }) {
-            // The editor isn’t focused anymore.
-        },
-        onDestroy() {
-            // The editor is being destroyed.
-        },
-    })
+    // React.useEffect(() => {
+    //     if (load === 0) {
+    //         // getInitialData(editor);
+    //         canvasRef.current?.loadPaths(ink)
+    //         onLoad(1)
+    //         console.log('Loaded... ', load)
+    //     }
+    //     if (canvasRef.current) debouncedInkSave(canvasRef.current)
+    // }, [debouncedInkSave, load])
 
     React.useEffect(() => {
         if (item === null) return
