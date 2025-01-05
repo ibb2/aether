@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm'
 import { users } from '@/db/drizzle/schema'
 import { NextResponse } from 'next/server'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+const APP_URL = process.env.VERCEL_URL || 'http://localhost:3000'
 
 export async function POST(req: Request) {
     try {
