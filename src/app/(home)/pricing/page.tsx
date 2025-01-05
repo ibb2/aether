@@ -1,29 +1,47 @@
-'use client';
+'use client'
 
 import { TopNavbar } from '@/components/top-navbar'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { useSession } from "next-auth/react"
+import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { PLANS } from '@/config/plans'
 import { PricingCard } from '@/components/pricing/pricing-card'
+import React from 'react'
+import { stripe } from '@/lib/stripe'
+import Stripe from 'stripe'
 
 export default function PricingSectionCards() {
     const { data: session } = useSession()
-    const [isYearly, setIsYearly] = useState(false);
+    const [isYearly, setIsYearly] = useState(false)
     const { toast } = useToast()
+
+    const [prices, setPrices] = React.useState<Stripe.Price[]>()
+
+    React.useEffect(() => {
+        const getPrices = async () => {
+            const prices = await stripe.prices.list({
+                lookup_keys: [
+                    'plus_monthly, plus_yearly, pro_monthly, pro_yearly',
+                ],
+            })
+            setPrices(prices.data)
+        }
+
+        getPrices()
+    }, [])
 
     const handleSubscribe = async (priceId: string) => {
         try {
             if (!session?.user) {
                 toast({
-                    title: "Error",
-                    description: "Please sign in to subscribe",
-                    variant: "destructive",
+                    title: 'Error',
+                    description: 'Please sign in to subscribe',
+                    variant: 'destructive',
                 })
-                return;
+                return
             }
 
             const response = await fetch('/api/stripe/checkout', {
@@ -33,26 +51,26 @@ export default function PricingSectionCards() {
                 },
                 body: JSON.stringify({
                     priceId,
-                    isYearly
+                    isYearly,
                 }),
-            });
+            })
 
-            const data = await response.json();
+            const data = await response.json()
 
             if (!response.ok) {
-                throw new Error('Failed to create checkout session');
+                throw new Error('Failed to create checkout session')
             }
 
-            window.location.href = data.url;
+            window.location.href = data.url
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error:', error)
             toast({
-                title: "Error",
-                description: "Something went wrong. Please try again.",
-                variant: "destructive",
+                title: 'Error',
+                description: 'Something went wrong. Please try again.',
+                variant: 'destructive',
             })
         }
-    };
+    }
 
     return (
         <>
@@ -79,7 +97,9 @@ export default function PricingSectionCards() {
                     <Label htmlFor="billing-period" className="relative ms-3">
                         Annual
                         <span className="absolute -top-10 start-auto -end-28">
-                            <Badge className="mt-3 uppercase">Save up to 20%</Badge>
+                            <Badge className="mt-3 uppercase">
+                                Save up to 20%
+                            </Badge>
                         </span>
                     </Label>
                 </div>
@@ -97,5 +117,5 @@ export default function PricingSectionCards() {
                 </div>
             </div>
         </>
-    );
+    )
 }
