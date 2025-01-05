@@ -6,16 +6,16 @@ dotenv.config({ path: '.env.local' })
 console.log('👋 Hello')
 
 const url =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
+    process.env.VERCEL_ENV === 'development'
         ? process.env.DATABASE_URL!
         : process.env.TURSO_DATABASE_URL!
 
 const authToken =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
+    process.env.VERCEL_ENV === 'development'
         ? undefined!
         : process.env.TURSO_AUTH_TOKEN!
 
-console.log('Development?', process.env.NEXT_PUBLIC_VERCEL_ENV)
+console.log('Development?', process.env.VERCEL_ENV)
 console.log('another url', url)
 
 export default defineConfig({

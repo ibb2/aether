@@ -6,15 +6,15 @@ import { createClient } from '@libsql/client'
 import * as dotenv from 'dotenv'
 
 console.log('process.env.DATABASE_URL', process.env.DATABASE_URL!)
-console.log('ENV', process.env.NEXT_PUBLIC_VERCEL_ENV)
+console.log('ENV', process.env.VERCEL_ENV)
 
 const url =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
+    process.env.VERCEL_ENV === 'development'
         ? process.env.DATABASE_URL!
         : process.env.NEXT_PUBLIC_TURSO_DATABASE_URL!
 
 const authToken =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
+    process.env.VERCEL_ENV === 'development'
         ? undefined!
         : process.env.TURSO_AUTH_TOKEN
 
