@@ -1,69 +1,76 @@
-interface PriceConfig {
-  amount: number;
-  priceId: string;
-}
-
 interface BasePlan {
-  name: string;
-  features: string[];
+    name: string
+    features: string[]
+    lookupKey: string
 }
 
 interface FreePlan extends BasePlan {
-  price: 0;
+    price: 0
 }
 
 interface PaidPlan extends BasePlan {
-  price: {
-    monthly: PriceConfig;
-    yearly: PriceConfig;
-  };
+    yearly: boolean
 }
 
-type Plan = FreePlan | PaidPlan;
+export type Plan = FreePlan | PaidPlan
 
-export const PLANS: { BASIC: FreePlan; PLUS: PaidPlan; PROFFESSIONAL: PaidPlan } = {
-  BASIC: {
-    name: 'Basic',
-    price: 0,
-    features: ['1 user', '0.5 GB storage (1 MB per file)'],
-  },
-  PLUS: {
-    name: 'Plus',
-    price: {
-      monthly: {
-        amount: 4.99,
-        priceId: 'price_1QCCl5JBPSgR8cUzOtdy8y1f',
-      },
-      yearly: {
-        amount: 49.99,
-        priceId: 'price_1QCvcaJBPSgR8cUzxgy6Htuo',
-      }
+export const PLANS: {
+    BASIC: FreePlan
+    PLUS: PaidPlan
+    PLUS_YEARLY: PaidPlan
+    PROFFESSIONAL: PaidPlan
+    PROFFESSIONAL_YEARLY: PaidPlan
+} = {
+    BASIC: {
+        name: 'Basic',
+        price: 0,
+        features: ['1 user', '0.5 GB storage (1 MB per file)'],
+        lookupKey: '',
     },
-    features: [
-      'All Basic features',
-      '2 GB storage (1 MB per file)',
-      'Version History',
-      'Collaboration',
-      'Knowledge-graph'
-    ],
-  },
-  PROFFESSIONAL: {
-    name: 'Pro',
-    price: {
-      monthly: {
-        amount: 9.99,
-        priceId: 'price_1Qbjt5JBPSgR8cUzFYeMf0Vy',
-      },
-      yearly: {
-        amount: 99.99,
-        priceId: 'price_1QbjtVJBPSgR8cUzhTrXryYc',
-      }
+    PLUS: {
+        name: 'Plus',
+        yearly: false,
+        lookupKey: 'plus_monthly',
+        features: [
+            'All Basic features',
+            '2 GB storage (1 MB per file)',
+            'Version History',
+            'Collaboration',
+            'Knowledge-graph',
+        ],
     },
-    features: [
-      'All Plus features',
-      '10 GB storage (5 MB per file)',
-      'Advanced search (OCR, handwriting, etc.)',
-      'Publishing',
-    ],
-  },
-};
+    PLUS_YEARLY: {
+        name: 'Plus',
+        yearly: true,
+        lookupKey: 'plus_yearly',
+        features: [
+            'All Basic features',
+            '2 GB storage (1 MB per file)',
+            'Version History',
+            'Collaboration',
+            'Knowledge-graph',
+        ],
+    },
+    PROFFESSIONAL: {
+        name: 'Pro',
+        yearly: false,
+        lookupKey: 'pro_monthly',
+        features: [
+            'All Plus features',
+            '10 GB storage (5 MB per file)',
+            'Advanced search (OCR, handwriting, etc.)',
+            'Publishing',
+        ],
+    },
+    PROFFESSIONAL_YEARLY: {
+        name: 'Pro',
+        yearly: true,
+        lookupKey: 'pro_yearly',
+        features: [
+            'All Plus features',
+            '10 GB storage (5 MB per file)',
+            'Advanced search (OCR, handwriting, etc.)',
+            'Publishing',
+        ],
+    },
+}
