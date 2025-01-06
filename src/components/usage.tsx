@@ -24,12 +24,12 @@ export default function Usage(params: { id: string }) {
                 const planResponse = await fetch(
                     `/api/stripe/subscription/${id}`
                 )
-                const { plan } = await planResponse.json()
+                const { plan, status } = await planResponse.json()
 
                 // Set max storage based on plan
-                if (plan === 'pro') {
+                if (plan === 'pro' && status === 'active') {
                     setMaxStorage(PlanStorage.pro)
-                } else if (plan === 'plus') {
+                } else if (plan === 'plus' && status === 'active') {
                     setMaxStorage(PlanStorage.plus)
                 } else {
                     setMaxStorage(PlanStorage.basic)
@@ -41,9 +41,7 @@ export default function Usage(params: { id: string }) {
 
                 // Convert bytes to GB
                 const usageInGb = res.usage.storage_bytes / (1024 * 1024 * 1024)
-                console.log('usageInGb', usageInGb)
                 setUsage(usageInGb)
-                console.log('usage', usage)
             } catch (error) {
                 console.error('Error fetching usage:', error)
             } finally {

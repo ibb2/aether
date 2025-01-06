@@ -165,16 +165,24 @@ const data = {
 
 export function AppSidebar() {
     const { data: session } = useSession()
-    const [subscription, setSubscription] = useState<{ status: string } | null>(null)
-    
+    const [subscription, setSubscription] = useState(null)
+    const [ran, setRan] = useState(false)
+
     useEffect(() => {
-        if (session?.user) {
-            fetch('/api/subscription')
-                .then(res => res.json())
-                .then(data => setSubscription(data))
-                .catch(err => console.error('Error fetching subscription:', err))
+        if (session === null || session === undefined) return
+        if (session.user === null || session.user === undefined) return
+
+        if (!ran) {
+            fetch(`/api/stripe/subscription/${session.user.email!}`)
+                .then((res) => res.json())
+                .then((data) => setSubscription(data))
+                .catch((err) =>
+                    console.error('Error fetching subscription:', err)
+                )
+            setRan(true)
         }
-    }, [session?.user])
+        console.log('subscription', subscription)
+    }, [session, subscription, ran])
 
     return (
         <Sidebar variant="inset">
@@ -217,7 +225,9 @@ export function AppSidebar() {
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
-                {session?.user && <NavUser user={session.user} subscription={subscription} />}
+                {session?.user && (
+                    <NavUser user={session.user} subscription={subscription} />
+                )}
                 {/* <NavUser user={session} /> */}
             </SidebarFooter>
         </Sidebar>

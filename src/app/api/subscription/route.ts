@@ -15,7 +15,7 @@ export async function GET() {
         const [subscription] = await db
             .select()
             .from(subscriptions)
-            .where(eq(subscriptions.userId, session.user.id))
+            .where(eq(subscriptions.userId, session.user.id!))
 
         return NextResponse.json(subscription || null)
     } catch (error) {
