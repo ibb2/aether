@@ -38,7 +38,7 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
             shouldShow={states.shouldShow}
             updateDelay={100}
         >
-            <Toolbar.Wrapper>
+            <Toolbar.Wrapper className="dark:bg-gray-800 dark:text-white">
                 <MemoContentTypePicker options={blockOptions} />
                 <MemoFontFamilyPicker
                     onChange={commands.onSetFont}
@@ -138,7 +138,7 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
                         </MemoButton>
                     </Popover.Trigger>
                     <Popover.Content side="top" asChild>
-                        <Toolbar.Wrapper>
+                        <Toolbar.Wrapper className="dark:bg-gray-800 dark:text-white">
                             <MemoButton
                                 tooltip="Subscript"
                                 tooltipShortcut={['Mod', '.']}
