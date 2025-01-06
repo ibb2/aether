@@ -1,39 +1,90 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Progress } from './ui/progress'
 import { DatabaseUsage } from '@tursodatabase/api'
-import { Usb } from 'lucide-react'
+import { HardDrive } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 enum PlanStorage {
-    // In Mb
-    basic = 512,
-    plus = 2048,
-    pro = 10240,
+    // In GB
+    basic = 0.5,
+    plus = 2,
+    pro = 10,
 }
 
 export default function Usage(params: { id: string }) {
-    const [usage, setUsage] = useState(0)
+    const { id } = params
+    const [usage, setUsage] = useState<number>(0)
+    const [maxStorage, setMaxStorage] = useState<number>(PlanStorage.basic)
+    const [loading, setLoading] = useState(true)
 
-    React.useEffect(() => {
-        async function getUsage() {
-            console.log('evoluid', params.id)
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                // Get subscription plan
+                const planResponse = await fetch(
+                    `/api/stripe/subscription/${id}`
+                )
+                const { plan } = await planResponse.json()
 
-            const data = await fetch(`/api/usage/${params.id}`)
-            const res: DatabaseUsage = await data.json()
+                // Set max storage based on plan
+                if (plan === 'pro') {
+                    setMaxStorage(PlanStorage.pro)
+                } else if (plan === 'plus') {
+                    setMaxStorage(PlanStorage.plus)
+                } else {
+                    setMaxStorage(PlanStorage.basic)
+                }
 
-            setUsage(res.usage.storage_bytes)
-            console.log('Usage', res)
+                // Get current usage
+                const data = await fetch(`/api/usage/${id}`)
+                const res: DatabaseUsage = await data.json()
+
+                // Convert bytes to GB
+                const usageInGb = res.usage.storage_bytes / (1024 * 1024 * 1024)
+                console.log('usageInGb', usageInGb)
+                setUsage(usageInGb)
+                console.log('usage', usage)
+            } catch (error) {
+                console.error('Error fetching usage:', error)
+            } finally {
+                setLoading(false)
+            }
         }
-        getUsage()
-    })
 
-    // function calcVal() {
-    //   stripe.
-    //   const storage = PlanStorage.basic
-    // }
+        fetchData()
+    }, [id])
+
+    const usagePercentage = (usage / maxStorage) * 100
+    const isNearLimit = usagePercentage > 80
+
+    if (loading) {
+        return (
+            <div className="px-2 py-1.5">
+                <Progress value={0} className="h-2" />
+            </div>
+        )
+    }
 
     return (
-        <div>
-            <Progress value={usage} />
+        <div className="px-2 py-1.5 space-y-1.5">
+            <div className="flex items-center gap-2 px-2 text-sm text-muted-foreground">
+                <HardDrive className="h-4 w-4" />
+                <span>Storage</span>
+            </div>
+            <div className="space-y-1">
+                <Progress
+                    value={usagePercentage}
+                    className={cn(
+                        'h-2',
+                        isNearLimit && 'bg-muted-foreground/20',
+                        isNearLimit && '[&>div]:bg-warning'
+                    )}
+                />
+                <div className="px-2 flex justify-between items-center text-xs text-muted-foreground">
+                    <span>{usage.toFixed(2)}GB used</span>
+                    <span>{maxStorage}GB limit</span>
+                </div>
+            </div>
         </div>
     )
 }

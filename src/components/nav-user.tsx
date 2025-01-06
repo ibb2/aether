@@ -113,11 +113,13 @@ export function NavUser({
                             ) : (
                                 <DropdownMenuItem asChild>
                                     <Link
-                                        href=""
+                                        href="/settings/billing"
                                         className="flex w-full items-center"
                                     >
-                                        <Sparkles className="h-4 w-4" />
-                                        Upgraded
+                                        <BadgeCheck className="h-4 w-4 text-green-500" />
+                                        {subscription.status === 'active'
+                                            ? 'Pro Plan'
+                                            : 'View Plan'}
                                     </Link>
                                 </DropdownMenuItem>
                             )}

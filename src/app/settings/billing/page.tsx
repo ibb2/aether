@@ -12,7 +12,7 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { PLANS } from '@/config/plans'
+import { PLANS, type Plan } from '@/config/plans'
 import Link from 'next/link'
 
 export default async function BillingPage() {
@@ -25,27 +25,27 @@ export default async function BillingPage() {
     const [subscription] = await db
         .select()
         .from(subscriptions)
-        .where(eq(subscriptions.userId, session.user.id))
+        .where(eq(subscriptions.userId, session.user.id!))
 
-    let currentPlan: any = PLANS.BASIC
+    let currentPlan: Plan = PLANS.BASIC
     let portalUrl = null
 
     if (subscription) {
-        // Find the plan based on the priceId
+        // Find the plan based on the subscription interval
         const isYearly = subscription.interval === 'year'
 
-        if (
-            subscription.priceId === PLANS.PLUS.price.yearly.priceId ||
-            subscription.priceId === PLANS.PLUS.price.monthly.priceId
-        ) {
-            currentPlan = PLANS.PLUS
-        }
-
-        if (
-            subscription.priceId === PLANS.PROFFESSIONAL.price.yearly.priceId ||
-            subscription.priceId === PLANS.PROFFESSIONAL.price.monthly.priceId
-        ) {
-            currentPlan = PLANS.PROFFESSIONAL
+        if (isYearly) {
+            if (subscription.priceId.includes('plus')) {
+                currentPlan = PLANS.PLUS_YEARLY as Plan
+            } else if (subscription.priceId.includes('pro')) {
+                currentPlan = PLANS.PROFFESSIONAL_YEARLY as Plan
+            }
+        } else {
+            if (subscription.priceId.includes('plus')) {
+                currentPlan = PLANS.PLUS as Plan
+            } else if (subscription.priceId.includes('pro')) {
+                currentPlan = PLANS.PROFFESSIONAL as Plan
+            }
         }
 
         // Create Stripe portal session
@@ -57,6 +57,9 @@ export default async function BillingPage() {
             portalUrl = portalSession.url
         }
     }
+
+    const planName = currentPlan.name
+    const isYearlyPlan = 'yearly' in currentPlan && currentPlan.yearly
 
     return (
         <div className="container max-w-4xl py-8">
@@ -74,7 +77,8 @@ export default async function BillingPage() {
                                 Current Plan
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                                {currentPlan.name}
+                                {planName}
+                                {isYearlyPlan ? ' (Yearly)' : ''}
                             </p>
                             {subscription && (
                                 <p className="text-sm text-muted-foreground">
@@ -91,7 +95,7 @@ export default async function BillingPage() {
                             </Button>
                         ) : (
                             <Button asChild>
-                                <Link href="/pricing">Upgrade to Basic</Link>
+                                <Link href="/pricing">Upgrade Plan</Link>
                             </Button>
                         )}
                     </div>
