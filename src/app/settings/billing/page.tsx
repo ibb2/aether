@@ -15,6 +15,10 @@ import { Button } from '@/components/ui/button'
 import { PLANS, type Plan } from '@/config/plans'
 import Link from 'next/link'
 
+const APP_URL = process.env.VERCEL_URL
+    ? process.env.VERCEL_URL
+    : 'http://localhost:3000'
+
 export default async function BillingPage() {
     const session = await auth()
 
@@ -52,7 +56,7 @@ export default async function BillingPage() {
         if (subscription.stripeSubscriptionId) {
             const portalSession = await stripe.billingPortal.sessions.create({
                 customer: subscription.stripeCustomerId,
-                return_url: `${process.env.VERCEL_URL}/settings/billing`,
+                return_url: `${APP_URL}/settings/billing`,
             })
             portalUrl = portalSession.url
         }
