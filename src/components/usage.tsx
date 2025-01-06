@@ -11,21 +11,24 @@ enum PlanStorage {
     pro = 10,
 }
 
-export default function Usage(params: { id: string }) {
-    const { id } = params
+export default function Usage(params: { email: string; id: string }) {
+    const { email, id } = params
     const [usage, setUsage] = useState<number>(0)
-    const [maxStorage, setMaxStorage] = useState<number>(PlanStorage.basic)
+    const [maxStorage, setMaxStorage] = useState<number>(1000)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
             try {
+                console.log('idid', id)
+                console.log('email', email)
                 // Get subscription plan
                 const planResponse = await fetch(
-                    `/api/stripe/subscription/${id}`
+                    `/api/stripe/subscription/${email}`
                 )
                 const { plan, status } = await planResponse.json()
-
+                console.log('plan', plan)
+                console.log('status', status)
                 // Set max storage based on plan
                 if (plan === 'pro' && status === 'active') {
                     setMaxStorage(PlanStorage.pro)

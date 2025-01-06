@@ -135,7 +135,9 @@ export function NavUser({
                                     </Link>
                                 </DropdownMenuItem>
                             )}
-                            {id !== null && <Usage id={id} />}
+                            {id !== null && (
+                                <Usage email={user.email!} id={id} />
+                            )}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>

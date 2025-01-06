@@ -13,6 +13,11 @@ export async function GET(
         const dbName = 'evolu-' + sanitizedUserId
         const orgSlug = 'ibb2'
 
+        console.log('id', id)
+        console.log('sanitizedUserId', sanitizedUserId)
+        console.log('dbName', dbName)
+        console.log('orgSlug', orgSlug)
+
         try {
             const turso = createClient({
                 org: '',
