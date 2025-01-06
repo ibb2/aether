@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { db } from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
-import { subscriptions } from '@/db/drizzle/schema'
+import { subscriptions, users } from '@/db/drizzle/schema'
 import { stripe } from '@/lib/stripe'
 import {
     Card,
@@ -12,8 +12,13 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { PLANS } from '@/config/plans'
+import { PLANS, type Plan } from '@/config/plans'
 import Link from 'next/link'
+import { string } from 'zod'
+
+const APP_URL = process.env.VERCEL_URL
+    ? process.env.VERCEL_URL
+    : 'http://localhost:3000'
 
 export default async function BillingPage() {
     const session = await auth()
@@ -22,41 +27,70 @@ export default async function BillingPage() {
         redirect('/login')
     }
 
+    const existingUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, session.user.email!))
+
     const [subscription] = await db
         .select()
         .from(subscriptions)
-        .where(eq(subscriptions.userId, session.user.id))
+        .where(eq(subscriptions.userId, session.user.id!))
 
-    let currentPlan: any = PLANS.BASIC
+    let currentPlan: Plan = PLANS.BASIC
     let portalUrl = null
 
-    if (subscription) {
-        // Find the plan based on the priceId
-        const isYearly = subscription.interval === 'year'
-
-        if (
-            subscription.priceId === PLANS.PLUS.price.yearly.priceId ||
-            subscription.priceId === PLANS.PLUS.price.monthly.priceId
-        ) {
-            currentPlan = PLANS.PLUS
+    console.log('subscription', subscription)
+    const customerResponse = await stripe.customers.retrieve(
+        existingUser[0].stripeCustomerId!,
+        {
+            expand: ['subscriptions'],
         }
+    )
 
-        if (
-            subscription.priceId === PLANS.PROFFESSIONAL.price.yearly.priceId ||
-            subscription.priceId === PLANS.PROFFESSIONAL.price.monthly.priceId
-        ) {
-            currentPlan = PLANS.PROFFESSIONAL
+    const customer = customerResponse as any
+
+    const stripeSubscription = customer.subscriptions?.data[0]
+    const plan =
+        stripeSubscription?.items.data[0]?.price.nickname?.toLowerCase() || ''
+
+    if (subscription) {
+        // Find the plan based on the subscription interval
+        const planCleaned = plan.replace(' ', '_')
+        console.log('planCleaned', planCleaned)
+        switch (planCleaned) {
+            case 'plus_monthly':
+                console.log('plus_monthly')
+                currentPlan = PLANS.PLUS
+                break
+            case 'plus_yearly':
+                console.log('plus_yearly')
+                currentPlan = PLANS.PLUS_YEARLY
+                break
+            case 'pro_monthly':
+                console.log('pro_monthly')
+                currentPlan = PLANS.PROFFESSIONAL
+                break
+            case 'pro_yearly':
+                console.log('pro_yearly')
+                currentPlan = PLANS.PROFFESSIONAL_YEARLY
+                break
+            default:
+                console.log('default')
+                currentPlan = PLANS.BASIC
         }
 
         // Create Stripe portal session
         if (subscription.stripeSubscriptionId) {
             const portalSession = await stripe.billingPortal.sessions.create({
                 customer: subscription.stripeCustomerId,
-                return_url: `${process.env.VERCEL_URL}/settings/billing`,
+                return_url: `${APP_URL}/settings/billing`,
             })
             portalUrl = portalSession.url
         }
     }
+
+    const planName = currentPlan.name
 
     return (
         <div className="container max-w-4xl py-8">
@@ -74,12 +108,12 @@ export default async function BillingPage() {
                                 Current Plan
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                                {currentPlan.name}
+                                {planName}
                             </p>
                             {subscription && (
                                 <p className="text-sm text-muted-foreground">
                                     Billing period:{' '}
-                                    {subscription.interval === 'year'
+                                    {currentPlan.name.includes('yearly')
                                         ? 'Yearly'
                                         : 'Monthly'}
                                 </p>
@@ -91,7 +125,7 @@ export default async function BillingPage() {
                             </Button>
                         ) : (
                             <Button asChild>
-                                <Link href="/pricing">Upgrade to Basic</Link>
+                                <Link href="/pricing">Upgrade Plan</Link>
                             </Button>
                         )}
                     </div>

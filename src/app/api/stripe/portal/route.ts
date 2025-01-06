@@ -2,6 +2,10 @@ import { auth } from '@/auth'
 import { stripe } from '@/lib/stripe'
 import { NextResponse } from 'next/server'
 
+const APP_URL = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000'
+
 export async function POST(req: Request) {
     try {
         const session = await auth()
@@ -14,7 +18,7 @@ export async function POST(req: Request) {
 
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: customerId,
-            return_url: `${process.env.VERCEL_URL}/settings`,
+            return_url: `${APP_URL}/settings`,
         })
 
         return NextResponse.json({ url: portalSession.url })

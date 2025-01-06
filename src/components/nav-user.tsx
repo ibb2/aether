@@ -1,5 +1,7 @@
 'use client'
 
+import * as S from '@effect/schema/Schema'
+
 import {
     BadgeCheck,
     Bell,
@@ -28,17 +30,21 @@ import {
 import { signOut } from 'next-auth/react'
 import { SettingsDialog } from './settings-dialog'
 import Link from 'next/link'
+import Usage from './usage'
+import { useEvolu } from '@evolu/react'
+import { User } from 'next-auth'
 
 export function NavUser({
     user,
     subscription,
 }: {
-    user: { name: string; email: string; image: string }
-    subscription?: { status: string } | null
+    user: User
+    subscription?: { plan: string; status: string; priceId: string } | null
 }) {
-    const { isMobile } = useSidebar()
+    const owner = useEvolu().getOwner()
+    const id = owner ? S.decodeSync(S.String)(owner?.id) : null
 
-    console.log('Image', user.image)
+    const { isMobile } = useSidebar()
 
     return (
         <SidebarMenu>
@@ -50,9 +56,12 @@ export function NavUser({
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
                             <Avatar className="h-8 w-8 rounded-lg">
-                                <AvatarImage src={user.image} alt={user.name} />
+                                <AvatarImage
+                                    src={user.image || ''}
+                                    alt={user.name || 'User'}
+                                />
                                 <AvatarFallback className="rounded-lg">
-                                    CN
+                                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
@@ -76,11 +85,12 @@ export function NavUser({
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <Avatar className="h-8 w-8 rounded-lg">
                                     <AvatarImage
-                                        src={user.image}
-                                        alt={user.name}
+                                        src={user.image || ''}
+                                        alt={user.name || 'User'}
                                     />
                                     <AvatarFallback className="rounded-lg">
-                                        CN
+                                        {user.name?.charAt(0)?.toUpperCase() ||
+                                            'U'}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -97,18 +107,36 @@ export function NavUser({
                         <DropdownMenuGroup>
                             {!subscription ? (
                                 <DropdownMenuItem asChild>
-                                    <Link href="/pricing" className="flex w-full items-center">
+                                    <Link
+                                        href="/pricing"
+                                        className="flex w-full items-center"
+                                    >
                                         <Sparkles className="h-4 w-4" />
                                         Upgrade to Pro
                                     </Link>
                                 </DropdownMenuItem>
                             ) : (
                                 <DropdownMenuItem asChild>
-                                    <Link href="" className="flex w-full items-center">
-                                        <Sparkles className="h-4 w-4" />
-                                        Upgraded
+                                    <Link
+                                        href="/settings/billing"
+                                        className="flex w-full items-center"
+                                    >
+                                        <BadgeCheck className="h-4 w-4 text-green-500" />
+                                        {subscription.status === 'active' &&
+                                        subscription.plan.includes('pro')
+                                            ? 'Pro Plan'
+                                            : subscription.status ===
+                                                    'active' &&
+                                                subscription.plan.includes(
+                                                    'plus'
+                                                )
+                                              ? 'Plus Plan'
+                                              : 'View Plan'}
                                     </Link>
                                 </DropdownMenuItem>
+                            )}
+                            {id !== null && (
+                                <Usage email={user.email!} id={id} />
                             )}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
@@ -117,7 +145,10 @@ export function NavUser({
                                 <SettingsDialog />
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/settings/billing" className="flex w-full items-center">
+                                <Link
+                                    href="/settings/billing"
+                                    className="flex w-full items-center"
+                                >
                                     <CreditCard className="h-4 w-4" />
                                     Billing
                                 </Link>
