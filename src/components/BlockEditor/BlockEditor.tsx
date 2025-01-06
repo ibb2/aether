@@ -3,7 +3,12 @@
 import * as S from '@effect/schema/Schema'
 import { Brand } from 'effect/Brand'
 
-import { EditorContent, PureEditorContent, useEditor } from '@tiptap/react'
+import {
+    BubbleMenu,
+    EditorContent,
+    PureEditorContent,
+    useEditor,
+} from '@tiptap/react'
 import { Editor } from '@tiptap/core'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
