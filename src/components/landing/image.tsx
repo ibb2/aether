@@ -4,13 +4,13 @@ import Image from 'next/image'
 import { useTheme } from 'next-themes'
 
 export default function HeroImage() {
-    const { theme, setTheme } = useTheme()
+    const { resolvedTheme } = useTheme()
 
     return (
         <div className="flex relative h-lvh w-[80rem] items-center justify-center">
             <Image
                 src={
-                    theme === 'light'
+                    resolvedTheme === 'light'
                         ? '/hero/app-light.jpeg'
                         : '/hero/app.jpeg'
                 }
