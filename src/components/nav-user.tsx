@@ -1,5 +1,7 @@
 'use client'
 
+import * as S from '@effect/schema/Schema'
+
 import {
     BadgeCheck,
     Bell,
@@ -28,6 +30,8 @@ import {
 import { signOut } from 'next-auth/react'
 import { SettingsDialog } from './settings-dialog'
 import Link from 'next/link'
+import Usage from './usage'
+import { useEvolu } from '@evolu/react'
 
 export function NavUser({
     user,
@@ -36,9 +40,10 @@ export function NavUser({
     user: { name: string; email: string; image: string }
     subscription?: { status: string } | null
 }) {
-    const { isMobile } = useSidebar()
+    const owner = useEvolu().getOwner()
+    const id = owner ? S.decodeSync(S.String)(owner?.id) : null
 
-    console.log('Image', user.image)
+    const { isMobile } = useSidebar()
 
     return (
         <SidebarMenu>
@@ -97,19 +102,26 @@ export function NavUser({
                         <DropdownMenuGroup>
                             {!subscription ? (
                                 <DropdownMenuItem asChild>
-                                    <Link href="/pricing" className="flex w-full items-center">
+                                    <Link
+                                        href="/pricing"
+                                        className="flex w-full items-center"
+                                    >
                                         <Sparkles className="h-4 w-4" />
                                         Upgrade to Pro
                                     </Link>
                                 </DropdownMenuItem>
                             ) : (
                                 <DropdownMenuItem asChild>
-                                    <Link href="" className="flex w-full items-center">
+                                    <Link
+                                        href=""
+                                        className="flex w-full items-center"
+                                    >
                                         <Sparkles className="h-4 w-4" />
                                         Upgraded
                                     </Link>
                                 </DropdownMenuItem>
                             )}
+                            {id !== null && <Usage id={id} />}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
@@ -117,7 +129,10 @@ export function NavUser({
                                 <SettingsDialog />
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/settings/billing" className="flex w-full items-center">
+                                <Link
+                                    href="/settings/billing"
+                                    className="flex w-full items-center"
+                                >
                                     <CreditCard className="h-4 w-4" />
                                     Billing
                                 </Link>
