@@ -41,7 +41,6 @@ export default function Document({ params }: { params: { room: string } }) {
     useEffect(() => {
         if (session?.user) {
             // Send Evolu ID and NextAuth user ID to your Turso DB via an API route
-
             fetch('/api/evolu', {
                 method: 'POST',
                 headers: {

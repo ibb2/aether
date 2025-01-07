@@ -28,6 +28,7 @@ import { indexes } from './indexes'
 import { initialContent } from '@/lib/data/initialContent'
 import useNoteStore from '@/store/note'
 import { blankContent } from '@/lib/data/blankContent'
+import { trace } from 'next/dist/trace'
 
 const Database = database({
     users: UsersTable,
@@ -44,7 +45,8 @@ export type Database = typeof Database.Type
 export const evolu = createEvolu(Database, {
     indexes,
     syncUrl:
-        process.env.VERCEL_ENV === 'development'
+        process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
             ? 'http://localhost:4000'
             : 'https://evolu.onrender.com',
+    // minimumLogLevel: 'trace',
 })
