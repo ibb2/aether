@@ -12,14 +12,11 @@ export async function GET(
     try {
         const { email } = params
 
-
         // Perform case-insensitive and trimmed email search
         const userQueryResult = await db
             .select()
             .from(users)
             .where(sql`lower(trim(user.email)) = lower(trim(${email}))`)
-
-        console.log('userQueryResult', userQueryResult)
 
         // If no user found
         if (userQueryResult.length === 0) {
@@ -70,8 +67,6 @@ export async function GET(
         const planName =
             stripeSubscription?.items.data[0]?.price.nickname?.toLowerCase() ||
             ''
-
-        console.log('stripeSubscription', stripeSubscription)
 
         let plan = 'plus'
         if (planName.includes('pro')) {

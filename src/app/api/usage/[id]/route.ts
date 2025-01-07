@@ -13,18 +13,12 @@ export async function GET(
         const dbName = 'evolu-' + sanitizedUserId
         const orgSlug = 'ibb2'
 
-        console.log('id', id)
-        console.log('sanitizedUserId', sanitizedUserId)
-        console.log('dbName', dbName)
-        console.log('orgSlug', orgSlug)
-
         try {
             const turso = createClient({
-                org: '',
+                org: orgSlug,
                 token: process.env.TURSO_API_TOKEN!,
             })
 
-            const database = await turso.databases.get(dbName)
             const usage = await turso.databases.usage(dbName)
 
             return NextResponse.json(usage)
