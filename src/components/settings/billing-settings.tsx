@@ -59,10 +59,9 @@ export function BillingSettings({ className }: BillingSettingsProps) {
   const currentPlan = subscription
     ? Object.values(PLANS).find(
       plan =>
-        (plan.price !== 0 && plan.price.monthly.priceId === subscription.priceId) ||
-        (plan.price !== 0 && plan.price.yearly.priceId === subscription.priceId)
-    ) || PLANS.FREE
-    : PLANS.FREE
+        (plan.price !== 0 && plan.lookupKey === (subscription.interval === 'month' ? 'plus_monthly' : 'plus_yearly'))
+    ) || PLANS.BASIC
+    : PLANS.BASIC
 
   if (loading) {
     return (
@@ -94,7 +93,7 @@ export function BillingSettings({ className }: BillingSettingsProps) {
                   )}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {currentPlan === PLANS.FREE
+                  {currentPlan === PLANS.BASIC
                     ? 'Free tier with basic features'
                     : `${subscription?.interval === 'year' ? 'Yearly' : 'Monthly'} subscription`}
                 </p>
@@ -109,21 +108,15 @@ export function BillingSettings({ className }: BillingSettingsProps) {
               )}
             </div>
 
-            {currentPlan !== PLANS.FREE && (
+            {currentPlan !== PLANS.BASIC && (
               <div className="rounded-lg border p-4">
                 <div className="space-y-3">
-                  <div className="flex items-center">
-                    <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
-                    <span className="text-sm">Unlimited Notes</span>
-                  </div>
-                  <div className="flex items-center">
-                    <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
-                    <span className="text-sm">Priority Support</span>
-                  </div>
-                  <div className="flex items-center">
-                    <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
-                    <span className="text-sm">Advanced Features</span>
-                  </div>
+                  {currentPlan.features.map((feature, index) => (
+                    <div key={index} className="flex items-center">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

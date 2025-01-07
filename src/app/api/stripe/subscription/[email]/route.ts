@@ -19,8 +19,8 @@ export async function GET(
 
         // If no user found
         if (userQueryResult.length === 0) {
-            return NextResponse.json({ 
-                plan: 'basic', 
+            return NextResponse.json({
+                plan: 'basic',
                 status: 'inactive',
                 error: 'No user found'
             })
@@ -29,8 +29,8 @@ export async function GET(
         const existingUser = userQueryResult[0]
 
         if (!existingUser.stripeCustomerId) {
-            return NextResponse.json({ 
-                plan: 'basic', 
+            return NextResponse.json({
+                plan: 'basic',
                 status: 'inactive',
                 error: 'No Stripe customer ID'
             })
@@ -44,8 +44,8 @@ export async function GET(
 
         // If no subscription found
         if (!subscriptionQueryResult.length) {
-            return NextResponse.json({ 
-                plan: 'basic', 
+            return NextResponse.json({
+                plan: 'basic',
                 status: 'inactive',
                 error: 'No subscription found'
             })
@@ -82,7 +82,7 @@ export async function GET(
     } catch (error) {
         console.error('Subscription check error:', error)
         return NextResponse.json(
-            { 
+            {
                 error: 'Failed to check subscription',
                 details: error instanceof Error ? error.message : 'Unknown error'
             },
