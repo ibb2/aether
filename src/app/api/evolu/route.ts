@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
 export async function POST(request) {
+    /* Responsible for saving the Evolu ID to the database */
     try {
         const { email, evoluOwnerId } = await request.json()
 

@@ -118,10 +118,20 @@ export function NavUser({
                             ) : (
                                 <DropdownMenuItem asChild>
                                     <Link
-                                        href="/settings/billing"
+                                        href={
+                                            !subscription.plan.includes('basic')
+                                                ? '/settings/billing'
+                                                : '/pricing'
+                                        }
                                         className="flex w-full items-center"
                                     >
-                                        <BadgeCheck className="h-4 w-4 text-green-500" />
+                                        {!subscription.plan.includes(
+                                            'basic'
+                                        ) ? (
+                                            <BadgeCheck className="h-4 w-4 text-green-500" />
+                                        ) : (
+                                            <Sparkles className="h-4 w-4" />
+                                        )}
                                         {subscription.status === 'active' &&
                                         subscription.plan.includes('pro')
                                             ? 'Pro Plan'
@@ -131,7 +141,7 @@ export function NavUser({
                                                     'plus'
                                                 )
                                               ? 'Plus Plan'
-                                              : 'View Plan'}
+                                              : 'Upgrade to Pro'}
                                     </Link>
                                 </DropdownMenuItem>
                             )}
@@ -146,7 +156,11 @@ export function NavUser({
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link
-                                    href="/settings/billing"
+                                    href={
+                                        subscription?.status === 'active'
+                                            ? '/settings/billing'
+                                            : ''
+                                    }
                                     className="flex w-full items-center"
                                 >
                                     <CreditCard className="h-4 w-4" />
