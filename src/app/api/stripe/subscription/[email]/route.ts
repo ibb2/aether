@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { db } from '@/db/drizzle'
 import { users, subscriptions } from '@/db/drizzle/schema'
 import { eq, sql } from 'drizzle-orm'
+import Stripe from 'stripe'
 
 export async function GET(
     request: NextRequest,
@@ -15,7 +16,7 @@ export async function GET(
         const userQueryResult = await db
             .select()
             .from(users)
-            .where(sql`lower(trim(email)) = lower(trim(${email}))`)
+            .where(sql`lower(trim(user.email)) = lower(trim(${email}))`)
 
         // If no user found
         if (userQueryResult.length === 0) {
@@ -61,17 +62,15 @@ export async function GET(
             }
         )
 
-        const customer = customerResponse as any
+        const customer = customerResponse as Stripe.Customer
         const stripeSubscription = customer.subscriptions?.data[0]
         const planName =
             stripeSubscription?.items.data[0]?.price.nickname?.toLowerCase() ||
             ''
 
-        let plan = 'basic'
+        let plan = 'plus'
         if (planName.includes('pro')) {
             plan = 'pro'
-        } else if (planName.includes('plus')) {
-            plan = 'plus'
         }
 
         return NextResponse.json({
