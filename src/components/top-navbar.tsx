@@ -3,13 +3,13 @@
  * @see https://v0.dev/t/xYHqD5MkVkT
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-'use client';
+'use client'
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud } from 'lucide-react'
-import { useSession } from "next-auth/react"
+import { useSession } from 'next-auth/react'
 
 export function TopNavbar() {
     const { data: session } = useSession()
@@ -41,13 +41,13 @@ export function TopNavbar() {
                         >
                             Pricing
                         </Link>
-                        <Link
+                        {/* <Link
                             href="#"
                             className="font-medium flex items-center text-sm transition-colors hover:underline"
                             prefetch={false}
                         >
                             Contact
-                        </Link>
+                        </Link> */}
                     </nav>
                     <div className="flex items-center gap-4">
                         {session?.user ? (
@@ -83,7 +83,9 @@ export function TopNavbar() {
     )
 }
 
-function MountainIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function MountainIcon(
+    props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) {
     return (
         <svg
             {...props}
