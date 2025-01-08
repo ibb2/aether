@@ -252,7 +252,6 @@ function sectionDialogComponent(
                     <Button
                         type="submit"
                         onClick={() => {
-                            console.log('new section', item)
                             newSection(currentName)
                         }}
                     >

@@ -27,10 +27,8 @@ export default function PricingSectionCards() {
                     throw new Error('Failed to fetch prices')
                 }
                 const data = await response.json()
-                console.log('Fetched prices:', data)
                 setPrices(data)
             } catch (error) {
-                console.error('Error fetching prices:', error)
                 toast({
                     title: 'Error',
                     description: 'Failed to load pricing information',
@@ -74,7 +72,6 @@ export default function PricingSectionCards() {
 
             window.location.href = data.url
         } catch (error) {
-            console.error('Error:', error)
             toast({
                 title: 'Error',
                 description: 'Something went wrong. Please try again.',
@@ -134,10 +131,6 @@ export default function PricingSectionCards() {
                                     (price) =>
                                         price.lookup_key === plan.lookupKey
                                 )
-                                console.log(`Plan ${plan.name}:`, {
-                                    plan,
-                                    price,
-                                })
 
                                 return (
                                     <PricingCard

@@ -165,7 +165,6 @@ export default function NavNotes() {
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
         setQuery(value)
-        console.log('Search results', searchTree(treeData, value))
         setTreeData(searchTree(treeData, query))
         if (value.length === 0) setTreeData(initialTreeData)
     }
@@ -176,12 +175,9 @@ export default function NavNotes() {
             const treeStructure = convertToTreeStructure(transformedData)
             setTreeData(treeStructure)
             setInitialTreeData(treeStructure)
-            console.log('Treedata transformed data', transformedData)
         }
 
         const getFragmentsData = async () => {
-            console.info('fragments', fragments)
-
             const arr = []
 
             for (let i = 0; i < fragments.length; i++) {
@@ -228,9 +224,7 @@ export default function NavNotes() {
 
     const setNote = useNoteStore((state) => state.setNote)
 
-    // Update selectNote to use the query results
-    const selectNote = (item) => {
-        console.log('select item')
+    const selectNote = (item: any) => {
         setNote(item)
         setTreeData(initialTreeData)
         setQuery('')

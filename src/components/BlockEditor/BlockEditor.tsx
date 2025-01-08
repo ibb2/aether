@@ -197,7 +197,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 inkData: S.decodeSync(CanvasPathArray)(cleanedData),
             })
             setLastInkedSaveTime(time)
-            console.log(data)
         },
         [item, exportedData.rows, lastInkedSaveTime, update]
     )
@@ -206,13 +205,15 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
     React.useEffect(() => {
         if (load === 0) {
-            const data = exportedData.rows.find(
-                (row) => row.noteId === S.decodeSync(NoteId)(item?.id)
-            )
-            if (data?.inkData && Array.isArray(data.inkData)) {
-                canvasRef.current?.loadPaths(
-                    data.inkData as unknown as import('react-sketch-canvas').CanvasPath[]
+            if (item?.id) {
+                const data = exportedData.rows.find(
+                    (row) => row.noteId === S.decodeSync(NoteId)(item.id)
                 )
+                if (data?.inkData && Array.isArray(data.inkData)) {
+                    canvasRef.current?.loadPaths(
+                        data.inkData as unknown as import('react-sketch-canvas').CanvasPath[]
+                    )
+                }
             }
             onLoad(1)
         }
@@ -220,7 +221,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     }, [debouncedInkSave, load, exportedData.rows, item])
 
     React.useEffect(() => {
-        if (item === null) return
+        if (item === null || !item.id) return
 
         const data = exportedData.rows.find(
             (row) => row.noteId === S.decodeSync(NoteId)(item.id)

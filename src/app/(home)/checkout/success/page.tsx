@@ -12,8 +12,6 @@ export default function SuccessPage() {
 
     useEffect(() => {
         if (sessionId) {
-            // setStatus('ok')
-            console.log('sessionId', sessionId)
             fetchSessionStatus()
         }
     }, [sessionId])
@@ -31,7 +29,6 @@ export default function SuccessPage() {
 
         if (error) {
             setStatus('failed')
-            console.error(error)
             return
         }
 
