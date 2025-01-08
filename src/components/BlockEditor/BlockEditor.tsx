@@ -56,9 +56,18 @@ import { useTheme } from 'next-themes'
 import { parse, stringify, toJSON, fromJSON } from 'flatted'
 import { settingQuery } from '@/db/queries'
 
+interface RawCanvasPath {
+    drawMode?: boolean
+    startTimestamp?: number
+    endTimestamp?: number
+    paths?: Array<{ x: number; y: number }>
+    strokeColor?: string
+    strokeWidth?: number
+}
+
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
-    const menuContainerRef = useRef(null)
-    const editorRef = useRef<PureEditorContent | null>(null)
+    const menuContainerRef = useRef<HTMLDivElement>(null)
+    const editorRef = useRef<HTMLDivElement>(null)
     const canvasRef = React.useRef<ReactSketchCanvasRef>(null)
 
     // State
@@ -152,12 +161,18 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         save: debouncedSave,
     })
 
-    const transformCanvasPaths = (data): CanvasPathSchema[] => {
-        return data.map((path) => ({
+    const transformCanvasPaths = (
+        data: RawCanvasPath[]
+    ): CanvasPathSchema[] => {
+        return data.map((path: RawCanvasPath) => ({
             drawMode: path.drawMode ?? false,
             startTimestamp: path.startTimestamp ?? 0,
             endTimestamp: path.endTimestamp ?? 0,
-            paths: path.paths.map((p) => ({ x: p.x, y: p.y })) ?? [],
+            paths:
+                path.paths?.map((p: { x: number; y: number }) => ({
+                    x: p.x,
+                    y: p.y,
+                })) ?? [],
             strokeColor: path.strokeColor ?? '',
             strokeWidth: path.strokeWidth ?? 1,
         }))
@@ -191,12 +206,18 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
     React.useEffect(() => {
         if (load === 0) {
-            // getInitialData(editor);
-            canvasRef.current?.loadPaths(ink)
+            const data = exportedData.rows.find(
+                (row) => row.noteId === S.decodeSync(NoteId)(item?.id)
+            )
+            if (data?.inkData && Array.isArray(data.inkData)) {
+                canvasRef.current?.loadPaths(
+                    data.inkData as unknown as import('react-sketch-canvas').CanvasPath[]
+                )
+            }
             onLoad(1)
         }
         if (canvasRef.current) debouncedInkSave(canvasRef.current)
-    }, [debouncedInkSave, load])
+    }, [debouncedInkSave, load, exportedData.rows, item])
 
     React.useEffect(() => {
         if (item === null) return
@@ -207,8 +228,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
         if (data === undefined || data === null) return
 
-        const ink = Array.isArray(data.inkData)
-            ? (data.inkData as CanvasPath[])
+        const inkData = Array.isArray(data.inkData)
+            ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
             : null
 
         if (canvasRef.current === null) {
@@ -216,9 +237,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         }
 
         canvasRef.current.resetCanvas()
-        canvasRef.current.resetCanvas()
-        if (ink === null) return
-        canvasRef.current.loadPaths(ink)
+        if (inkData === null) return
+        canvasRef.current.loadPaths(inkData)
 
         editor?.commands.setContent(data.jsonData!)
     }, [canvasRef, editor, item, exportedData.rows])
