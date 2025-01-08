@@ -56,9 +56,18 @@ import { useTheme } from 'next-themes'
 import { parse, stringify, toJSON, fromJSON } from 'flatted'
 import { settingQuery } from '@/db/queries'
 
+interface RawCanvasPath {
+    drawMode?: boolean
+    startTimestamp?: number
+    endTimestamp?: number
+    paths?: Array<{ x: number; y: number }>
+    strokeColor?: string
+    strokeWidth?: number
+}
+
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
-    const menuContainerRef = useRef(null)
-    const editorRef = useRef<PureEditorContent | null>(null)
+    const menuContainerRef = useRef<HTMLDivElement>(null)
+    const editorRef = useRef<HTMLDivElement>(null)
     const canvasRef = React.useRef<ReactSketchCanvasRef>(null)
 
     // State
@@ -94,12 +103,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         })
     )
 
-    const { users, characterCount, collabState } = useBlockEditor({
-        ydoc,
-        provider,
-    })
-
-    // Evolu
     const exportedDataQuery = React.useCallback(() => {
         return evolu.createQuery((db) =>
             db
@@ -122,47 +125,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
             title: S.decodeSync(NonEmptyString50)('settings'),
         })
     }
-
-    // Get initial data
-    // const getInitialData = async (editor: Editor) => {
-    //     const {  } = exportedData.rows[0]
-    //     setNote()
-    //     editor.commands.setContent(jsonData!)
-    //     console.log('Retrieved ink ')
-    //     // await canvasRef.current?.loadPaths(inkData!);
-    // }
-
-    const customEditor = useEditor({
-        extensions: [
-            ...ExtensionKit({
-                provider,
-            }),
-        ],
-        onBeforeCreate({ editor }) {
-            // Before the view is created.
-        },
-        onCreate({ editor }) {
-            // The editor is ready.
-        },
-        onUpdate({ editor }) {
-            debouncedSave(editor)
-        },
-        onSelectionUpdate({ editor }) {
-            // The selection has changed.
-        },
-        onTransaction({ editor, transaction }) {
-            // The editor state has changed.
-        },
-        onFocus({ editor, event }) {
-            // The editor is focused.
-        },
-        onBlur({ editor, event }) {
-            // The editor isn't focused anymore.
-        },
-        onDestroy() {
-            // The editor is being destroyed.
-        },
-    })
 
     const saveData = React.useCallback(
         (editor: Editor) => {
@@ -193,48 +155,24 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
     const debouncedSave = useDebouncedCallback(saveData, 2000)
 
-    // Single effect to handle all content updates
-    React.useEffect(() => {
-        if (!customEditor || !item) return
-        const data = exportedData.rows.find(
-            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
-        )
-        if (!data?.jsonData) return
+    const { users, characterCount, collabState, editor } = useBlockEditor({
+        ydoc,
+        provider,
+        save: debouncedSave,
+    })
 
-        // Store selection
-        const { from, to } = customEditor.state.selection
-
-        // Update content with preservation options
-        customEditor.commands.setContent(data.jsonData, false, {
-            preserveWhitespace: 'full',
-        })
-
-        // Restore selection
-        requestAnimationFrame(() => {
-            if (customEditor.isFocused) {
-                customEditor.commands.setTextSelection({ from, to })
-            }
-        })
-
-        // Handle ink data
-        if (canvasRef.current) {
-            const ink = Array.isArray(data.inkData)
-                ? (data.inkData as CanvasPath[])
-                : null
-
-            canvasRef.current.resetCanvas()
-            if (ink) {
-                canvasRef.current.loadPaths(ink)
-            }
-        }
-    }, [customEditor, item, exportedData.rows])
-
-    const transformCanvasPaths = (data): CanvasPathSchema[] => {
-        return data.map((path) => ({
+    const transformCanvasPaths = (
+        data: RawCanvasPath[]
+    ): CanvasPathSchema[] => {
+        return data.map((path: RawCanvasPath) => ({
             drawMode: path.drawMode ?? false,
             startTimestamp: path.startTimestamp ?? 0,
             endTimestamp: path.endTimestamp ?? 0,
-            paths: path.paths.map((p) => ({ x: p.x, y: p.y })) ?? [],
+            paths:
+                path.paths?.map((p: { x: number; y: number }) => ({
+                    x: p.x,
+                    y: p.y,
+                })) ?? [],
             strokeColor: path.strokeColor ?? '',
             strokeWidth: path.strokeWidth ?? 1,
         }))
@@ -268,12 +206,18 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
     React.useEffect(() => {
         if (load === 0) {
-            // getInitialData(editor);
-            canvasRef.current?.loadPaths(ink)
+            const data = exportedData.rows.find(
+                (row) => row.noteId === S.decodeSync(NoteId)(item?.id)
+            )
+            if (data?.inkData && Array.isArray(data.inkData)) {
+                canvasRef.current?.loadPaths(
+                    data.inkData as unknown as import('react-sketch-canvas').CanvasPath[]
+                )
+            }
             onLoad(1)
         }
         if (canvasRef.current) debouncedInkSave(canvasRef.current)
-    }, [debouncedInkSave, load])
+    }, [debouncedInkSave, load, exportedData.rows, item])
 
     React.useEffect(() => {
         if (item === null) return
@@ -284,8 +228,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
         if (data === undefined || data === null) return
 
-        const ink = Array.isArray(data.inkData)
-            ? (data.inkData as CanvasPath[])
+        const inkData = Array.isArray(data.inkData)
+            ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
             : null
 
         if (canvasRef.current === null) {
@@ -293,12 +237,11 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         }
 
         canvasRef.current.resetCanvas()
-        canvasRef.current.resetCanvas()
-        if (ink === null) return
-        canvasRef.current.loadPaths(ink)
+        if (inkData === null) return
+        canvasRef.current.loadPaths(inkData)
 
-        customEditor?.commands.setContent(data.jsonData!)
-    }, [canvasRef, customEditor, item, exportedData.rows])
+        editor?.commands.setContent(data.jsonData!)
+    }, [canvasRef, editor, item, exportedData.rows])
 
     const displayedUsers = users.slice(0, 3)
 
@@ -323,9 +266,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
                 // Load the modified paths
                 await canvasRef.current.loadPaths(updatedPaths)
-
-                // Update the current stroke color for new strokes
-                // setStrokeColor(newColor);
             }
         }
         changeExistingStrokeColor()
@@ -357,17 +297,14 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         }
     }
 
-    if (!customEditor) {
+    if (!editor) {
         return null
     }
 
     return (
-        // <div className="flex h-full align-self self-start">
         <div className="flex flex-col relative w-auto h-full border-0 overflow-hidden">
             <EditorHeader
                 characters={characterCount.characters()}
-                // collabState={collabState}
-                // users={displayedUsers}
                 words={characterCount.words()}
                 isSidebarOpen={open}
                 toggleSidebar={collapsePanel}
@@ -384,7 +321,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 strokeColor={theme === 'light' ? 'black' : 'white'}
                 className={reactSketchCanvasClass}
                 onChange={() => {
-                    // Save function in here, handles all points.
                     if (canvasRef.current) {
                         debouncedInkSave(canvasRef.current)
                     }
@@ -392,23 +328,17 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 withTimestamp
             />
             <EditorContent
-                editor={customEditor}
+                editor={editor}
                 ref={editorRef}
                 className={editorClass}
             />
-            <ContentItemMenu editor={customEditor!} />
-            <LinkMenu editor={customEditor!} appendTo={menuContainerRef} />
-            <TextMenu editor={customEditor!} />
-            <ColumnsMenu editor={customEditor!} appendTo={menuContainerRef} />
-            <TableRowMenu editor={customEditor!} appendTo={menuContainerRef} />
-            <TableColumnMenu
-                editor={customEditor!}
-                appendTo={menuContainerRef}
-            />
-            <ImageBlockMenu
-                editor={customEditor!}
-                appendTo={menuContainerRef}
-            />
+            <ContentItemMenu editor={editor} />
+            <LinkMenu editor={editor} appendTo={menuContainerRef} />
+            <TextMenu editor={editor} />
+            <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
+            <TableRowMenu editor={editor} appendTo={menuContainerRef} />
+            <TableColumnMenu editor={editor} appendTo={menuContainerRef} />
+            <ImageBlockMenu editor={editor} appendTo={menuContainerRef} />
         </div>
     )
 }
