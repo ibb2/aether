@@ -25,9 +25,11 @@ function randomElement(array: Array<any>) {
 export const useBlockEditor = ({
     ydoc,
     provider,
+    save,
 }: {
     ydoc: YDoc
     provider?: TiptapCollabProvider | null | undefined
+    save: any
 }) => {
     const leftSidebar = useSidebar()
     const [collabState, setCollabState] = useState<WebSocketStatus>(
@@ -37,28 +39,11 @@ export const useBlockEditor = ({
     const editor = useEditor(
         {
             autofocus: true,
-            onCreate: ({ editor }) => {
-                provider?.on('synced', () => {
-                    if (editor.isEmpty) {
-                        editor.commands.setContent(initialContent)
-                    }
-                })
-            },
             immediatelyRender: false,
             extensions: [
                 ...ExtensionKit({
                     provider,
                 }),
-                // Collaboration.configure({
-                //   document: ydoc,
-                // }),
-                // CollaborationCursor.configure({
-                //   provider,
-                //   user: {
-                //     name: randomElement(userNames),
-                //     color: randomElement(userColors),
-                //   },
-                // }),
             ],
             editorProps: {
                 attributes: {
@@ -67,6 +52,34 @@ export const useBlockEditor = ({
                     autocapitalize: 'off',
                     class: 'min-h-full',
                 },
+            },
+            onBeforeCreate({ editor }) {
+                // Before the view is created.
+            },
+            onCreate({ editor }) {
+                provider?.on('synced', () => {
+                    if (editor.isEmpty) {
+                        editor.commands.setContent(initialContent)
+                    }
+                })
+            },
+            onUpdate({ editor }) {
+                save(editor)
+            },
+            onSelectionUpdate({ editor }) {
+                // The selection has changed.
+            },
+            onTransaction({ editor, transaction }) {
+                // The editor state has changed.
+            },
+            onFocus({ editor, event }) {
+                // The editor is focused.
+            },
+            onBlur({ editor, event }) {
+                // The editor isn't focused anymore.
+            },
+            onDestroy() {
+                // The editor is being destroyed.
             },
         },
         [ydoc, provider]
