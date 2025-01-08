@@ -138,6 +138,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 provider,
             }),
         ],
+        immediatelyRender: false,
         onBeforeCreate({ editor }) {
             // Before the view is created.
         },
