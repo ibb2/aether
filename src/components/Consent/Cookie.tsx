@@ -43,9 +43,7 @@ export default function CookieConsent({
                     }, 700)
                 }
             }
-        } catch (e) {
-            // console.log("Error: ", e);
-        }
+        } catch (e) {}
     }, [])
 
     return variant != 'small' ? (

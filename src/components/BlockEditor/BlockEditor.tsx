@@ -197,7 +197,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 inkData: S.decodeSync(CanvasPathArray)(cleanedData),
             })
             setLastInkedSaveTime(time)
-            console.log(data)
         },
         [item, exportedData.rows, lastInkedSaveTime, update]
     )

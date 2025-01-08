@@ -98,8 +98,7 @@ export default function ProfileForm() {
     })
 
     async function onSubmit(data: ProfileFormValues) {
-        console.log('form data', data)
-        await db
+        awaitdb
             .update(users)
             .set({ name: data.username })
             .where(eq(users.email, session?.user?.email ?? ''))

@@ -40,7 +40,6 @@ export default async function BillingPage() {
     let currentPlan: Plan = PLANS.BASIC
     let portalUrl = null
 
-    console.log('subscription', subscription)
     const customerResponse = await stripe.customers.retrieve(
         existingUser[0].stripeCustomerId!,
         {
@@ -57,26 +56,20 @@ export default async function BillingPage() {
     if (subscription) {
         // Find the plan based on the subscription interval
         const planCleaned = plan.replace(' ', '_')
-        console.log('planCleaned', planCleaned)
         switch (planCleaned) {
             case 'plus_monthly':
-                console.log('plus_monthly')
                 currentPlan = PLANS.PLUS
                 break
             case 'plus_yearly':
-                console.log('plus_yearly')
                 currentPlan = PLANS.PLUS_YEARLY
                 break
             case 'pro_monthly':
-                console.log('pro_monthly')
                 currentPlan = PLANS.PROFFESSIONAL
                 break
             case 'pro_yearly':
-                console.log('pro_yearly')
                 currentPlan = PLANS.PROFFESSIONAL_YEARLY
                 break
             default:
-                console.log('default')
                 currentPlan = PLANS.BASIC
         }
 

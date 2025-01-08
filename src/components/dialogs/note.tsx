@@ -79,8 +79,6 @@ export const NoteDialog = ({
             jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${noteId}`),
             jsonData: initialContent,
         })
-
-        console.log('Exported Data for note created: ', exportedDataId)
     }
 
     return (

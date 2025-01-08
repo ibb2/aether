@@ -176,12 +176,9 @@ export function AppSidebar() {
             fetch(`/api/stripe/subscription/${session.user.email!}`)
                 .then((res) => res.json())
                 .then((data) => setSubscription(data))
-                .catch((err) =>
-                    console.error('Error fetching subscription:', err)
-                )
+                .catch((err) => {})
             setRan(true)
         }
-        console.log('subscription', subscription)
     }, [session, subscription, ran])
 
     return (

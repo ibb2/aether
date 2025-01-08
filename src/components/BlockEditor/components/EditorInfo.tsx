@@ -80,7 +80,6 @@ export const EditorInfo = memo(
 
         const openSettings = () => {
             onAnimate(true)
-            console.log(animate)
             setTimeout(() => {
                 onAnimate(false)
             }, 1000)
