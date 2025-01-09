@@ -279,7 +279,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 readOnly={readOnly}
                 setReadOnly={setReadOnly}
             />
-            <ReactSketchCanvas
+            {/* <ReactSketchCanvas
                 ref={canvasRef}
                 readOnly={readOnly}
                 height="100%"
@@ -293,7 +293,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                     }
                 }}
                 withTimestamp
-            />
+            /> */}
             <EditorContent
                 editor={editor}
                 ref={editorRef}

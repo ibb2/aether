@@ -40,6 +40,7 @@ export const useBlockEditor = ({
         {
             autofocus: true,
             immediatelyRender: false,
+            // content: initialContent,
             extensions: [
                 ...ExtensionKit({
                     provider,

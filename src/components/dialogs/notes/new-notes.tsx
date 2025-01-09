@@ -83,20 +83,6 @@ export default function NewNotes() {
         notesQuery,
     ])
 
-    // const restrictedSectionsQuery = evolu.createQuery((db) =>
-    //     db
-    //         .selectFrom('sections')
-    //         .where('isDeleted', 'is not', cast(true))
-    //         .where(
-    //             'notebookId',
-    //             '==',
-    //             S.decodeSync(NotebookId)(selectedNotebook)
-    //         )
-    //         .selectAll()
-    // )
-
-    // const restrictedSections = useQuery(restrictedSectionsQuery)
-
     const [selectedNotebook, setSelectedNotebook] = React.useState<
         string | null
     >()
@@ -112,13 +98,6 @@ export default function NewNotes() {
         setNewItemName('')
         setIsDialogOpen(true)
     }
-
-    // React.useEffect(() => {
-    //     if (notebooks === undefined || notebooks === null) return
-
-    //     if (notebooks.row !== null && notebooks.row.title !== null)
-    //         setSelectedNotebook(S.decodeSync(S.String)(notebooks.row.title))
-    // }, [notebooks])
 
     const addItem = () => {
         if (newItemName.trim() === '') return
