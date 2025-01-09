@@ -40,7 +40,7 @@ export const useBlockEditor = ({
         {
             autofocus: true,
             immediatelyRender: false,
-            // content: initialContent,
+            content: initialContent,
             extensions: [
                 ...ExtensionKit({
                     provider,
@@ -58,11 +58,11 @@ export const useBlockEditor = ({
                 // Before the view is created.
             },
             onCreate({ editor }) {
-                provider?.on('synced', () => {
-                    if (editor.isEmpty) {
-                        editor.commands.setContent(initialContent)
-                    }
-                })
+                // provider?.on('synced', () => {
+                //     if (editor.isEmpty) {
+                //         editor.commands.setContent(initialContent)
+                //     }
+                // })
             },
             onUpdate({ editor }) {
                 save(editor)

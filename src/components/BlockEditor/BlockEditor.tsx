@@ -42,15 +42,7 @@ import { ReactSketchCanvas, ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useSidebarStore from '@/store/sidebar'
 import { useTheme } from 'next-themes'
 import { settingQuery } from '@/db/queries'
-
-interface RawCanvasPath {
-    drawMode?: boolean
-    startTimestamp?: number
-    endTimestamp?: number
-    paths?: Array<{ x: number; y: number }>
-    strokeColor?: string
-    strokeWidth?: number
-}
+import { convertCanvasPathsForDatabase } from '@/lib/utils/convertCanvasPaths'
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     const menuContainerRef = useRef<HTMLDivElement>(null)
@@ -102,55 +94,32 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         })
     }
 
+    /* 
+    Section related to code for handeling the saving or both note data and ink data
+    */
+
     const saveData = React.useCallback(
+        /*
+        Exports and saves note data into the exportedData table
+        */
         (editor: Editor) => {
             if (item === null || !editor) return
+
             const data = exportedData.rows.find((row) => row.noteId === item.id)
+
             if (data === undefined || data === null) return
 
-            // Store selection before update
-            const { from, to } = editor.state.selection
-
             const content = editor.getJSON()
+
             update('exportedData', {
                 id: data.id,
                 jsonData: content,
-            })
-
-            // Restore selection after update
-            requestAnimationFrame(() => {
-                if (editor.isFocused) {
-                    editor.commands.setTextSelection({ from, to })
-                }
             })
         },
         [item, exportedData.rows, update]
     )
 
     const debouncedSave = useDebouncedCallback(saveData, 2000)
-
-    const { users, characterCount, collabState, editor } = useBlockEditor({
-        ydoc,
-        provider,
-        save: debouncedSave,
-    })
-
-    const transformCanvasPaths = (
-        data: RawCanvasPath[]
-    ): CanvasPathSchema[] => {
-        return data.map((path: RawCanvasPath) => ({
-            drawMode: path.drawMode ?? false,
-            startTimestamp: path.startTimestamp ?? 0,
-            endTimestamp: path.endTimestamp ?? 0,
-            paths:
-                path.paths?.map((p: { x: number; y: number }) => ({
-                    x: p.x,
-                    y: p.y,
-                })) ?? [],
-            strokeColor: path.strokeColor ?? '',
-            strokeWidth: path.strokeWidth ?? 1,
-        }))
-    }
 
     const saveInkData = React.useCallback(
         async (canvasRef: ReactSketchCanvasRef) => {
@@ -163,7 +132,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
             const time = await canvasRef.getSketchingTime()
             const paths = await canvasRef.exportPaths()
 
-            const cleanedData = transformCanvasPaths(paths)
+            const cleanedData = convertCanvasPathsForDatabase(paths)
 
             update('exportedData', {
                 id: data.id,
@@ -176,6 +145,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
 
     React.useEffect(() => {
+        // What the hell does this fucking do man?
         if (load === 0) {
             if (item?.id) {
                 const data = exportedData.rows.find(
@@ -191,6 +161,29 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         }
         if (canvasRef.current) debouncedInkSave(canvasRef.current)
     }, [debouncedInkSave, load, exportedData.rows, item])
+
+    // Note info
+
+    const [noteContent, setNoteContent] = useState<any>()
+
+    useEffect(() => {
+        if (item === null) return
+        const data = exportedData.rows.find(
+            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
+        )
+        setNoteContent(data)
+    }, [item, exportedData.rows])
+
+    /* 
+    How to 
+    */
+
+    const { users, characterCount, collabState, editor } = useBlockEditor({
+        ydoc,
+        provider,
+        save: debouncedSave,
+        data: noteContent,
+    })
 
     React.useEffect(() => {
         if (item === null || !item.id) return
@@ -214,6 +207,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         canvasRef.current.loadPaths(inkData)
 
         editor?.commands.setContent(data.jsonData!)
+        console.log('✅ Set')
     }, [canvasRef, editor, item, exportedData.rows])
 
     React.useEffect(() => {
@@ -279,7 +273,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 readOnly={readOnly}
                 setReadOnly={setReadOnly}
             />
-            {/* <ReactSketchCanvas
+            <ReactSketchCanvas
                 ref={canvasRef}
                 readOnly={readOnly}
                 height="100%"
@@ -293,7 +287,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                     }
                 }}
                 withTimestamp
-            /> */}
+            />
             <EditorContent
                 editor={editor}
                 ref={editorRef}
