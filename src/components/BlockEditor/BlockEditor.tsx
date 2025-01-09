@@ -119,8 +119,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         [item, exportedData.rows, update]
     )
 
-    const debouncedSave = useDebouncedCallback(saveData, 2000)
-
     const saveInkData = React.useCallback(
         async (canvasRef: ReactSketchCanvasRef) => {
             if (item === null) return
@@ -142,6 +140,7 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         [item, exportedData.rows, update]
     )
 
+    const debouncedSave = useDebouncedCallback(saveData, 2000)
     const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
 
     React.useEffect(() => {
