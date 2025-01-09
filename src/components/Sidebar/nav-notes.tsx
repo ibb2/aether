@@ -47,6 +47,7 @@ import {
     ContextMenuTrigger,
 } from '@/components/ui/context-menu'
 import NotesContextMenu from '../dialogs/notes/context-menu'
+import { useCurrentEditor } from '@tiptap/react'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -77,6 +78,7 @@ function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
 
 export default function NavNotes() {
     const router = useRouter()
+    const { editor } = useCurrentEditor()
 
     const [notebooks, sections, notes] = useQueries([
         notebooksQuery,
@@ -192,10 +194,30 @@ export default function NavNotes() {
 
     const setNote = useNoteStore((state) => state.setNote)
 
-    const selectNote = (item: any) => {
+    const selectNote = (item: any, editor: Editor) => {
         setNote(item)
         setTreeData(initialTreeData)
         setQuery('')
+
+        // Update the editor's content directly
+        const data = exportedData.rows.find(
+            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
+        )
+
+        if (data) {
+            const inkData = Array.isArray(data.inkData)
+                ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
+                : null
+
+            if (canvasRef.current) {
+                canvasRef.current.resetCanvas()
+                if (inkData) {
+                    canvasRef.current.loadPaths(inkData)
+                }
+                editor.commands.setContent(data.jsonData!)
+                console.log('✅ Set')
+            }
+        }
     }
 
     const deleteNode = (item) => {
@@ -224,7 +246,7 @@ export default function NavNotes() {
                             <Tree
                                 key={item.id}
                                 item={item}
-                                selectNote={selectNote}
+                                selectNote={(item) => selectNote(item, editor)}
                                 deleteNode={deleteNode}
                                 deleteNote={deleteNote}
                             />
@@ -314,7 +336,9 @@ function Tree({
                                             <Tree
                                                 key={note.id}
                                                 item={note}
-                                                selectNote={selectNote}
+                                                selectNote={(item) =>
+                                                    selectNote(item, editor)
+                                                }
                                                 deleteNode={deleteNode}
                                                 deleteNote={deleteNote}
                                             />

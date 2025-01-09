@@ -7,6 +7,7 @@ import {
     BubbleMenu,
     EditorContent,
     PureEditorContent,
+    useCurrentEditor,
     useEditor,
 } from '@tiptap/react'
 import { Editor } from '@tiptap/core'
@@ -43,6 +44,7 @@ import useSidebarStore from '@/store/sidebar'
 import { useTheme } from 'next-themes'
 import { settingQuery } from '@/db/queries'
 import { convertCanvasPathsForDatabase } from '@/lib/utils/convertCanvasPaths'
+import ExtensionKit from '@/extensions/extension-kit'
 
 export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     const menuContainerRef = useRef<HTMLDivElement>(null)
@@ -193,30 +195,30 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
         data: noteContent,
     })
 
-    React.useEffect(() => {
-        if (item === null || !item.id) return
+    // React.useEffect(() => {
+    //     if (item === null || !item.id) return
 
-        const data = exportedData.rows.find(
-            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
-        )
+    //     const data = exportedData.rows.find(
+    //         (row) => row.noteId === S.decodeSync(NoteId)(item.id)
+    //     )
 
-        if (data === undefined || data === null) return
+    //     if (data === undefined || data === null) return
 
-        const inkData = Array.isArray(data.inkData)
-            ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
-            : null
+    //     const inkData = Array.isArray(data.inkData)
+    //         ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
+    //         : null
 
-        if (canvasRef.current === null) {
-            return
-        }
+    //     if (canvasRef.current === null) {
+    //         return
+    //     }
 
-        canvasRef.current.resetCanvas()
-        if (inkData === null) return
-        canvasRef.current.loadPaths(inkData)
+    //     canvasRef.current.resetCanvas()
+    //     if (inkData === null) return
+    //     canvasRef.current.loadPaths(inkData)
 
-        editor?.commands.setContent(data.jsonData!)
-        console.log('✅ Set')
-    }, [canvasRef, editor, item, exportedData.rows])
+    //     editor?.commands.setContent(data.jsonData!)
+    //     console.log('✅ Set')
+    // }, [canvasRef, editor, item, exportedData.rows])
 
     React.useEffect(() => {
         const changeExistingStrokeColor = async () => {

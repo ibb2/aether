@@ -14,8 +14,6 @@ import {
     SquareTerminal,
 } from 'lucide-react'
 
-import { NavMain } from '@/components/nav-main'
-import { NavProjects } from '@/components/nav-projects'
 import { NavSecondary } from '@/components/nav-secondary'
 import { NavUser } from '@/components/nav-user'
 import {
@@ -32,9 +30,6 @@ import NavNotes from '@/components/Sidebar/nav-notes'
 import NavFragmentNotes from '@/components/Sidebar/nav-fragment-notes'
 import favicon from '@/assets/favicon.ico'
 import Image from 'next/image'
-import { useSession } from 'next-auth/react'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import NewNotes from './dialogs/notes/new-notes'
 
 const data = {
