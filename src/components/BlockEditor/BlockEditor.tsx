@@ -18,8 +18,6 @@ import { useBlockEditor } from '@/hooks/useBlockEditor'
 
 import '@/styles/index.css'
 
-import { Sidebar } from '@/components/Sidebar'
-import { EditorContext } from '@/context/EditorContext'
 import ImageBlockMenu from '@/extensions/ImageBlock/components/ImageBlockMenu'
 import { ColumnsMenu } from '@/extensions/MultiColumn/menus'
 import { TableColumnMenu, TableRowMenu } from '@/extensions/Table/menus'
@@ -27,9 +25,6 @@ import { TiptapProps } from './types'
 import { EditorHeader } from './components/EditorHeader'
 import { TextMenu } from '../menus/TextMenu'
 import { ContentItemMenu } from '../menus/ContentItemMenu'
-import { initialContent } from '@/lib/data/initialContent'
-import { blankContent } from '@/lib/data/blankContent'
-import ExtensionKit from '@/extensions/extension-kit'
 import { useEvolu, useQueries, useQuery } from '@evolu/react'
 import { evolu, type Database } from '@/db/db'
 import useNoteStore from '@/store/note'
@@ -42,18 +37,10 @@ import {
 } from '@/db/schema'
 import { useDebounce, useDebouncedCallback } from 'use-debounce'
 
-import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-} from '@/components/ui/resizable'
-import { useSidebar } from '@/hooks/useSidebar'
 import { cn } from '@/lib/utils'
 import { ReactSketchCanvas, ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useSidebarStore from '@/store/sidebar'
-import useStateStore from '@/store/state'
 import { useTheme } from 'next-themes'
-import { parse, stringify, toJSON, fromJSON } from 'flatted'
 import { settingQuery } from '@/db/queries'
 
 interface RawCanvasPath {
@@ -71,37 +58,26 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     const canvasRef = React.useRef<ReactSketchCanvasRef>(null)
 
     // State
-    const [lastSaveTime, setLastSaveTime] = React.useState(Date.now())
-    const [lastInkedSaveTime, setLastInkedSaveTime] = React.useState(0)
-    const [sidebarOpen, setSidebarOpen] = React.useState(true)
     const [readOnly, setReadOnly] = React.useState(false)
     const [load, onLoad] = React.useState(0)
-    const [zIndex, setZIndex] = React.useState(0)
     const [sidebarSize, setSidebarSize] = React.useState(0)
-    const [current, setCurrent] = React.useState<any>()
 
     // Themes
-    const { theme, setTheme } = useTheme()
+    const { theme } = useTheme()
 
     // Evolu
     const { create, update } = useEvolu<Database>()
 
     // Zustand Stores
-    const { setNote, item } = useNoteStore((state) => ({
-        setNote: state.setNote,
+    const { item } = useNoteStore((state) => ({
         item: state.item,
     }))
 
-    const { open, size, ref, setOpen, adjustSize, setRef } = useSidebarStore(
-        (state) => ({
-            open: state.open,
-            size: state.size,
-            ref: state.ref,
-            setOpen: state.setOpen,
-            adjustSize: state.adjustSize,
-            setRef: state.setRef,
-        })
-    )
+    const { open, ref, setOpen } = useSidebarStore((state) => ({
+        open: state.open,
+        ref: state.ref,
+        setOpen: state.setOpen,
+    }))
 
     const exportedDataQuery = React.useCallback(() => {
         return evolu.createQuery((db) =>
@@ -147,8 +123,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                     editor.commands.setTextSelection({ from, to })
                 }
             })
-
-            setLastSaveTime(Date.now())
         },
         [item, exportedData.rows, update]
     )
@@ -186,7 +160,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
             if (data === undefined || data === null || canvasRef === null)
                 return
 
-            const prevTime = lastInkedSaveTime
             const time = await canvasRef.getSketchingTime()
             const paths = await canvasRef.exportPaths()
 
@@ -196,9 +169,8 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
                 id: data.id,
                 inkData: S.decodeSync(CanvasPathArray)(cleanedData),
             })
-            setLastInkedSaveTime(time)
         },
-        [item, exportedData.rows, lastInkedSaveTime, update]
+        [item, exportedData.rows, update]
     )
 
     const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
@@ -243,12 +215,6 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
 
         editor?.commands.setContent(data.jsonData!)
     }, [canvasRef, editor, item, exportedData.rows])
-
-    const displayedUsers = users.slice(0, 3)
-
-    const providerValue = useMemo(() => {
-        return {}
-    }, [])
 
     React.useEffect(() => {
         const changeExistingStrokeColor = async () => {
