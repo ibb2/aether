@@ -27,24 +27,38 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar'
-import { signOut } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { SettingsDialog } from './settings-dialog'
 import Link from 'next/link'
 import Usage from './usage'
 import { useEvolu } from '@evolu/react'
 import { User } from 'next-auth'
+import { useEffect, useState } from 'react'
 
-export function NavUser({
-    user,
-    subscription,
-}: {
-    user: User
-    subscription?: { plan: string; status: string; priceId: string } | null
-}) {
+export function NavUser() {
     const owner = useEvolu().getOwner()
     const id = owner ? S.decodeSync(S.String)(owner?.id) : null
 
     const { isMobile } = useSidebar()
+
+    const { data: session } = useSession()
+    const [subscription, setSubscription] = useState(null)
+    const [ran, setRan] = useState(false)
+
+    const user = session?.user
+
+    useEffect(() => {
+        if (session === null || session === undefined) return
+        if (session.user === null || session.user === undefined) return
+
+        if (!ran) {
+            fetch(`/api/stripe/subscription/${session.user.email!}`)
+                .then((res) => res.json())
+                .then((data) => setSubscription(data))
+                .catch((err) => {})
+            setRan(true)
+        }
+    }, [session, subscription, ran])
 
     return (
         <SidebarMenu>
@@ -57,19 +71,20 @@ export function NavUser({
                         >
                             <Avatar className="h-8 w-8 rounded-lg">
                                 <AvatarImage
-                                    src={user.image || ''}
-                                    alt={user.name || 'User'}
+                                    src={user?.image || undefined}
+                                    alt={user?.name || undefined}
                                 />
                                 <AvatarFallback className="rounded-lg">
-                                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                                    {user?.name?.charAt(0)?.toUpperCase() ||
+                                        'CN'}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">
-                                    {user.name ?? 'Jane Doe'}
+                                    {user?.name ?? 'Jane Doe'}
                                 </span>
                                 <span className="truncate text-xs">
-                                    {user.email ?? 'jane.doe@pm.me'}
+                                    {user?.email ?? 'jane.doe@pm.me'}
                                 </span>
                             </div>
                             <ChevronsUpDown className="ml-auto size-4" />
@@ -85,20 +100,20 @@ export function NavUser({
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <Avatar className="h-8 w-8 rounded-lg">
                                     <AvatarImage
-                                        src={user.image || ''}
-                                        alt={user.name || 'User'}
+                                        src={user?.image || undefined}
+                                        alt={user?.name || undefined}
                                     />
                                     <AvatarFallback className="rounded-lg">
-                                        {user.name?.charAt(0)?.toUpperCase() ||
-                                            'U'}
+                                        {user?.name?.charAt(0)?.toUpperCase() ||
+                                            'CN'}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">
-                                        {user.name ?? 'Jane Doe'}
+                                        {user?.name ?? 'Jane Doe'}
                                     </span>
                                     <span className="truncate text-xs">
-                                        {user.email ?? 'jane.doe@pm.me'}
+                                        {user?.email ?? 'jane.doe@pm.me'}
                                     </span>
                                 </div>
                             </div>
@@ -119,25 +134,27 @@ export function NavUser({
                                 <DropdownMenuItem asChild>
                                     <Link
                                         href={
-                                            !subscription.plan.includes('basic')
+                                            !subscription?.plan.includes(
+                                                'basic'
+                                            )
                                                 ? '/settings/billing'
                                                 : '/pricing'
                                         }
                                         className="flex w-full items-center"
                                     >
-                                        {!subscription.plan.includes(
+                                        {!subscription?.plan.includes(
                                             'basic'
                                         ) ? (
                                             <BadgeCheck className="h-4 w-4 text-green-500" />
                                         ) : (
                                             <Sparkles className="h-4 w-4" />
                                         )}
-                                        {subscription.status === 'active' &&
-                                        subscription.plan.includes('pro')
+                                        {subscription?.status === 'active' &&
+                                        subscription?.plan.includes('pro')
                                             ? 'Pro Plan'
-                                            : subscription.status ===
+                                            : subscription?.status ===
                                                     'active' &&
-                                                subscription.plan.includes(
+                                                subscription?.plan.includes(
                                                     'plus'
                                                 )
                                               ? 'Plus Plan'
@@ -146,7 +163,7 @@ export function NavUser({
                                 </DropdownMenuItem>
                             )}
                             {id !== null && (
-                                <Usage email={user.email!} id={id} />
+                                <Usage email={user?.email!} id={id} />
                             )}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />

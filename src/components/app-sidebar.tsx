@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 import {
     BookOpen,
@@ -164,23 +162,6 @@ const data = {
 }
 
 export function AppSidebar() {
-    const { data: session } = useSession()
-    const [subscription, setSubscription] = useState(null)
-    const [ran, setRan] = useState(false)
-
-    useEffect(() => {
-        if (session === null || session === undefined) return
-        if (session.user === null || session.user === undefined) return
-
-        if (!ran) {
-            fetch(`/api/stripe/subscription/${session.user.email!}`)
-                .then((res) => res.json())
-                .then((data) => setSubscription(data))
-                .catch((err) => {})
-            setRan(true)
-        }
-    }, [session, subscription, ran])
-
     return (
         <Sidebar variant="inset">
             <SidebarHeader>
@@ -222,10 +203,7 @@ export function AppSidebar() {
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
-                {session?.user && (
-                    <NavUser user={session.user} subscription={subscription} />
-                )}
-                {/* <NavUser user={session} /> */}
+                <NavUser />
             </SidebarFooter>
         </Sidebar>
     )
