@@ -143,23 +143,32 @@ export const BlockEditor = ({ ydoc, provider }: TiptapProps) => {
     const debouncedSave = useDebouncedCallback(saveData, 2000)
     const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
 
-    React.useEffect(() => {
-        // What the hell does this fucking do man?
-        if (load === 0) {
-            if (item?.id) {
-                const data = exportedData.rows.find(
-                    (row) => row.noteId === S.decodeSync(NoteId)(item.id)
-                )
-                if (data?.inkData && Array.isArray(data.inkData)) {
-                    canvasRef.current?.loadPaths(
-                        data.inkData as unknown as import('react-sketch-canvas').CanvasPath[]
-                    )
-                }
-            }
-            onLoad(1)
-        }
-        if (canvasRef.current) debouncedInkSave(canvasRef.current)
-    }, [debouncedInkSave, load, exportedData.rows, item])
+    /**
+     * This effect is used to load ink data into the canvas and save ink data from the canvas to the database.
+     * It runs when the component mounts or updates.
+     *
+     * @return {void}
+     */
+    // React.useEffect(() => {
+    //     // Load ink data into the canvas if the load state is 0 and an item with an id exists
+    //     if (load === 0) {
+    //         if (item?.id) {
+    //             const data = exportedData.rows.find(
+    //                 (row) => row.noteId === S.decodeSync(NoteId)(item.id)
+    //             )
+    //             if (data?.inkData && Array.isArray(data.inkData)) {
+    //                 canvasRef.current?.loadPaths(
+    //                     data.inkData as unknown as import('react-sketch-canvas').CanvasPath[]
+    //                 )
+    //             }
+    //         }
+    //     }
+
+    //     // Save ink data from the canvas to the database using the debouncedInkSave function
+    //     if (canvasRef.current) {
+    //         debouncedInkSave(canvasRef.current)
+    //     }
+    // }, [debouncedInkSave, load, exportedData.rows, item])
 
     // Note info
 
