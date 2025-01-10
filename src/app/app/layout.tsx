@@ -120,6 +120,34 @@ export default function AppLayout({
 
     const debouncedSave = useDebouncedCallback(saveData, 2000)
 
+    // const saveInkData = React.useCallback(
+    //     async (canvasRef: ReactSketchCanvasRef) => {
+    //         if (item === null) return
+    //         const data = exportedData.rows.find(
+    //             (row) => row.noteId === item.id
+    //         )
+
+    //         if (
+    //             data === undefined ||
+    //             data === null ||
+    //             canvasRef === null
+    //         )
+    //             return
+
+    //         const time = await canvasRef?.getSketchingTime()
+    //         const paths = await canvasRef?.exportPaths()
+
+    //         const cleanedData = convertCanvasPathsForDatabase(paths)
+
+    //         update('exportedData', {
+    //             id: data.id,
+    //             inkData: S.decodeSync(CanvasPathArray)(cleanedData),
+    //         })
+    //     },
+    //     [item, exportedData.rows, update]
+    // )
+    // const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
+
     return (
         <TooltipProvider>
             <EditorProvider
@@ -150,7 +178,6 @@ export default function AppLayout({
                 }}
                 onBlur={(props) => {
                     if (delay) props.editor.commands.focus()
-                    // props.editor.commands.setTextSelection({ from, to })
                     console.log('onBlur')
                 }}
             >

@@ -58,7 +58,6 @@ import { Doc as YDoc } from 'yjs'
 export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
     ({ ydoc, provider }, canvasRef) => {
         const menuContainerRef = useRef<HTMLDivElement>(null)
-        const editorRef = useRef<HTMLDivElement>(null)
 
         // State
         const [readOnly, setReadOnly] = React.useState(false)
@@ -69,7 +68,7 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
         const { theme } = useTheme()
 
         // Evolu
-        const { create, update } = useEvolu<Database>()
+        const { create } = useEvolu<Database>()
 
         // Zustand Stores
         const { item } = useNoteStore((state) => ({
@@ -104,59 +103,6 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
                 title: S.decodeSync(NonEmptyString50)('settings'),
             })
         }
-
-        /* 
-    Section related to code for handeling the saving or both note data and ink data
-    */
-
-        const saveData = React.useCallback(
-            /*
-        Exports and saves note data into the exportedData table
-        */
-            (editor: Editor) => {
-                if (item === null || !editor) return
-
-                const data = exportedData.rows.find(
-                    (row) => row.noteId === item.id
-                )
-
-                if (data === undefined || data === null) return
-
-                const content = editor.getJSON()
-
-                update('exportedData', {
-                    id: data.id,
-                    jsonData: content,
-                })
-            },
-            [item, exportedData.rows, update]
-        )
-
-        const saveInkData = React.useCallback(
-            async (canvasRef: ReactSketchCanvasRef) => {
-                if (item === null) return
-                const data = exportedData.rows.find(
-                    (row) => row.noteId === item.id
-                )
-
-                if (data === undefined || data === null || canvasRef === null)
-                    return
-
-                const time = await canvasRef?.getSketchingTime()
-                const paths = await canvasRef?.exportPaths()
-
-                const cleanedData = convertCanvasPathsForDatabase(paths)
-
-                update('exportedData', {
-                    id: data.id,
-                    inkData: S.decodeSync(CanvasPathArray)(cleanedData),
-                })
-            },
-            [item, exportedData.rows, update]
-        )
-
-        const debouncedSave = useDebouncedCallback(saveData, 2000)
-        const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
 
         /**
          * This effect is used to load ink data into the canvas and save ink data from the canvas to the database.
@@ -197,41 +143,9 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
             setNoteContent(data)
         }, [item, exportedData.rows])
 
-        /* 
-    How to 
-    */
-
         const { users, characterCount, collabState, editor } = useBlockEditor({
-            ydoc,
             provider,
-            save: debouncedSave,
-            data: noteContent,
         })
-
-        // React.useEffect(() => {
-        //     if (item === null || !item.id) return
-
-        //     const data = exportedData.rows.find(
-        //         (row) => row.noteId === S.decodeSync(NoteId)(item.id)
-        //     )
-
-        //     if (data === undefined || data === null) return
-
-        //     const inkData = Array.isArray(data.inkData)
-        //         ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
-        //         : null
-
-        //     if (canvasRef?.current === null) {
-        //         return
-        //     }
-
-        //     canvasRef?.current.resetCanvas()
-        //     if (inkData === null) return
-        //     canvasRef?.current.loadPaths(inkData)
-
-        //     editor?.commands.setContent(data.jsonData!)
-        //     console.log('✅ Set')
-        // }, [canvasRef, editor, item, exportedData.rows])
 
         React.useEffect(() => {
             const changeExistingStrokeColor = async () => {
@@ -287,7 +201,7 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
 
         return (
             <div className="flex flex-col relative w-auto h-full border-0 overflow-hidden">
-                <EditorHeader
+                <MemoizedEditorHeader
                     characters={characterCount.characters()}
                     words={characterCount.words()}
                     isSidebarOpen={open}
@@ -304,16 +218,15 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
                     canvasColor="transparent"
                     strokeColor={theme === 'light' ? 'black' : 'white'}
                     className={reactSketchCanvasClass}
-                    onChange={() => {
-                        if (canvasRef?.current) {
-                            debouncedInkSave(canvasRef?.current)
-                        }
-                    }}
+                    // onChange={() => {
+                    //     if (canvasRef?.current) {
+                    //         debouncedInkSave(canvasRef?.current)
+                    //     }
+                    // }}
                     withTimestamp
                 />
-                <EditorContent
+                <MemoizedEditorContent
                     editor={editor}
-                    ref={editorRef}
                     className={editorClass}
                 />
                 <ContentItemMenu editor={editor} />
@@ -327,6 +240,48 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
         )
     }
 )
+
+const MemoizedEditorHeader = React.memo(
+    ({
+        characters,
+        words,
+        isSidebarOpen,
+        toggleSidebar,
+        canvasRef,
+        readOnly,
+        setReadOnly,
+    }: {
+        characters: number
+        words: number
+        isSidebarOpen: boolean
+        toggleSidebar: () => void
+        canvasRef: HTMLCanvasElement | null
+        readOnly: boolean
+        setReadOnly: (value: boolean) => void
+    }) => {
+        return (
+            <EditorHeader
+                characters={characters}
+                words={words}
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
+                canvasRef={canvasRef}
+                readOnly={readOnly}
+                setReadOnly={setReadOnly}
+            />
+        )
+    }
+)
+
+MemoizedEditorHeader.displayName = 'MemoizedEditorHeader'
+
+const MemoizedEditorContent = React.memo(
+    ({ editor, className }: { editor: any; className?: string }) => {
+        return <EditorContent editor={editor} className={className} />
+    }
+)
+
+MemoizedEditorContent.displayName = 'MemoizedEditorContent'
 
 BlockEditor.displayName = 'BlockEditor'
 
