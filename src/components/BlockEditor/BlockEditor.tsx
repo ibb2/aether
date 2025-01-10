@@ -60,41 +60,6 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
     ({ ydoc, provider }, canvasRef) => {
         const menuContainerRef = useRef<HTMLDivElement>(null)
 
-        // Define lazy loaded menu components
-        const ContentItemMenu = React.lazy(() =>
-            import('../menus/ContentItemMenu').then((module) => ({
-                default: module.ContentItemMenu,
-            }))
-        )
-        const LinkMenu = React.lazy(() =>
-            import('@/components/menus').then((module) => ({
-                default: module.LinkMenu,
-            }))
-        )
-        const TextMenu = React.lazy(() =>
-            import('../menus/TextMenu').then((module) => ({
-                default: module.TextMenu,
-            }))
-        )
-        const ColumnsMenu = React.lazy(() =>
-            import('@/extensions/MultiColumn/menus').then((module) => ({
-                default: module.ColumnsMenu,
-            }))
-        )
-        const TableRowMenu = React.lazy(() =>
-            import('@/extensions/Table/menus').then((module) => ({
-                default: module.TableRowMenu,
-            }))
-        )
-        const TableColumnMenu = React.lazy(() =>
-            import('@/extensions/Table/menus').then((module) => ({
-                default: module.TableColumnMenu,
-            }))
-        )
-        const ImageBlockMenu = React.lazy(
-            () => import('@/extensions/ImageBlock/components/ImageBlockMenu')
-        )
-
         // State
         const [readOnly, setReadOnly] = useState(false)
         const [load, onLoad] = useState(0)
@@ -262,7 +227,7 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
 
         return (
             <div className="flex flex-col relative w-auto h-full border-0 overflow-hidden">
-                <MemoizedEditorHeader
+                <EditorHeader
                     characters={characterCount.characters()}
                     words={characterCount.words()}
                     isSidebarOpen={open}
@@ -286,25 +251,16 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
                     // }}
                     withTimestamp
                 />
-                <MemoizedEditorContent
-                    editor={editor}
-                    className={editorClass}
-                />
-                <Suspense fallback={null}>
-                    <ContentItemMenu editor={editor} />
-                    <LinkMenu editor={editor} appendTo={menuContainerRef} />
-                    <TextMenu editor={editor} />
-                    <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
-                    <TableRowMenu editor={editor} appendTo={menuContainerRef} />
-                    <TableColumnMenu
-                        editor={editor}
-                        appendTo={menuContainerRef}
-                    />
-                    <ImageBlockMenu
-                        editor={editor}
-                        appendTo={menuContainerRef}
-                    />
-                </Suspense>
+                <EditorContent editor={editor} className={editorClass} />
+                {/* <Suspense fallback={null}> */}
+                <ContentItemMenu editor={editor} />
+                <LinkMenu editor={editor} appendTo={menuContainerRef} />
+                <TextMenu editor={editor} />
+                <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
+                <TableRowMenu editor={editor} appendTo={menuContainerRef} />
+                <TableColumnMenu editor={editor} appendTo={menuContainerRef} />
+                <ImageBlockMenu editor={editor} appendTo={menuContainerRef} />
+                {/* </Suspense> */}
             </div>
         )
     }
