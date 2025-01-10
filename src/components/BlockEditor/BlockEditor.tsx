@@ -13,6 +13,7 @@ import {
 import { Editor } from '@tiptap/core'
 import React, {
     forwardRef,
+    Suspense,
     useCallback,
     useEffect,
     useMemo,
@@ -59,10 +60,45 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
     ({ ydoc, provider }, canvasRef) => {
         const menuContainerRef = useRef<HTMLDivElement>(null)
 
+        // Define lazy loaded menu components
+        const ContentItemMenu = React.lazy(() =>
+            import('../menus/ContentItemMenu').then((module) => ({
+                default: module.ContentItemMenu,
+            }))
+        )
+        const LinkMenu = React.lazy(() =>
+            import('@/components/menus').then((module) => ({
+                default: module.LinkMenu,
+            }))
+        )
+        const TextMenu = React.lazy(() =>
+            import('../menus/TextMenu').then((module) => ({
+                default: module.TextMenu,
+            }))
+        )
+        const ColumnsMenu = React.lazy(() =>
+            import('@/extensions/MultiColumn/menus').then((module) => ({
+                default: module.ColumnsMenu,
+            }))
+        )
+        const TableRowMenu = React.lazy(() =>
+            import('@/extensions/Table/menus').then((module) => ({
+                default: module.TableRowMenu,
+            }))
+        )
+        const TableColumnMenu = React.lazy(() =>
+            import('@/extensions/Table/menus').then((module) => ({
+                default: module.TableColumnMenu,
+            }))
+        )
+        const ImageBlockMenu = React.lazy(
+            () => import('@/extensions/ImageBlock/components/ImageBlockMenu')
+        )
+
         // State
-        const [readOnly, setReadOnly] = React.useState(false)
-        const [load, onLoad] = React.useState(0)
-        const [sidebarSize, setSidebarSize] = React.useState(0)
+        const [readOnly, setReadOnly] = useState(false)
+        const [load, onLoad] = useState(0)
+        const [sidebarSize, setSidebarSize] = useState(0)
 
         // Themes
         const { theme } = useTheme()
@@ -81,20 +117,22 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
             setOpen: state.setOpen,
         }))
 
-        const exportedDataQuery = React.useCallback(() => {
-            return evolu.createQuery((db) =>
-                db
-                    .selectFrom('exportedData')
-                    .select('id')
-                    .select('jsonData')
-                    .select('noteId')
-                    .select('inkData')
-            )
-        }, [])
+        const exportedDataQuery = useMemo(
+            () =>
+                evolu.createQuery((db) =>
+                    db
+                        .selectFrom('exportedData')
+                        .select('id')
+                        .select('jsonData')
+                        .select('noteId')
+                        .select('inkData')
+                ),
+            []
+        )
 
         // Use the query result here
         const [exportedData, settings] = useQueries([
-            exportedDataQuery(),
+            exportedDataQuery,
             settingQuery,
         ])
 
@@ -135,23 +173,27 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
 
         const [noteContent, setNoteContent] = useState<any>()
 
-        useEffect(() => {
-            if (item === null) return
-            const data = exportedData.rows.find(
+        const data = useMemo(() => {
+            if (item === null) return null
+            return exportedData.rows.find(
                 (row) => row.noteId === S.decodeSync(NoteId)(item.id)
             )
-            setNoteContent(data)
         }, [item, exportedData.rows])
+
+        useEffect(() => {
+            setNoteContent(data)
+        }, [data])
 
         const { users, characterCount, collabState, editor } = useBlockEditor({
             provider,
         })
 
-        React.useEffect(() => {
-            const changeExistingStrokeColor = async () => {
+        // Debounced effect to change stroke color based on theme
+        const debouncedChangeExistingStrokeColor = useDebouncedCallback(
+            async () => {
                 if (canvasRef?.current) {
                     // Get current paths
-                    const paths = await canvasRef?.current.exportPaths()
+                    const paths = await canvasRef.current.exportPaths()
 
                     // Modify the color of all paths
                     const updatedPaths = paths.map((path) => ({
@@ -160,19 +202,31 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
                     }))
 
                     // Clear the canvas
-                    await canvasRef?.current.clearCanvas()
+                    await canvasRef.current.clearCanvas()
 
                     // Load the modified paths
-                    await canvasRef?.current.loadPaths(updatedPaths)
+                    await canvasRef.current.loadPaths(updatedPaths)
                 }
-            }
-            changeExistingStrokeColor()
-        }, [theme])
+            },
+            300
+        )
 
-        const reactSketchCanvasClass = cn(
-            'absolute',
-            readOnly && 'z-0'
-            // !readOnly && 'z-1'
+        useEffect(() => {
+            debouncedChangeExistingStrokeColor()
+            // Cleanup on unmount
+            return () => {
+                debouncedChangeExistingStrokeColor.cancel()
+            }
+        }, [theme, debouncedChangeExistingStrokeColor])
+
+        const reactSketchCanvasClass = useMemo(
+            () =>
+                cn(
+                    'absolute',
+                    readOnly && 'z-0'
+                    // !readOnly && 'z-1'
+                ),
+            [readOnly]
         )
 
         const editorClass = cn(
@@ -181,7 +235,7 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
             !readOnly && '-z-10'
         )
 
-        const collapsePanel = () => {
+        const collapsePanel = useCallback(() => {
             if (ref === null) return
             const panel = ref.current
             setOpen()
@@ -193,7 +247,14 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
                     panel.expand(sidebarSize)
                 }
             }
-        }
+        }, [ref, setOpen, sidebarSize])
+
+        const strokeColor = useMemo(
+            () => (theme === 'light' ? 'black' : 'white'),
+            [theme]
+        )
+
+        const canvasStyle = useMemo(() => ({ border: 0 }), [])
 
         if (!editor) {
             return null
@@ -214,9 +275,9 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
                     ref={canvasRef}
                     readOnly={readOnly}
                     height="100%"
-                    style={{ border: 0 }}
+                    style={canvasStyle}
                     canvasColor="transparent"
-                    strokeColor={theme === 'light' ? 'black' : 'white'}
+                    strokeColor={strokeColor}
                     className={reactSketchCanvasClass}
                     // onChange={() => {
                     //     if (canvasRef?.current) {
@@ -229,13 +290,21 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
                     editor={editor}
                     className={editorClass}
                 />
-                <ContentItemMenu editor={editor} />
-                <LinkMenu editor={editor} appendTo={menuContainerRef} />
-                <TextMenu editor={editor} />
-                <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
-                <TableRowMenu editor={editor} appendTo={menuContainerRef} />
-                <TableColumnMenu editor={editor} appendTo={menuContainerRef} />
-                <ImageBlockMenu editor={editor} appendTo={menuContainerRef} />
+                <Suspense fallback={null}>
+                    <ContentItemMenu editor={editor} />
+                    <LinkMenu editor={editor} appendTo={menuContainerRef} />
+                    <TextMenu editor={editor} />
+                    <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
+                    <TableRowMenu editor={editor} appendTo={menuContainerRef} />
+                    <TableColumnMenu
+                        editor={editor}
+                        appendTo={menuContainerRef}
+                    />
+                    <ImageBlockMenu
+                        editor={editor}
+                        appendTo={menuContainerRef}
+                    />
+                </Suspense>
             </div>
         )
     }
