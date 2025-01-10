@@ -83,6 +83,8 @@ export default function AppLayout({
     // Use the query result here
     const exportedData = useQuery(exportedDataQuery())
 
+    let delay = true
+
     /**
      * Exports and saves note data into the exportedData table
      */
@@ -96,6 +98,8 @@ export default function AppLayout({
 
             const data = exportedData.rows.find((row) => row.noteId === item.id)
 
+            const { from, to } = editor.state.selection
+
             if (data === undefined || data === null) return
 
             const content = editor.getJSON()
@@ -104,6 +108,12 @@ export default function AppLayout({
                 id: data.id,
                 jsonData: content,
             })
+
+            delay = true
+
+            editor.commands.setTextSelection({ from, to })
+            delay = false
+            // editor.commands.focus()
         },
         [item, exportedData.rows, update]
     )
@@ -131,6 +141,17 @@ export default function AppLayout({
                 }}
                 onUpdate={(props) => {
                     debouncedSave(props.editor)
+                }}
+                onTransaction={(props) => {
+                    console.log(
+                        'onTransaction',
+                        props.transaction.selection.$from.pos
+                    )
+                }}
+                onBlur={(props) => {
+                    if (delay) props.editor.commands.focus()
+                    // props.editor.commands.setTextSelection({ from, to })
+                    console.log('onBlur')
                 }}
             >
                 <SessionProvider>

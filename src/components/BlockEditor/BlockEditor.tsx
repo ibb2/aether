@@ -60,8 +60,6 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef, TiptapProps>(
         const menuContainerRef = useRef<HTMLDivElement>(null)
         const editorRef = useRef<HTMLDivElement>(null)
 
-        console.log('CanvasRef', canvasRef)
-
         // State
         const [readOnly, setReadOnly] = React.useState(false)
         const [load, onLoad] = React.useState(0)
