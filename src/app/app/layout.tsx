@@ -1,7 +1,13 @@
 'use client'
 
 import * as S from '@effect/schema/Schema'
-import React, { memo, useLayoutEffect, useMemo, useState } from 'react'
+import React, {
+    memo,
+    useLayoutEffect,
+    useMemo,
+    useState,
+    useCallback,
+} from 'react'
 import { SessionProvider, useSession } from 'next-auth/react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import {
@@ -148,52 +154,85 @@ export default function AppLayout({
     // )
     // const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
 
+    // Memoize the params object to ensure stability
+    const params = useMemo(
+        () => ({
+            room: '',
+        }),
+        []
+    )
+
+    // Memoize editorProps to prevent unnecessary re-renders
+    const editorProps = useMemo(
+        () => ({
+            attributes: {
+                autocomplete: 'off',
+                autocorrect: 'off',
+                autocapitalize: 'off',
+                class: 'min-h-full',
+            },
+        }),
+        []
+    )
+
+    // Memoize extensions to ensure they are stable across renders
+    const extensions = useMemo(
+        () => [
+            ...ExtensionKit({
+                provider,
+            }),
+        ],
+        [provider]
+    )
+
+    // Memoize the onUpdate handler
+    const handleUpdate = useCallback(
+        (props) => {
+            debouncedSave(props.editor)
+        },
+        [debouncedSave]
+    )
+
+    // Memoize the onTransaction handler
+    const handleTransaction = useCallback((props) => {
+        console.log('onTransaction', props.transaction.selection.$from.pos)
+    }, [])
+
+    // Memoize the onBlur handler
+    const handleBlur = useCallback(
+        (props) => {
+            if (delay) props.editor.commands.focus()
+            console.log('onBlur')
+        },
+        [delay]
+    )
+
+    // Memoize the SidebarProvider to prevent unnecessary re-renders
+    const memoizedSidebar = useMemo(
+        () => (
+            <SidebarProvider>
+                <AppSidebar canvasRef={canvasRef} />
+                <SidebarInset>
+                    <Document ref={canvasRef} params={params} />
+                </SidebarInset>
+            </SidebarProvider>
+        ),
+        [canvasRef, params]
+    )
+
     return (
         <TooltipProvider>
             <EditorProvider
                 autofocus={true}
                 immediatelyRender={true}
                 content={initialContent}
-                extensions={[
-                    ...ExtensionKit({
-                        provider,
-                    }),
-                ]}
-                editorProps={{
-                    attributes: {
-                        autocomplete: 'off',
-                        autocorrect: 'off',
-                        autocapitalize: 'off',
-                        class: 'min-h-full',
-                    },
-                }}
-                onUpdate={(props) => {
-                    debouncedSave(props.editor)
-                }}
-                onTransaction={(props) => {
-                    console.log(
-                        'onTransaction',
-                        props.transaction.selection.$from.pos
-                    )
-                }}
-                onBlur={(props) => {
-                    if (delay) props.editor.commands.focus()
-                    console.log('onBlur')
-                }}
+                extensions={extensions}
+                editorProps={editorProps}
+                onUpdate={handleUpdate}
+                onTransaction={handleTransaction}
+                onBlur={handleBlur}
             >
-                <SessionProvider>
-                    <SidebarProvider>
-                        <AppSidebar canvasRef={canvasRef} />
-                        <SidebarInset>
-                            <Document
-                                ref={canvasRef}
-                                params={{
-                                    room: '',
-                                }}
-                            />
-                        </SidebarInset>
-                    </SidebarProvider>
-                </SessionProvider>
+                <SessionProvider>{memoizedSidebar}</SessionProvider>
             </EditorProvider>
         </TooltipProvider>
     )
