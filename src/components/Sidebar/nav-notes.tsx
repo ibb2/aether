@@ -33,7 +33,7 @@ import {
     sectionsQuery,
 } from '@/db/queries'
 
-import { Database } from '@/db/db'
+import { Database, evolu } from '@/db/db'
 import { NonEmptyString50, NoteId, SectionId } from '@/db/schema'
 import { initialContent } from '@/lib/data/initialContent'
 import useNoteStore from '@/store/note'
@@ -47,7 +47,9 @@ import {
     ContextMenuTrigger,
 } from '@/components/ui/context-menu'
 import NotesContextMenu from '../dialogs/notes/context-menu'
-import { useCurrentEditor } from '@tiptap/react'
+import { Editor, useCurrentEditor } from '@tiptap/react'
+import { ReactSketchCanvasRef } from 'react-sketch-canvas'
+import useSidebarStore from '@/store/sidebar'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -76,7 +78,11 @@ function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     )
 }
 
-export default function NavNotes() {
+export default function NavNotes({
+    canvasRef,
+}: {
+    canvasRef: React.RefObject<ReactSketchCanvasRef>
+}) {
     const router = useRouter()
     const { editor } = useCurrentEditor()
 
@@ -194,6 +200,31 @@ export default function NavNotes() {
 
     const setNote = useNoteStore((state) => state.setNote)
 
+    // Zustand Stores
+    const { item } = useNoteStore((state) => ({
+        item: state.item,
+    }))
+
+    const { open, ref, setOpen } = useSidebarStore((state) => ({
+        open: state.open,
+        ref: state.ref,
+        setOpen: state.setOpen,
+    }))
+
+    const exportedDataQuery = React.useCallback(() => {
+        return evolu.createQuery((db) =>
+            db
+                .selectFrom('exportedData')
+                .select('id')
+                .select('jsonData')
+                .select('noteId')
+                .select('inkData')
+        )
+    }, [])
+
+    // Use the query result here
+    const exportedData = useQuery(exportedDataQuery())
+
     const selectNote = (item: any, editor: Editor) => {
         setNote(item)
         setTreeData(initialTreeData)
@@ -249,6 +280,7 @@ export default function NavNotes() {
                                 selectNote={(item) => selectNote(item, editor)}
                                 deleteNode={deleteNode}
                                 deleteNote={deleteNote}
+                                editor={editor!}
                             />
                         ))}
                     </>
@@ -263,11 +295,13 @@ function Tree({
     selectNote,
     deleteNode,
     deleteNote,
+    editor,
 }: {
     item: any
     selectNote: (item: any) => void
     deleteNode: (item: any) => void
     deleteNote: (item: any) => void
+    editor: Editor
 }) {
     const [dialogType, setDialogType] = React.useState<string>('')
     const [openDialog, setOpenDialog] = React.useState<boolean>(false)

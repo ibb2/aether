@@ -23,6 +23,8 @@ import { NonEmptyString50 } from '@/db/schema'
 import { Database, evolu } from '@/db/db'
 import useNoteStore from '@/store/note'
 import useSidebarStore from '@/store/sidebar'
+import { ReactSketchCanvasRef } from 'react-sketch-canvas'
+import Document from '@/app/app/page'
 
 // Memoize the Sidebar component
 
@@ -31,6 +33,8 @@ export default function AppLayout({
 }: {
     children: React.ReactNode
 }) {
+    const canvasRef = React.useRef<ReactSketchCanvasRef>(null)
+
     const [provider, setProvider] = useState<TiptapCollabProvider | null>(null)
     const [collabToken, setCollabToken] = useState<string | null>(null)
     const searchParams = useSearchParams()
@@ -79,14 +83,14 @@ export default function AppLayout({
     // Use the query result here
     const exportedData = useQuery(exportedDataQuery())
 
-    /* 
-    Section related to code for handeling the saving or both note data and ink data
-    */
-
+    /**
+     * Exports and saves note data into the exportedData table
+     */
     const saveData = React.useCallback(
-        /*
-        Exports and saves note data into the exportedData table
-        */
+        /**
+         * Saves the current editor content into the exportedData table
+         * @param editor The Tiptap editor instance
+         */
         (editor: Editor) => {
             if (item === null || !editor) return
 
@@ -131,8 +135,15 @@ export default function AppLayout({
             >
                 <SessionProvider>
                     <SidebarProvider>
-                        <AppSidebar />
-                        <SidebarInset>{children}</SidebarInset>
+                        <AppSidebar canvasRef={canvasRef} />
+                        <SidebarInset>
+                            <Document
+                                ref={canvasRef}
+                                params={{
+                                    room: '',
+                                }}
+                            />
+                        </SidebarInset>
                     </SidebarProvider>
                 </SessionProvider>
             </EditorProvider>

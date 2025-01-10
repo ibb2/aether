@@ -31,6 +31,7 @@ import NavFragmentNotes from '@/components/Sidebar/nav-fragment-notes'
 import favicon from '@/assets/favicon.ico'
 import Image from 'next/image'
 import NewNotes from './dialogs/notes/new-notes'
+import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 
 const data = {
     user: {
@@ -156,7 +157,11 @@ const data = {
     ],
 }
 
-export function AppSidebar() {
+export function AppSidebar({
+    canvasRef,
+}: {
+    canvasRef: React.RefObject<ReactSketchCanvasRef>
+}) {
     return (
         <Sidebar variant="inset">
             <SidebarHeader>
@@ -192,7 +197,7 @@ export function AppSidebar() {
             </SidebarHeader>
             <SidebarContent>
                 <NavFragmentNotes />
-                <NavNotes />
+                <NavNotes canvasRef={canvasRef} />
                 {/* <NavMain items={data.navMain} />
                 <NavProjects projects={data.projects} /> */}
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
