@@ -30,90 +30,58 @@ type DocumentProps = {
     params: { room: string }
 }
 
-export const Document = forwardRef<ReactSketchCanvasRef, DocumentProps>(
-    ({ params }, canvasRef) => {
-        const { theme, setTheme } = useTheme()
-        const [provider, setProvider] = useState<TiptapCollabProvider | null>(
-            null
-        )
-        const [collabToken, setCollabToken] = useState<string | null>(null)
-        const searchParams = useSearchParams()
+export const Document = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
+    const { theme, setTheme } = useTheme()
 
-        const hasCollab = parseInt(searchParams.get('noCollab') as string) !== 1
+    const { data: session } = useSession()
 
-        const { room } = params
+    useEffect(() => {
+        if (session?.user) {
+            // Send Evolu ID and NextAuth user ID to your Turso DB via an API route
+            fetch('/api/evolu', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: session.user.email,
+                    evoluOwnerId: evolu.getOwner()?.id,
+                }),
+            })
+        }
+    }, [session?.user])
 
-        const ydoc = useMemo(() => new YDoc(), [])
+    // if (hasCollab && (!collabToken || !provider)) return;
 
-        const { data: session } = useSession()
+    const MemoizedBlockEditor = React.memo(BlockEditor)
 
-        useEffect(() => {
-            if (session?.user) {
-                // Send Evolu ID and NextAuth user ID to your Turso DB via an API route
-                fetch('/api/evolu', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: session.user.email,
-                        evoluOwnerId: evolu.getOwner()?.id,
-                    }),
-                })
-            }
-        }, [session?.user])
+    const lightTheme = React.useMemo(() => {
+        return () => setTheme('light')
+    }, [setTheme])
 
-        useLayoutEffect(() => {
-            if (hasCollab && collabToken) {
-                setProvider(
-                    new TiptapCollabProvider({
-                        name: `${process.env.NEXT_PUBLIC_COLLAB_DOC_PREFIX}${room}`,
-                        appId:
-                            process.env.NEXT_PUBLIC_TIPTAP_COLLAB_APP_ID ?? '',
-                        token: collabToken,
-                        document: ydoc,
-                    })
-                )
-            }
-        }, [setProvider, collabToken, ydoc, room, hasCollab])
+    const darkTheme = React.useMemo(() => {
+        return () => setTheme('dark')
+    }, [setTheme])
 
-        // if (hasCollab && (!collabToken || !provider)) return;
+    const DarkModeSwitcher = createPortal(
+        <Surface className="flex items-center gap-1 fixed bottom-6 right-6 z-[99999] p-1">
+            <Toolbar.Button onClick={lightTheme} active={theme === 'light'}>
+                <Icon name="Sun" />
+            </Toolbar.Button>
+            <Toolbar.Button onClick={darkTheme} active={theme === 'dark'}>
+                <Icon name="Moon" />
+            </Toolbar.Button>
+        </Surface>,
+        document.body
+    )
 
-        const MemoizedBlockEditor = React.memo(BlockEditor)
-
-        const lightTheme = React.useMemo(() => {
-            return () => setTheme('light')
-        }, [setTheme])
-
-        const darkTheme = React.useMemo(() => {
-            return () => setTheme('dark')
-        }, [setTheme])
-
-        const DarkModeSwitcher = createPortal(
-            <Surface className="flex items-center gap-1 fixed bottom-6 right-6 z-[99999] p-1">
-                <Toolbar.Button onClick={lightTheme} active={theme === 'light'}>
-                    <Icon name="Sun" />
-                </Toolbar.Button>
-                <Toolbar.Button onClick={darkTheme} active={theme === 'dark'}>
-                    <Icon name="Moon" />
-                </Toolbar.Button>
-            </Surface>,
-            document.body
-        )
-
-        return (
-            <>
-                {DarkModeSwitcher}
-                <MemoizedBlockEditor
-                    hasCollab={hasCollab}
-                    ydoc={ydoc}
-                    provider={provider}
-                    ref={canvasRef}
-                />
-            </>
-        )
-    }
-)
+    return (
+        <>
+            {DarkModeSwitcher}
+            <MemoizedBlockEditor ref={canvasRef} />
+        </>
+    )
+})
 
 Document.displayName = 'Document'
 

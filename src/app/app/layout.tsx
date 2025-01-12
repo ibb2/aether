@@ -188,7 +188,8 @@ export default function AppLayout({
     // Memoize the onUpdate handler
     const handleUpdate = useCallback(
         (props) => {
-            debouncedSave(props.editor)
+            // debouncedSave(props.editor)
+            console.log('onUpdate')
         },
         [debouncedSave]
     )
@@ -220,17 +221,20 @@ export default function AppLayout({
         [canvasRef, params]
     )
 
+    console.log('1')
+
     return (
         <TooltipProvider>
             <EditorProvider
                 autofocus={true}
                 immediatelyRender={true}
+                shouldRerenderOnTransaction={false}
                 content={initialContent}
                 extensions={extensions}
                 editorProps={editorProps}
-                onUpdate={handleUpdate}
+                // onUpdate={handleUpdate}
                 onTransaction={handleTransaction}
-                onBlur={handleBlur}
+                // onBlur={handleBlur}
             >
                 <SessionProvider>{memoizedSidebar}</SessionProvider>
             </EditorProvider>
