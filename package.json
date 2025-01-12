@@ -41,6 +41,7 @@
         "@stripe/react-stripe-js": "^2.9.0",
         "@stripe/stripe-js": "^4.10.0",
         "@svgr/webpack": "^8.1.0",
+        "@tanstack/react-query": "^5.64.0",
         "@tippyjs/react": "^4.2.6",
         "@tiptap-pro/extension-drag-handle-react": "^2.17.2",
         "@tiptap-pro/extension-emoji": "^2.17.2",
@@ -131,6 +132,7 @@
     },
     "devDependencies": {
         "@tailwindcss/typography": "^0.5.16",
+        "@tanstack/eslint-plugin-query": "^5.62.16",
         "@types/jsonwebtoken": "^9.0.7",
         "@types/lodash.debounce": "^4.0.9",
         "@types/md5": "^2.3.5",
