@@ -189,23 +189,8 @@ export default function AppLayout({
     const handleUpdate = useCallback(
         (props) => {
             debouncedSave(props.editor)
-            console.log('onUpdate')
         },
         [debouncedSave]
-    )
-
-    // Memoize the onTransaction handler
-    const handleTransaction = useCallback((props) => {
-        console.log('onTransaction', props.transaction.selection.$from.pos)
-    }, [])
-
-    // Memoize the onBlur handler
-    const handleBlur = useCallback(
-        (props) => {
-            if (delay) props.editor.commands.focus()
-            console.log('onBlur')
-        },
-        [delay]
     )
 
     // Memoize the SidebarProvider to prevent unnecessary re-renders
@@ -230,8 +215,6 @@ export default function AppLayout({
                 extensions={extensions}
                 editorProps={editorProps}
                 onUpdate={handleUpdate}
-                onTransaction={handleTransaction}
-                // onBlur={handleBlur}
             >
                 <SessionProvider>{memoizedSidebar}</SessionProvider>
             </EditorProvider>
