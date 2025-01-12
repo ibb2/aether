@@ -246,7 +246,8 @@ export default function NavNotes({
                     canvasRef.current.loadPaths(inkData)
                 }
                 editor.commands.setContent(data.jsonData!)
-                console.log('✅ Set')
+            } else {
+                editor.commands.setContent(data.jsonData!)
             }
         }
     }
