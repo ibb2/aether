@@ -9,6 +9,7 @@ import { evolu } from '@/db/db'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SessionProvider } from 'next-auth/react'
+import { EditorProvider } from '@tiptap/react'
 
 // import ClientComponents from "@/components/Layout/ClientComponents";
 

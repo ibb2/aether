@@ -4,6 +4,7 @@ import { TiptapCollabProvider } from '@hocuspocus/provider'
 import 'iframe-resizer/js/iframeResizer.contentWindow'
 import { useSearchParams } from 'next/navigation'
 import {
+    forwardRef,
     useCallback,
     useEffect,
     useLayoutEffect,
@@ -23,18 +24,14 @@ import { useTheme } from 'next-themes'
 import React from 'react'
 import { useSession } from 'next-auth/react'
 import { db } from '@/db/drizzle'
+import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 
-export default function Document({ params }: { params: { room: string } }) {
+type DocumentProps = {
+    params: { room: string }
+}
+
+export const Document = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
     const { theme, setTheme } = useTheme()
-    const [provider, setProvider] = useState<TiptapCollabProvider | null>(null)
-    const [collabToken, setCollabToken] = useState<string | null>(null)
-    const searchParams = useSearchParams()
-
-    const hasCollab = parseInt(searchParams.get('noCollab') as string) !== 1
-
-    const { room } = params
-
-    const ydoc = useMemo(() => new YDoc(), [])
 
     const { data: session } = useSession()
 
@@ -53,21 +50,6 @@ export default function Document({ params }: { params: { room: string } }) {
             })
         }
     }, [session?.user])
-
-    useLayoutEffect(() => {
-        if (hasCollab && collabToken) {
-            setProvider(
-                new TiptapCollabProvider({
-                    name: `${process.env.NEXT_PUBLIC_COLLAB_DOC_PREFIX}${room}`,
-                    appId: process.env.NEXT_PUBLIC_TIPTAP_COLLAB_APP_ID ?? '',
-                    token: collabToken,
-                    document: ydoc,
-                })
-            )
-        }
-    }, [setProvider, collabToken, ydoc, room, hasCollab])
-
-    // if (hasCollab && (!collabToken || !provider)) return;
 
     const MemoizedBlockEditor = React.memo(BlockEditor)
 
@@ -94,11 +76,11 @@ export default function Document({ params }: { params: { room: string } }) {
     return (
         <>
             {DarkModeSwitcher}
-            <MemoizedBlockEditor
-                hasCollab={hasCollab}
-                ydoc={ydoc}
-                provider={provider}
-            />
+            <MemoizedBlockEditor ref={canvasRef} />
         </>
     )
-}
+})
+
+Document.displayName = 'Document'
+
+export default Document

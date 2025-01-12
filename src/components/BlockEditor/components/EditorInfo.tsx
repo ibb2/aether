@@ -37,8 +37,8 @@ import { cn } from '@/lib/utils'
 type Checked = DropdownMenuCheckboxItemProps['checked']
 
 export type EditorInfoProps = {
-    characters: number
-    words: number
+    characters?: number
+    words?: number
     // collabState: WebSocketStatus;
     // users: EditorUser[];
     canvasRef: ReactSketchCanvasRef | null
@@ -48,8 +48,8 @@ export type EditorInfoProps = {
 
 export const EditorInfo = memo(
     ({
-        characters,
-        words,
+        characters = 0,
+        words = 0,
         canvasRef,
         readOnly,
         setReadOnly,

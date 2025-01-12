@@ -33,7 +33,7 @@ import {
     sectionsQuery,
 } from '@/db/queries'
 
-import { Database } from '@/db/db'
+import { Database, evolu } from '@/db/db'
 import { NonEmptyString50, NoteId, SectionId } from '@/db/schema'
 import { initialContent } from '@/lib/data/initialContent'
 import useNoteStore from '@/store/note'
@@ -47,6 +47,9 @@ import {
     ContextMenuTrigger,
 } from '@/components/ui/context-menu'
 import NotesContextMenu from '../dialogs/notes/context-menu'
+import { Editor, useCurrentEditor } from '@tiptap/react'
+import { ReactSketchCanvasRef } from 'react-sketch-canvas'
+import useSidebarStore from '@/store/sidebar'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -75,8 +78,13 @@ function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     )
 }
 
-export default function NavNotes() {
+export default function NavNotes({
+    canvasRef,
+}: {
+    canvasRef: React.RefObject<ReactSketchCanvasRef>
+}) {
     const router = useRouter()
+    const { editor } = useCurrentEditor()
 
     const [notebooks, sections, notes] = useQueries([
         notebooksQuery,
@@ -84,20 +92,13 @@ export default function NavNotes() {
         notesQuery,
     ])
 
-    const { rows: fragments } = useQuery(fragmentsQuery)
-
     // State
     const [initialTreeData, setInitialTreeData] = React.useState<any>()
     const [treeData, setTreeData] = React.useState<any>()
-    const [query, setQuery] = React.useState('')
-    const [fragmentsData, setFragmentsData] = React.useState<any>()
 
     // Make treeview data
     const convertToTreeStructure = (data) => {
         const allItems = [...data.notebooks, ...data.sections, ...data.notes]
-        const itemMap = new Map(
-            allItems.map((item) => [item.id, { ...item, children: [] }])
-        )
 
         const findChildren = (parentId, notebookId) => {
             return allItems.filter((item) => {
@@ -162,13 +163,6 @@ export default function NavNotes() {
         return normalizedData
     }
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        setQuery(value)
-        setTreeData(searchTree(treeData, query))
-        if (value.length === 0) setTreeData(initialTreeData)
-    }
-
     React.useEffect(() => {
         const getData = async () => {
             const transformedData = transformData(notebooks, sections, notes)
@@ -177,57 +171,51 @@ export default function NavNotes() {
             setInitialTreeData(treeStructure)
         }
 
-        const getFragmentsData = async () => {
-            const arr = []
-
-            for (let i = 0; i < fragments.length; i++) {
-                arr.push({
-                    id: fragments[i].id,
-                    name: S.decodeSync(S.String)(fragments[i].title!),
-                    type: 'fragment',
-                })
-            }
-
-            setFragmentsData([...arr])
-        }
-
-        getFragmentsData()
         getData()
-    }, [notebooks, sections, notes, fragments])
+    }, [notebooks, sections, notes])
 
-    const [notebookName, setNotebookName] = React.useState('')
-    const [notebookOpen, onNotebookOpen] = React.useState(false)
-
-    const [fragmentName, setFragmentName] = React.useState('')
-    const [fragmentOpen, onFragmentOpen] = React.useState(false)
-
-    const { create, update } = useEvolu<Database>()
-
-    const handler = () => {
-        create('notebooks', {
-            title: S.decodeSync(NonEmptyString1000)(notebookName),
-        })
-    }
-
-    const createNoteFragment = () => {
-        const { id } = create('notes', {
-            title: S.decodeSync(NonEmptyString1000)(fragmentName),
-            isFragment: true,
-        })
-
-        create('exportedData', {
-            noteId: id,
-            jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${id}`),
-            jsonData: initialContent,
-        })
-    }
+    const { update } = useEvolu<Database>()
 
     const setNote = useNoteStore((state) => state.setNote)
 
-    const selectNote = (item: any) => {
+    const exportedDataQuery = React.useCallback(() => {
+        return evolu.createQuery((db) =>
+            db
+                .selectFrom('exportedData')
+                .select('id')
+                .select('jsonData')
+                .select('noteId')
+                .select('inkData')
+        )
+    }, [])
+
+    // Use the query result here
+    const exportedData = useQuery(exportedDataQuery())
+
+    const selectNote = (item: any, editor: Editor) => {
         setNote(item)
         setTreeData(initialTreeData)
-        setQuery('')
+
+        // Update the editor's content directly
+        const data = exportedData.rows.find(
+            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
+        )
+
+        if (data) {
+            const inkData = Array.isArray(data.inkData)
+                ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
+                : null
+
+            if (canvasRef.current) {
+                canvasRef.current.resetCanvas()
+                if (inkData) {
+                    canvasRef.current.loadPaths(inkData)
+                }
+                editor.commands.setContent(data.jsonData!)
+            } else {
+                editor.commands.setContent(data.jsonData!)
+            }
+        }
     }
 
     const deleteNode = (item) => {
@@ -246,15 +234,6 @@ export default function NavNotes() {
         })
     }
 
-    const windowClassName = cn(
-        'bg-white lg:bg-white/30 lg:backdrop-blur-xl h-full w-0 duration-300 transition-all',
-        'dark:bg-black lg:dark:bg-black/30',
-        'min-h-svh',
-        'w-full'
-        // !isOpen && "border-r-transparent",
-        // isOpen && "w-full",
-    )
-
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Notes</SidebarGroupLabel>
@@ -265,9 +244,10 @@ export default function NavNotes() {
                             <Tree
                                 key={item.id}
                                 item={item}
-                                selectNote={selectNote}
+                                selectNote={(item) => selectNote(item, editor)}
                                 deleteNode={deleteNode}
                                 deleteNote={deleteNote}
+                                editor={editor!}
                             />
                         ))}
                     </>
@@ -282,15 +262,15 @@ function Tree({
     selectNote,
     deleteNode,
     deleteNote,
+    editor,
 }: {
     item: any
     selectNote: (item: any) => void
     deleteNode: (item: any) => void
     deleteNote: (item: any) => void
+    editor: Editor
 }) {
     const [dialogType, setDialogType] = React.useState<string>('')
-
-    const { update } = useEvolu<Database>()
     const [openDialog, setOpenDialog] = React.useState<boolean>(false)
 
     if (item.type === 'note') {
@@ -338,10 +318,7 @@ function Tree({
     return (
         <ContextMenu>
             <SidebarMenuItem>
-                <Collapsible
-                    className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
-                    // defaultOpen={name === 'components' || name === 'ui'}
-                >
+                <Collapsible className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90">
                     <CollapsibleTrigger asChild>
                         <ContextMenuTrigger asChild>
                             <SidebarMenuButton>
@@ -360,7 +337,9 @@ function Tree({
                                             <Tree
                                                 key={note.id}
                                                 item={note}
-                                                selectNote={selectNote}
+                                                selectNote={(item) =>
+                                                    selectNote(item, editor)
+                                                }
                                                 deleteNode={deleteNode}
                                                 deleteNote={deleteNote}
                                             />
@@ -417,48 +396,3 @@ function Tree({
         </ContextMenu>
     )
 }
-
-// function NotesContextMenu({ type }: { type: string }) {
-//     return (
-//         <ContextMenuContent>
-//             <ContextMenuGroup>
-//                 <ContextMenuItem
-//                     onSelect={(e) => {
-//                         setDialogType('rename')
-//                         e.preventDefault()
-//                         console.log('notebook and section ', item)
-//                     }}
-//                 >
-//                     <span>Rename</span>
-//                 </ContextMenuItem>
-//             </ContextMenuGroup>
-//             <ContextMenuSeparator />
-//             <ContextMenuItem
-//                 onSelect={(e) => {
-//                     setDialogType('section')
-//                     e.preventDefault()
-//                 }}
-//             >
-//                 <span>New Section</span>
-//             </ContextMenuItem>
-//             <ContextMenuItem
-//                 onSelect={(e) => {
-//                     setDialogType('note')
-//                     e.preventDefault()
-//                 }}
-//             >
-//                 <span>New Note</span>
-//             </ContextMenuItem>
-//             <ContextMenuSeparator />
-//             <ContextMenuItem
-//                 onSelect={(e) => {
-//                     deleteNode(item)
-//                     e.preventDefault()
-//                 }}
-//             >
-//                 <span>Delete</span>
-//             </ContextMenuItem>
-//             <NotesContextMenu type={dialogType} />
-//         </ContextMenuContent>
-//     )
-// }
