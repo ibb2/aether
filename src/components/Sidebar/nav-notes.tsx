@@ -92,20 +92,13 @@ export default function NavNotes({
         notesQuery,
     ])
 
-    const { rows: fragments } = useQuery(fragmentsQuery)
-
     // State
     const [initialTreeData, setInitialTreeData] = React.useState<any>()
     const [treeData, setTreeData] = React.useState<any>()
-    const [query, setQuery] = React.useState('')
-    const [fragmentsData, setFragmentsData] = React.useState<any>()
 
     // Make treeview data
     const convertToTreeStructure = (data) => {
         const allItems = [...data.notebooks, ...data.sections, ...data.notes]
-        const itemMap = new Map(
-            allItems.map((item) => [item.id, { ...item, children: [] }])
-        )
 
         const findChildren = (parentId, notebookId) => {
             return allItems.filter((item) => {
@@ -178,38 +171,12 @@ export default function NavNotes({
             setInitialTreeData(treeStructure)
         }
 
-        const getFragmentsData = async () => {
-            const arr = []
-
-            for (let i = 0; i < fragments.length; i++) {
-                arr.push({
-                    id: fragments[i].id,
-                    name: S.decodeSync(S.String)(fragments[i].title!),
-                    type: 'fragment',
-                })
-            }
-
-            setFragmentsData([...arr])
-        }
-
-        getFragmentsData()
         getData()
-    }, [notebooks, sections, notes, fragments])
+    }, [notebooks, sections, notes])
 
-    const { create, update } = useEvolu<Database>()
+    const { update } = useEvolu<Database>()
 
     const setNote = useNoteStore((state) => state.setNote)
-
-    // Zustand Stores
-    const { item } = useNoteStore((state) => ({
-        item: state.item,
-    }))
-
-    const { open, ref, setOpen } = useSidebarStore((state) => ({
-        open: state.open,
-        ref: state.ref,
-        setOpen: state.setOpen,
-    }))
 
     const exportedDataQuery = React.useCallback(() => {
         return evolu.createQuery((db) =>
@@ -228,7 +195,6 @@ export default function NavNotes({
     const selectNote = (item: any, editor: Editor) => {
         setNote(item)
         setTreeData(initialTreeData)
-        setQuery('')
 
         // Update the editor's content directly
         const data = exportedData.rows.find(

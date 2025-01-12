@@ -59,100 +59,25 @@ import { Doc as YDoc } from 'yjs'
 export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
     const menuContainerRef = useRef<HTMLDivElement>(null)
 
-    // State
-    const [readOnly, setReadOnly] = useState(false)
-    const [load, onLoad] = useState(0)
-    const [sidebarSize, setSidebarSize] = useState(0)
+    const { editor } = useCurrentEditor()
 
-    // Themes
+    // States for React Sketch Canvas
+    const [readOnly, setReadOnly] = useState(false)
+
+    // State for Themes
     const { theme } = useTheme()
 
     // Evolu
     const { create } = useEvolu<Database>()
 
-    // Zustand Stores
-    const { item } = useNoteStore((state) => ({
-        item: state.item,
-    }))
-
-    const { open, ref, setOpen } = useSidebarStore((state) => ({
-        open: state.open,
-        ref: state.ref,
-        setOpen: state.setOpen,
-    }))
-
-    const exportedDataQuery = useMemo(
-        () =>
-            evolu.createQuery((db) =>
-                db
-                    .selectFrom('exportedData')
-                    .select('id')
-                    .select('jsonData')
-                    .select('noteId')
-                    .select('inkData')
-            ),
-        []
-    )
-
     // Use the query result here
-    const [exportedData, settings] = useQueries([
-        exportedDataQuery,
-        settingQuery,
-    ])
+    const settings = useQuery(settingQuery)
 
     if (settings.row === null || settings.row === undefined) {
         create('settings', {
             title: S.decodeSync(NonEmptyString50)('settings'),
         })
     }
-
-    /**
-     * This effect is used to load ink data into the canvas and save ink data from the canvas to the database.
-     * It runs when the component mounts or updates.
-     *
-     * @return {void}
-     */
-    // React.useEffect(() => {
-    //     // Load ink data into the canvas if the load state is 0 and an item with an id exists
-    //     if (load === 0) {
-    //         if (item?.id) {
-    //             const data = exportedData.rows.find(
-    //                 (row) => row.noteId === S.decodeSync(NoteId)(item.id)
-    //             )
-    //             if (data?.inkData && Array.isArray(data.inkData)) {
-    //                 canvasRef?.current?.loadPaths(
-    //                     data.inkData as unknown as import('react-sketch-canvas').CanvasPath[]
-    //                 )
-    //             }
-    //         }
-    //     }
-
-    //     // Save ink data from the canvas to the database using the debouncedInkSave function
-    //     if (canvasRef?.current) {
-    //         debouncedInkSave(canvasRef?.current)
-    //     }
-    // }, [debouncedInkSave, load, exportedData.rows, item])
-
-    // Note info
-
-    const [noteContent, setNoteContent] = useState<any>()
-
-    const data = useMemo(() => {
-        if (item === null) return null
-        return exportedData.rows.find(
-            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
-        )
-    }, [item, exportedData.rows])
-
-    useEffect(() => {
-        setNoteContent(data)
-    }, [data])
-
-    // const { users, characterCount, collabState, editor } = useBlockEditor({
-    //     provider,
-    // })
-
-    const { editor } = useCurrentEditor()
 
     // Debounced effect to change stroke color based on theme
     const debouncedChangeExistingStrokeColor = useDebouncedCallback(
@@ -186,12 +111,7 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
     }, [theme, debouncedChangeExistingStrokeColor])
 
     const reactSketchCanvasClass = useMemo(
-        () =>
-            cn(
-                'absolute',
-                readOnly && 'z-0'
-                // !readOnly && 'z-1'
-            ),
+        () => cn('absolute', readOnly && 'z-0'),
         [readOnly]
     )
 
@@ -200,20 +120,6 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
         readOnly && 'z-1',
         !readOnly && '-z-10'
     )
-
-    const collapsePanel = useCallback(() => {
-        if (ref === null) return
-        const panel = ref.current
-        setOpen()
-        if (panel) {
-            if (!panel.isCollapsed()) {
-                setSidebarSize(panel.getSize())
-                panel.collapse()
-            } else {
-                panel.expand(sidebarSize)
-            }
-        }
-    }, [ref, setOpen, sidebarSize])
 
     const strokeColor = useMemo(
         () => (theme === 'light' ? 'black' : 'white'),
@@ -233,31 +139,29 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
                 readOnly={readOnly}
                 setReadOnly={setReadOnly}
             />
-            {/* <ReactSketchCanvas
-                    ref={canvasRef}
-                    readOnly={readOnly}
-                    height="100%"
-                    style={canvasStyle}
-                    canvasColor="transparent"
-                    strokeColor={strokeColor}
-                    className={reactSketchCanvasClass}
-                    // onChange={() => {
-                    //     if (canvasRef?.current) {
-                    //         debouncedInkSave(canvasRef?.current)
-                    //     }
-                    // }}
-                    withTimestamp
-                /> */}
+            <ReactSketchCanvas
+                ref={canvasRef?.current}
+                readOnly={readOnly}
+                height="100%"
+                style={canvasStyle}
+                canvasColor="transparent"
+                strokeColor={strokeColor}
+                className={reactSketchCanvasClass}
+                // onChange={() => {
+                //     if (canvasRef?.current) {
+                //         debouncedInkSave(canvasRef?.current)
+                //     }
+                // }}
+                withTimestamp
+            />
             <EditorContent editor={editor} className={editorClass} />
-            {/* <Suspense fallback={null}> */}
-            {/* <ContentItemMenu editor={editor} />
-                <LinkMenu editor={editor} appendTo={menuContainerRef} />
-                <TextMenu editor={editor} />
-                <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
-                <TableRowMenu editor={editor} appendTo={menuContainerRef} />
-                <TableColumnMenu editor={editor} appendTo={menuContainerRef} />
-                <ImageBlockMenu editor={editor} appendTo={menuContainerRef} /> */}
-            {/* </Suspense> */}
+            <ContentItemMenu editor={editor} />
+            <LinkMenu editor={editor} appendTo={menuContainerRef} />
+            <TextMenu editor={editor} />
+            <ColumnsMenu editor={editor} appendTo={menuContainerRef} />
+            <TableRowMenu editor={editor} appendTo={menuContainerRef} />
+            <TableColumnMenu editor={editor} appendTo={menuContainerRef} />
+            <ImageBlockMenu editor={editor} appendTo={menuContainerRef} />
         </div>
     )
 })

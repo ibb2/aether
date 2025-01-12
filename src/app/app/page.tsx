@@ -51,8 +51,6 @@ export const Document = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
         }
     }, [session?.user])
 
-    // if (hasCollab && (!collabToken || !provider)) return;
-
     const MemoizedBlockEditor = React.memo(BlockEditor)
 
     const lightTheme = React.useMemo(() => {
