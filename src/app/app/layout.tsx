@@ -230,7 +230,7 @@ export default function AppLayout({
             <SessionProvider>
                 <SidebarProvider>
                     <QueryClientProvider client={queryClient}>
-                        <AppSidebar canvasRef={canvasRef} id={id} />
+                        <AppSidebar canvasRef={canvasRef} id={id!} />
                     </QueryClientProvider>
                     <SidebarInset>
                         <EditorProvider
