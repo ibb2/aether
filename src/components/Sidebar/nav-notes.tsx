@@ -50,6 +50,7 @@ import NotesContextMenu from '../dialogs/notes/context-menu'
 import { Editor, useCurrentEditor } from '@tiptap/react'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useSidebarStore from '@/store/sidebar'
+import useEditorStore from '@/store/editor'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -84,7 +85,8 @@ export default function NavNotes({
     canvasRef: React.RefObject<ReactSketchCanvasRef>
 }) {
     const router = useRouter()
-    const { editor } = useCurrentEditor()
+
+    const editor = useEditorStore((s) => s.editor)
 
     const [notebooks, sections, notes] = useQueries([
         notebooksQuery,

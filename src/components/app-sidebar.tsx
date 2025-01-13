@@ -196,7 +196,7 @@ export function AppSidebar({
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavFragmentNotes />
+                <NavFragmentNotes canvasRef={canvasRef} />
                 <NavNotes canvasRef={canvasRef} />
                 {/* <NavMain items={data.navMain} />
                 <NavProjects projects={data.projects} /> */}

@@ -5,6 +5,7 @@ import 'iframe-resizer/js/iframeResizer.contentWindow'
 import { useSearchParams } from 'next/navigation'
 import {
     forwardRef,
+    use,
     useCallback,
     useEffect,
     useLayoutEffect,
@@ -25,6 +26,8 @@ import React from 'react'
 import { useSession } from 'next-auth/react'
 import { db } from '@/db/drizzle'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
+import useEditorStore from '@/store/editor'
+import { useCurrentEditor, useEditorState } from '@tiptap/react'
 
 type DocumentProps = {
     params: { room: string }
@@ -34,6 +37,11 @@ export const Document = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
     const { theme, setTheme } = useTheme()
 
     const { data: session } = useSession()
+
+    const setEditor = useEditorStore((s) => s.setEditor)
+
+    const { editor } = useCurrentEditor()
+    setEditor(editor)
 
     useEffect(() => {
         if (session?.user) {

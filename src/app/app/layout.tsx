@@ -196,28 +196,56 @@ export default function AppLayout({
     // Memoize the SidebarProvider to prevent unnecessary re-renders
     const memoizedSidebar = useMemo(
         () => (
-            <SidebarProvider>
-                <AppSidebar canvasRef={canvasRef} />
-                <SidebarInset>
-                    <Document ref={canvasRef} params={params} />
-                </SidebarInset>
-            </SidebarProvider>
+            <TooltipProvider>
+                <SessionProvider>
+                    <SidebarProvider>
+                        <AppSidebar canvasRef={canvasRef} />
+                        <SidebarInset>
+                            <EditorProvider
+                                autofocus={true}
+                                immediatelyRender={true}
+                                shouldRerenderOnTransaction={false}
+                                extensions={extensions}
+                                editorProps={editorProps}
+                                onUpdate={handleUpdate}
+                            >
+                                {React.isValidElement(children)
+                                    ? React.cloneElement(children, {
+                                          ref: canvasRef,
+                                      })
+                                    : children}
+                            </EditorProvider>
+                        </SidebarInset>
+                    </SidebarProvider>
+                </SessionProvider>
+            </TooltipProvider>
         ),
         [canvasRef, params]
     )
 
     return (
         <TooltipProvider>
-            <EditorProvider
-                autofocus={true}
-                immediatelyRender={true}
-                shouldRerenderOnTransaction={false}
-                extensions={extensions}
-                editorProps={editorProps}
-                onUpdate={handleUpdate}
-            >
-                <SessionProvider>{memoizedSidebar}</SessionProvider>
-            </EditorProvider>
+            <SessionProvider>
+                <SidebarProvider>
+                    <AppSidebar canvasRef={canvasRef} />
+                    <SidebarInset>
+                        <EditorProvider
+                            autofocus={true}
+                            immediatelyRender={true}
+                            shouldRerenderOnTransaction={false}
+                            extensions={extensions}
+                            editorProps={editorProps}
+                            onUpdate={handleUpdate}
+                        >
+                            {React.isValidElement(children)
+                                ? React.cloneElement(children, {
+                                      ref: canvasRef,
+                                  })
+                                : children}
+                        </EditorProvider>
+                    </SidebarInset>
+                </SidebarProvider>
+            </SessionProvider>
         </TooltipProvider>
     )
 }
