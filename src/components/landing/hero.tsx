@@ -41,7 +41,7 @@ export default function Hero() {
         }
 
         const settingNoteTakingText = async () => {
-            awaitsetTimeout(() => {
+            await setTimeout(() => {
                 setNoteTakingText(getWhoIsNoteTakingFor())
             }, 1000)
         }

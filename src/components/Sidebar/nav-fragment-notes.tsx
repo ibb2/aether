@@ -36,7 +36,7 @@ import {
 } from '@/db/queries'
 import { Diamond } from 'lucide-react'
 
-import { Database } from '@/db/db'
+import { Database, evolu } from '@/db/db'
 import { NonEmptyString50, NoteId } from '@/db/schema'
 import { initialContent } from '@/lib/data/initialContent'
 import useNoteStore from '@/store/note'
@@ -50,6 +50,9 @@ import {
     ContextMenuItem,
     ContextMenuSeparator,
 } from '@/components/ui/context-menu'
+import useEditorStore from '@/store/editor'
+import { ReactSketchCanvasRef } from 'react-sketch-canvas'
+import { Editor } from '@tiptap/react'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -78,7 +81,11 @@ function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     )
 }
 
-export default function NavFragmentNotes() {
+export default function NavFragmentNotes({
+    canvasRef,
+}: {
+    canvasRef: React.RefObject<ReactSketchCanvasRef>
+}) {
     const router = useRouter()
 
     const [notebooks, sections, notes] = useQueries([
@@ -88,6 +95,7 @@ export default function NavFragmentNotes() {
     ])
 
     const { rows: fragments } = useQuery(fragmentsQuery)
+    const editor = useEditorStore((s) => s.editor)
 
     // State
     const [initialTreeData, setInitialTreeData] = React.useState<any>()
@@ -234,10 +242,45 @@ export default function NavFragmentNotes() {
 
     const setNote = useNoteStore((state) => state.setNote)
 
-    const selectNote = (item: any) => {
+    const exportedDataQuery = React.useCallback(() => {
+        return evolu.createQuery((db) =>
+            db
+                .selectFrom('exportedData')
+                .select('id')
+                .select('jsonData')
+                .select('noteId')
+                .select('inkData')
+        )
+    }, [])
+
+    // Use the query result here
+    const exportedData = useQuery(exportedDataQuery())
+
+    const selectNote = (item: any, editor: Editor) => {
         setNote(item)
         setTreeData(initialTreeData)
         setQuery('')
+
+        // Update the editor's content directly
+        const data = exportedData.rows.find(
+            (row) => row.noteId === S.decodeSync(NoteId)(item.id)
+        )
+
+        if (data) {
+            const inkData = Array.isArray(data.inkData)
+                ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
+                : null
+
+            if (canvasRef.current) {
+                canvasRef.current.resetCanvas()
+                if (inkData) {
+                    canvasRef.current.loadPaths(inkData)
+                }
+                editor.commands.setContent(data.jsonData!)
+            } else {
+                editor.commands.setContent(data.jsonData!)
+            }
+        }
     }
 
     const deleteNote = (item) => {
@@ -258,8 +301,9 @@ export default function NavFragmentNotes() {
                             <Tree
                                 key={item.id}
                                 item={item}
-                                selectNote={selectNote}
+                                selectNote={(item) => selectNote(item, editor)}
                                 deleteNote={deleteNote}
+                                editor={editor!}
                             />
                         ))}
                     </>
@@ -273,10 +317,12 @@ function Tree({
     item,
     selectNote,
     deleteNote,
+    editor,
 }: {
     item: any
     selectNote: any
     deleteNote: (item: any) => void
+    editor: Editor
 }) {
     const [dialogType, setDialogType] = React.useState<string>('')
 
@@ -291,7 +337,7 @@ function Tree({
                         // isActive={name === 'button.tsx'}
                         className="data-[active=true]:bg-transparent"
                         onClick={() => {
-                            selectNote(item)
+                            selectNote(item, editor)
                         }}
                     >
                         <File />
@@ -357,8 +403,11 @@ function Tree({
                                                 <Tree
                                                     key={fragment.id}
                                                     item={fragment}
-                                                    selectNote={selectNote}
+                                                    selectNote={(item) =>
+                                                        selectNote(item, editor)
+                                                    }
                                                     deleteNote={deleteNote}
+                                                    editor={editor!}
                                                 />
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>

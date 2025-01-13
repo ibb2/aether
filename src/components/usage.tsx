@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import { Progress } from './ui/progress'
 import { DatabaseUsage } from '@tursodatabase/api'
