@@ -1,10 +1,9 @@
-'use client'
-
 import * as S from '@effect/schema/Schema'
 
 import {
     BadgeCheck,
     Bell,
+    ChevronDown,
     ChevronsUpDown,
     CreditCard,
     LogOut,
@@ -34,31 +33,30 @@ import Usage from './usage'
 import { useEvolu } from '@evolu/react'
 import { User } from 'next-auth'
 import { useEffect, useState } from 'react'
+import UserCard from '@/components/Sidebar/nav/UserCard'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from '@/components/ui/skeleton'
 
-export function NavUser() {
-    const owner = useEvolu().getOwner()
-    const id = owner ? S.decodeSync(S.String)(owner?.id) : null
-
+export function NavUser({ id }: { id: string | null }) {
     const { isMobile } = useSidebar()
 
     const { data: session } = useSession()
-    const [subscription, setSubscription] = useState(null)
-    const [ran, setRan] = useState(false)
 
     const user = session?.user
 
-    useEffect(() => {
-        if (session === null || session === undefined) return
-        if (session.user === null || session.user === undefined) return
+    const { isPending, error, data, isFetching } = useQuery({
+        queryKey: ['repoData'],
+        queryFn: async () => {
+            const response = await fetch(
+                `/api/stripe/subscription/${user?.email!}`
+            )
+            return await response.json()
+        },
+    })
 
-        if (!ran) {
-            fetch(`/api/stripe/subscription/${session.user.email!}`)
-                .then((res) => res.json())
-                .then((data) => setSubscription(data))
-                .catch((err) => {})
-            setRan(true)
-        }
-    }, [session, subscription, ran])
+    if (isPending) return <UserProfileSkeleton />
+
+    if (error) return 'An error has occurred: ' + error.message
 
     return (
         <SidebarMenu>
@@ -69,24 +67,7 @@ export function NavUser() {
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <Avatar className="h-8 w-8 rounded-lg">
-                                <AvatarImage
-                                    src={user?.image || undefined}
-                                    alt={user?.name || undefined}
-                                />
-                                <AvatarFallback className="rounded-lg">
-                                    {user?.name?.charAt(0)?.toUpperCase() ||
-                                        'CN'}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold">
-                                    {user?.name ?? 'Jane Doe'}
-                                </span>
-                                <span className="truncate text-xs">
-                                    {user?.email ?? 'jane.doe@pm.me'}
-                                </span>
-                            </div>
+                            <UserCard user={user!} />
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
@@ -98,29 +79,12 @@ export function NavUser() {
                     >
                         <DropdownMenuLabel className="p-0 font-normal">
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                <Avatar className="h-8 w-8 rounded-lg">
-                                    <AvatarImage
-                                        src={user?.image || undefined}
-                                        alt={user?.name || undefined}
-                                    />
-                                    <AvatarFallback className="rounded-lg">
-                                        {user?.name?.charAt(0)?.toUpperCase() ||
-                                            'CN'}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">
-                                        {user?.name ?? 'Jane Doe'}
-                                    </span>
-                                    <span className="truncate text-xs">
-                                        {user?.email ?? 'jane.doe@pm.me'}
-                                    </span>
-                                </div>
+                                <UserCard user={user!} />
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            {!subscription ? (
+                            {!data ? (
                                 <DropdownMenuItem asChild>
                                     <Link
                                         href="/pricing"
@@ -134,29 +98,22 @@ export function NavUser() {
                                 <DropdownMenuItem asChild>
                                     <Link
                                         href={
-                                            !subscription?.plan.includes(
-                                                'basic'
-                                            )
+                                            !data?.plan.includes('basic')
                                                 ? '/settings/billing'
                                                 : '/pricing'
                                         }
                                         className="flex w-full items-center"
                                     >
-                                        {!subscription?.plan.includes(
-                                            'basic'
-                                        ) ? (
+                                        {!data?.plan.includes('basic') ? (
                                             <BadgeCheck className="h-4 w-4 text-green-500" />
                                         ) : (
                                             <Sparkles className="h-4 w-4" />
                                         )}
-                                        {subscription?.status === 'active' &&
-                                        subscription?.plan.includes('pro')
+                                        {data?.status === 'active' &&
+                                        data?.plan.includes('pro')
                                             ? 'Pro Plan'
-                                            : subscription?.status ===
-                                                    'active' &&
-                                                subscription?.plan.includes(
-                                                    'plus'
-                                                )
+                                            : data?.status === 'active' &&
+                                                data?.plan.includes('plus')
                                               ? 'Plus Plan'
                                               : 'Upgrade to Pro'}
                                     </Link>
@@ -174,7 +131,7 @@ export function NavUser() {
                             <DropdownMenuItem asChild>
                                 <Link
                                     href={
-                                        subscription?.status === 'active'
+                                        data?.status === 'active'
                                             ? '/settings/billing'
                                             : ''
                                     }
@@ -196,5 +153,21 @@ export function NavUser() {
                 </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>
+    )
+}
+
+export function UserProfileSkeleton() {
+    return (
+        <div className="flex items-center gap-3 p-3 w-full bg-background/5 rounded-lg">
+            <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+            </Avatar>
+            <Skeleton className="h-10 w-10 rounded-full bg-muted/10" />
+            <div className="flex-1 min-w-0">
+                <Skeleton className="h-5 w-32 mb-1 bg-muted/10" />
+                <Skeleton className="h-4 w-40 bg-muted/10" />
+            </div>
+            <ChevronDown className="h-4 w-4 text-muted-foreground/50" />
+        </div>
     )
 }

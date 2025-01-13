@@ -159,8 +159,10 @@ const data = {
 
 export function AppSidebar({
     canvasRef,
+    id,
 }: {
     canvasRef: React.RefObject<ReactSketchCanvasRef>
+    id: string
 }) {
     return (
         <Sidebar variant="inset">
@@ -203,7 +205,7 @@ export function AppSidebar({
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
-                <NavUser />
+                <NavUser id={id} />
             </SidebarFooter>
         </Sidebar>
     )

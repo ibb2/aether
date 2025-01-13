@@ -31,8 +31,9 @@ import useNoteStore from '@/store/note'
 import useSidebarStore from '@/store/sidebar'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import Document from '@/app/app/page'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-// Memoize the Sidebar component
+const queryClient = new QueryClient()
 
 export default function AppLayout({
     children, // will be a page or nested layout
@@ -40,6 +41,9 @@ export default function AppLayout({
     children: React.ReactNode
 }) {
     const canvasRef = React.useRef<ReactSketchCanvasRef>(null)
+
+    const owner = useEvolu().getOwner()
+    const id = owner ? S.decodeSync(S.String)(owner?.id) : null
 
     const [provider, setProvider] = useState<TiptapCollabProvider | null>(null)
     const [collabToken, setCollabToken] = useState<string | null>(null)
@@ -50,8 +54,6 @@ export default function AppLayout({
     const room = 0
 
     const ydoc = useMemo(() => new YDoc(), [])
-
-    const { data: session } = useSession()
 
     useLayoutEffect(() => {
         if (hasCollab && collabToken) {
@@ -199,7 +201,7 @@ export default function AppLayout({
             <TooltipProvider>
                 <SessionProvider>
                     <SidebarProvider>
-                        <AppSidebar canvasRef={canvasRef} />
+                        <AppSidebar canvasRef={canvasRef} id={id} />
                         <SidebarInset>
                             <EditorProvider
                                 autofocus={true}
@@ -227,7 +229,9 @@ export default function AppLayout({
         <TooltipProvider>
             <SessionProvider>
                 <SidebarProvider>
-                    <AppSidebar canvasRef={canvasRef} />
+                    <QueryClientProvider client={queryClient}>
+                        <AppSidebar canvasRef={canvasRef} id={id} />
+                    </QueryClientProvider>
                     <SidebarInset>
                         <EditorProvider
                             autofocus={true}
