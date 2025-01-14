@@ -61,9 +61,10 @@ export function NavUser({
                 `/api/stripe/subscription/${user?.email!}`
             )
 
-            console.log('response', response.json())
+            const res = await response.json()
+            console.log('response', res)
 
-            return response.json()
+            return res
         },
     })
 
