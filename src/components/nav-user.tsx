@@ -60,7 +60,10 @@ export function NavUser({
             const response = await fetch(
                 `/api/stripe/subscription/${user?.email!}`
             )
-            return await response.json()
+
+            console.log('response', response.json())
+
+            return response.json()
         },
     })
 
