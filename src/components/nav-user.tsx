@@ -68,7 +68,6 @@ export function NavUser({
 
             return res
         },
-        enabled: !!user?.email, // Only run query if user.email is defined
     })
 
     console.log('Is Pending ', isPending)
