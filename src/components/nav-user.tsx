@@ -64,6 +64,8 @@ export function NavUser({
         },
     })
 
+    console.log('Is Pending ', isPending)
+    console.log('Is fetching', isFetching)
     if (isPending) return <UserProfileSkeleton user={defaultUser} />
 
     if (error) return 'An error has occurred: ' + error.message
