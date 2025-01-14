@@ -1,3 +1,5 @@
+'use client'
+
 import * as S from '@effect/schema/Schema'
 
 import {
