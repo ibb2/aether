@@ -227,8 +227,8 @@ export default function AppLayout({
 
     return (
         <TooltipProvider>
-            <SessionProvider>
-                <SidebarProvider>
+            <SidebarProvider>
+                <SessionProvider>
                     <QueryClientProvider client={queryClient}>
                         <AppSidebar canvasRef={canvasRef} id={id!} />
                     </QueryClientProvider>
@@ -248,8 +248,8 @@ export default function AppLayout({
                                 : children}
                         </EditorProvider>
                     </SidebarInset>
-                </SidebarProvider>
-            </SessionProvider>
+                </SessionProvider>
+            </SidebarProvider>
         </TooltipProvider>
     )
 }
