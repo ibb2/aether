@@ -37,7 +37,17 @@ import UserCard from '@/components/Sidebar/nav/UserCard'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 
-export function NavUser({ id }: { id: string | null }) {
+export function NavUser({
+    defaultUser,
+    id,
+}: {
+    defaultUser: {
+        name: string
+        email: string
+        avatar: string
+    }
+    id: string | null
+}) {
     const { isMobile } = useSidebar()
 
     const { data: session } = useSession()
@@ -54,7 +64,7 @@ export function NavUser({ id }: { id: string | null }) {
         },
     })
 
-    if (isPending) return <UserProfileSkeleton />
+    if (isPending) return <UserProfileSkeleton user={defaultUser} />
 
     if (error) return 'An error has occurred: ' + error.message
 
@@ -156,18 +166,26 @@ export function NavUser({ id }: { id: string | null }) {
     )
 }
 
-export function UserProfileSkeleton() {
+export function UserProfileSkeleton({
+    user,
+}: {
+    user: {
+        name: string
+        email: string
+        avatar: string
+    }
+}) {
     return (
         <div className="flex items-center gap-3 p-3 w-full bg-background/5 rounded-lg">
             <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
             </Avatar>
-            <Skeleton className="h-10 w-10 rounded-full bg-muted/10" />
             <div className="flex-1 min-w-0">
-                <Skeleton className="h-5 w-32 mb-1 bg-muted/10" />
-                <Skeleton className="h-4 w-40 bg-muted/10" />
+                <Skeleton className="h-3 w-30 mb-1 bg-muted" />
+                <Skeleton className="h-4 w-36 bg-muted" />
             </div>
-            <ChevronDown className="h-4 w-4 text-muted-foreground/50" />
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </div>
     )
 }
