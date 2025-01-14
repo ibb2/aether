@@ -59,13 +59,14 @@ export function NavUser({
     const { isPending, error, data, isFetching } = useQuery({
         queryKey: ['repoData'],
         queryFn: async () => {
-            const url =
+            const scheme =
                 process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
                     ? 'http://'
-                    : 'https://' +
-                      process.env.NEXT_PUBLIC_VERCEL_URL +
-                      '/api/stripe/subscription/' +
-                      user?.email!
+                    : 'https://'
+            const domain = process.env.NEXT_PUBLIC_VERCEL_URL
+            const subdirectory = '/api/stripe/subscription/' + user?.email!
+            const url = scheme + domain + subdirectory
+            console.log('URL', url)
             const response = await fetch(url)
 
             const res = await response.json()

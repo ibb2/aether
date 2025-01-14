@@ -32,7 +32,6 @@ import favicon from '@/assets/favicon.ico'
 import Image from 'next/image'
 import NewNotes from './dialogs/notes/new-notes'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
-import NavUserServer from './Sidebar/nav/NavUserServer'
 
 const data = {
     user: {
