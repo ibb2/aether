@@ -50,9 +50,11 @@ export function NavUser({
 }) {
     const { isMobile } = useSidebar()
 
-    const { data: session } = useSession()
+    const { data: session, status } = useSession()
 
     const user = session?.user
+
+    console.log('User', user)
 
     const { isPending, error, data, isFetching } = useQuery({
         queryKey: ['repoData'],
@@ -66,12 +68,14 @@ export function NavUser({
 
             return res
         },
+        enabled: !!user?.email, // Only run query if user.email is defined
     })
 
     console.log('Is Pending ', isPending)
     console.log('Is fetching', isFetching)
     console.log('Error', error)
-    if (isPending) return <UserProfileSkeleton user={defaultUser} />
+    if (isPending || status === 'loading' || !user)
+        return <UserProfileSkeleton user={defaultUser} />
 
     if (error) return 'An error has occurred: ' + error.message
 
@@ -84,7 +88,7 @@ export function NavUser({
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <UserCard user={user!} />
+                            <UserCard user={user} />
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
@@ -96,7 +100,7 @@ export function NavUser({
                     >
                         <DropdownMenuLabel className="p-0 font-normal">
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                <UserCard user={user!} />
+                                <UserCard user={user} />
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
