@@ -28,7 +28,7 @@ export const providerMap = providers
     .filter((provider) => provider.id !== 'credentials')
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    debug: false,
+    debug: true,
     adapter: DrizzleAdapter(db, {
         usersTable: users,
         accountsTable: accounts,
@@ -54,6 +54,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
             // For other paths, allow access by default (if desired)
             return true
+        },
+        session({ session, user }) {
+            session.user.id = user.id
+            return session
         },
     },
 })

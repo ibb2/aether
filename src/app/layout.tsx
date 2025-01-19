@@ -10,6 +10,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SessionProvider } from 'next-auth/react'
 import { EditorProvider } from '@tiptap/react'
+import { auth } from '@/auth'
 
 // import ClientComponents from "@/components/Layout/ClientComponents";
 
@@ -46,11 +47,13 @@ const ClientComponents = dynamic(
     }
 )
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
+    const session = await auth()
+
     return (
         <html
             lang="en"
@@ -65,7 +68,7 @@ export default function RootLayout({
             </head>
             <body className="flex min-h-svh items-center justify-center">
                 <PHProvider>
-                    <SessionProvider>
+                    <SessionProvider session={session}>
                         <EvoluProvider value={evolu}>
                             <ThemeProvider
                                 attribute="class"
