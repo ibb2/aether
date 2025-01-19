@@ -69,7 +69,7 @@ export function NavUser({
             const subdirectory = '/api/stripe/subscription/' + user?.email!
             const url = scheme + domain + subdirectory
             console.log('URL', url)
-            const response = await fetch(url)
+            const response = await fetch(url, { cache: 'no-store' })
 
             const res = await response.json()
             console.log('response', res)
@@ -77,6 +77,8 @@ export function NavUser({
             return res
         },
     })
+
+    useEffect(() => {}, [session])
 
     console.log('Is Pending ', isPending)
     console.log('Status', status)
