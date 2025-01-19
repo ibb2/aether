@@ -65,7 +65,10 @@ export function NavUser({
                 process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
                     ? 'http://'
                     : 'https://'
-            const domain = process.env.NEXT_PUBLIC_VERCEL_URL
+            const domain =
+                process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
+                    ? process.env.NEXT_PUBLIC_VERCEL_URL
+                    : process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
             const subdirectory = '/api/stripe/subscription/' + user?.email!
             const url = scheme + domain + subdirectory
             console.log('URL', url)
