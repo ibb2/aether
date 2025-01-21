@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { Brand } from 'effect/Brand'
-import { TreeDataItem } from '@/components/tree-view'
 
 interface NoteState {
     id: (string & Brand<'Id'> & Brand<'ExportedData'>) | null
@@ -12,6 +11,8 @@ interface NoteState {
     isPageSplit: boolean
     item: any
     setNote: (item: any) => void
+    setId: (id: any) => void
+    setNoteId: (id: any) => void
     setInk: (data: any) => void
     setInkStatus: () => void
     setPageSplit: () => void
@@ -28,6 +29,8 @@ const useNoteStore = create<NoteState>()((set) => ({
     item: null,
 
     setNote: (item) => set(() => ({ item })),
+    setId: (id) => set(() => ({ id })),
+    setNoteId: (id) => set(() => ({ noteId: id })),
     setInk: (data: any) =>
         set(() => ({
             ink: data,

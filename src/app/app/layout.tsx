@@ -43,7 +43,7 @@ export default function AppLayout({
     const canvasRef = React.useRef<ReactSketchCanvasRef>(null)
 
     const owner = useEvolu().getOwner()
-    const id = owner ? S.decodeSync(S.String)(owner?.id) : null
+    const evoluId = owner ? S.decodeSync(S.String)(owner?.id) : null
 
     const [provider, setProvider] = useState<TiptapCollabProvider | null>(null)
     const [collabToken, setCollabToken] = useState<string | null>(null)
@@ -70,28 +70,13 @@ export default function AppLayout({
 
     // Editor related
     // Evolu
-    const { create, update } = useEvolu<Database>()
+    const { update } = useEvolu<Database>()
 
     // Zustand Stores
-    const { item } = useNoteStore((state) => ({
+    const { item, exportedId } = useNoteStore((state) => ({
         item: state.item,
+        exportedId: state.id,
     }))
-
-    const exportedDataQuery = React.useCallback(() => {
-        return evolu.createQuery((db) =>
-            db
-                .selectFrom('exportedData')
-                .select('id')
-                .select('jsonData')
-                .select('noteId')
-                .select('inkData')
-        )
-    }, [])
-
-    // Use the query result here
-    const exportedData = useQuery(exportedDataQuery())
-
-    let delay = true
 
     /**
      * Exports and saves note data into the exportedData table
@@ -102,24 +87,16 @@ export default function AppLayout({
          * @param editor The Tiptap editor instance
          */
         (editor: Editor) => {
-            if (item === null || !editor) return
-
-            const data = exportedData.rows.find((row) => row.noteId === item.id)
-
-            const { from, to } = editor.state.selection
-
-            console.log('From and to:', from, to)
-
-            if (data === undefined || data === null) return
+            if (item === null || !editor || exportedId === null) return
 
             const content = editor.getJSON()
 
             update('exportedData', {
-                id: data.id,
+                id: exportedId,
                 jsonData: content,
             })
         },
-        [item, exportedData.rows, update]
+        [item, update, exportedId]
     )
 
     const debouncedSave = useDebouncedCallback(saveData, 2000)
@@ -151,14 +128,6 @@ export default function AppLayout({
     //     [item, exportedData.rows, update]
     // )
     // const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
-
-    // Memoize the params object to ensure stability
-    const params = useMemo(
-        () => ({
-            room: '',
-        }),
-        []
-    )
 
     // Memoize editorProps to prevent unnecessary re-renders
     const editorProps = useMemo(
@@ -196,7 +165,7 @@ export default function AppLayout({
         <TooltipProvider>
             <SidebarProvider>
                 <QueryClientProvider client={queryClient}>
-                    <AppSidebar canvasRef={canvasRef} id={id!} />
+                    <AppSidebar canvasRef={canvasRef} id={evoluId!} />
                 </QueryClientProvider>
                 <SidebarInset>
                     <EditorProvider
