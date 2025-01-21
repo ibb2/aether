@@ -52,6 +52,7 @@
 
         /* Tiptap */
         --gray-3: #ccc;
+        --gray-4: #bbb;
     }
 
     .dark {
@@ -93,6 +94,7 @@
 
         /* Tiptap */
         --gray-3: #333;
+        --gray-4: #444;
     }
 }
 
@@ -108,4 +110,21 @@
 .custom-blockquote {
     border-left: 3px solid var(--gray-3);
     padding-left: 1rem;
+}
+
+/* Placeholder (at the top) */
+p.is-editor-empty:first-child::before {
+    color: var(--gray-4);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}
+
+h1.is-editor-empty:first-child::before {
+    color: var(--gray-4);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
 }

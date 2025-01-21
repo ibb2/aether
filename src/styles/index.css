@@ -39,6 +39,13 @@
     border-left: 3px solid var(--gray-3);
 }
 
+.is-placeholder::before {
+    content: attr(data-placeholder);
+    color: #aaa; /* Light gray */
+    font-style: italic;
+    pointer-events: none; /* Prevent interaction with the placeholder */
+}
+
 @import './partials/animations.css';
 @import './partials/blocks.css';
 @import './partials/code.css';

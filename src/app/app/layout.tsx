@@ -34,6 +34,7 @@ import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import Document from '@/app/app/page'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { EditorHeader } from '@/components/BlockEditor/components/EditorHeader'
+import { Cone } from 'lucide-react'
 
 const queryClient = new QueryClient()
 
@@ -92,6 +93,7 @@ export default function AppLayout({
             if (item === null || !editor || exportedId === null) return
 
             const content = editor.getJSON()
+            console.log('content', content)
 
             update('exportedData', {
                 id: exportedId,
@@ -175,6 +177,7 @@ export default function AppLayout({
                     <EditorProvider
                         autofocus={false}
                         immediatelyRender={true}
+                        content={initialContent}
                         shouldRerenderOnTransaction={false}
                         extensions={extensions}
                         editorProps={editorProps}
