@@ -41,7 +41,7 @@ export type EditorInfoProps = {
     words?: number
     // collabState: WebSocketStatus;
     // users: EditorUser[];
-    canvasRef: ReactSketchCanvasRef | null
+    canvasRef: ReactSketchCanvasRef | null | undefined
     readOnly: boolean
     setReadOnly: any
 }

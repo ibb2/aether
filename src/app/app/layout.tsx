@@ -7,6 +7,7 @@ import React, {
     useMemo,
     useState,
     useCallback,
+    RefObject,
 } from 'react'
 import { SessionProvider, useSession } from 'next-auth/react'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -209,16 +210,18 @@ const MemoizedEditorHeader = React.memo(
         readOnly,
         setReadOnly,
     }: {
-        canvasRef: HTMLCanvasElement | null
+        canvasRef: RefObject<ReactSketchCanvasRef> | null
         readOnly: boolean
         setReadOnly: (value: boolean) => void
     }) => {
         return (
             <EditorHeader
-                canvasRef={canvasRef?.current}
+                canvasRef={canvasRef}
                 readOnly={readOnly}
                 setReadOnly={setReadOnly}
             />
         )
     }
 )
+
+MemoizedEditorHeader.displayName = 'MemoizedEditorHeader'
