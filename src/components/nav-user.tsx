@@ -56,8 +56,6 @@ export function NavUser({
 
     const user = session?.user
 
-    console.log('User', user)
-
     const { isPending, error, data, isFetching } = useQuery({
         queryKey: ['repoData'],
         queryFn: async () => {
@@ -81,9 +79,6 @@ export function NavUser({
         },
     })
 
-    console.log('Is Pending ', isPending)
-    console.log('Status', status)
-    console.log('Error', error)
     if (isPending || status === 'loading' || user === undefined)
         return <UserProfileSkeleton user={defaultUser} />
 
