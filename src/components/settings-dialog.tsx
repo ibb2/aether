@@ -75,7 +75,7 @@ const data = {
         ],
         general: [
             { name: 'Appearance', icon: Paintbrush },
-            { name: 'Language & region', icon: Globe },
+            // { name: 'Language & region', icon: Globe },
         ],
         // { name: 'Notifications', icon: Bell },
         // { name: 'Navigation', icon: Menu },
@@ -196,6 +196,8 @@ function getContentComponent(section: string) {
             return <Sync />
         case 'Danger':
             return <Danger />
+        case 'Appearance':
+            return <Appearance />
         default:
             return null
     }
