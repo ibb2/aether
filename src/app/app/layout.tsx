@@ -108,6 +108,8 @@ export default function AppLayout({
 
             const { from, to } = editor.state.selection
 
+            console.log('From and to:', from, to)
+
             if (data === undefined || data === null) return
 
             const content = editor.getJSON()
@@ -116,12 +118,6 @@ export default function AppLayout({
                 id: data.id,
                 jsonData: content,
             })
-
-            delay = true
-
-            editor.commands.setTextSelection({ from, to })
-            delay = false
-            // editor.commands.focus()
         },
         [item, exportedData.rows, update]
     )
@@ -191,6 +187,7 @@ export default function AppLayout({
     const handleUpdate = useCallback(
         (props) => {
             debouncedSave(props.editor)
+            console.log('Updating...')
         },
         [debouncedSave]
     )
@@ -209,6 +206,11 @@ export default function AppLayout({
                         extensions={extensions}
                         editorProps={editorProps}
                         onUpdate={handleUpdate}
+                        onTransaction={(editor) => {
+                            console.log('Transacting')
+                            // const { from, to } = editor.state.selection
+                            // console.log('From and to:', from, to)
+                        }}
                     >
                         {React.isValidElement(children)
                             ? React.cloneElement(children, {

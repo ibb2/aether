@@ -81,8 +81,6 @@ export function NavUser({
         },
     })
 
-    useEffect(() => {}, [session])
-
     console.log('Is Pending ', isPending)
     console.log('Status', status)
     console.log('Error', error)
