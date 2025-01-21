@@ -75,7 +75,7 @@ const data = {
         ],
         general: [
             { name: 'Appearance', icon: Paintbrush },
-            { name: 'Language & region', icon: Globe },
+            // { name: 'Language & region', icon: Globe },
         ],
         // { name: 'Notifications', icon: Bell },
         // { name: 'Navigation', icon: Menu },
