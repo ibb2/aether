@@ -32,6 +32,7 @@ import useSidebarStore from '@/store/sidebar'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import Document from '@/app/app/page'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { EditorHeader } from '@/components/BlockEditor/components/EditorHeader'
 
 const queryClient = new QueryClient()
 
@@ -161,6 +162,8 @@ export default function AppLayout({
         [debouncedSave]
     )
 
+    const [readOnly, setReadOnly] = useState(false)
+
     return (
         <TooltipProvider>
             <SidebarProvider>
@@ -169,7 +172,7 @@ export default function AppLayout({
                 </QueryClientProvider>
                 <SidebarInset>
                     <EditorProvider
-                        autofocus={true}
+                        autofocus={false}
                         immediatelyRender={true}
                         shouldRerenderOnTransaction={false}
                         extensions={extensions}
@@ -180,6 +183,13 @@ export default function AppLayout({
                             // const { from, to } = editor.state.selection
                             // console.log('From and to:', from, to)
                         }}
+                        slotBefore={
+                            <MemoizedEditorHeader
+                                canvasRef={canvasRef}
+                                readOnly={readOnly}
+                                setReadOnly={setReadOnly}
+                            />
+                        }
                     >
                         {React.isValidElement(children)
                             ? React.cloneElement(children, {
@@ -192,3 +202,23 @@ export default function AppLayout({
         </TooltipProvider>
     )
 }
+
+const MemoizedEditorHeader = React.memo(
+    ({
+        canvasRef,
+        readOnly,
+        setReadOnly,
+    }: {
+        canvasRef: HTMLCanvasElement | null
+        readOnly: boolean
+        setReadOnly: (value: boolean) => void
+    }) => {
+        return (
+            <EditorHeader
+                canvasRef={canvasRef?.current}
+                readOnly={readOnly}
+                setReadOnly={setReadOnly}
+            />
+        )
+    }
+)
