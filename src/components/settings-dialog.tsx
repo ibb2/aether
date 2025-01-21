@@ -196,6 +196,8 @@ function getContentComponent(section: string) {
             return <Sync />
         case 'Danger':
             return <Danger />
+        case 'Appearance':
+            return <Appearance />
         default:
             return null
     }

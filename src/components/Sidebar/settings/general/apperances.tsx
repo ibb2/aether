@@ -39,9 +39,6 @@ export default function Appearance() {
                 <div className="flex flex-col">
                     <div className="flex flex-col justify-between gap-y-2">
                         <Label htmlFor="mnemonic">Theme</Label>
-                        {/* <span className="text-sm font-light text-gray-400">
-                                Basic analytics gathered via PostHog.
-                            </span> */}
                         <Select defaultValue={theme} onValueChange={setTheme}>
                             <SelectTrigger>
                                 <SelectValue />
