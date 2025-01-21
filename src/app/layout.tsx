@@ -61,6 +61,12 @@ export default async function RootLayout({
             suppressHydrationWarning
         >
             <head>
+                {process.env.VERCEL_ENV !== 'production' && (
+                    <script
+                        src="https://unpkg.com/react-scan/dist/auto.global.js"
+                        async
+                    />
+                )}
                 <script
                     async
                     src="https://js.stripe.com/v3/pricing-table.js"
