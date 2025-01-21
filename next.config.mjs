@@ -19,6 +19,6 @@ const nextConfig = {
 }
 
 export default MillionLint.next({
-    enabled: false,
+    enabled: process.env.VERCEL_ENV === 'development',
     rsc: true,
 })(nextConfig)
