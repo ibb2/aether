@@ -7,6 +7,7 @@ import React, {
     useMemo,
     useState,
     useCallback,
+    RefObject,
 } from 'react'
 import { SessionProvider, useSession } from 'next-auth/react'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -32,6 +33,7 @@ import useSidebarStore from '@/store/sidebar'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import Document from '@/app/app/page'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { EditorHeader } from '@/components/BlockEditor/components/EditorHeader'
 
 const queryClient = new QueryClient()
 
@@ -43,7 +45,7 @@ export default function AppLayout({
     const canvasRef = React.useRef<ReactSketchCanvasRef>(null)
 
     const owner = useEvolu().getOwner()
-    const id = owner ? S.decodeSync(S.String)(owner?.id) : null
+    const evoluId = owner ? S.decodeSync(S.String)(owner?.id) : null
 
     const [provider, setProvider] = useState<TiptapCollabProvider | null>(null)
     const [collabToken, setCollabToken] = useState<string | null>(null)
@@ -70,28 +72,13 @@ export default function AppLayout({
 
     // Editor related
     // Evolu
-    const { create, update } = useEvolu<Database>()
+    const { update } = useEvolu<Database>()
 
     // Zustand Stores
-    const { item } = useNoteStore((state) => ({
+    const { item, exportedId } = useNoteStore((state) => ({
         item: state.item,
+        exportedId: state.id,
     }))
-
-    const exportedDataQuery = React.useCallback(() => {
-        return evolu.createQuery((db) =>
-            db
-                .selectFrom('exportedData')
-                .select('id')
-                .select('jsonData')
-                .select('noteId')
-                .select('inkData')
-        )
-    }, [])
-
-    // Use the query result here
-    const exportedData = useQuery(exportedDataQuery())
-
-    let delay = true
 
     /**
      * Exports and saves note data into the exportedData table
@@ -102,28 +89,16 @@ export default function AppLayout({
          * @param editor The Tiptap editor instance
          */
         (editor: Editor) => {
-            if (item === null || !editor) return
-
-            const data = exportedData.rows.find((row) => row.noteId === item.id)
-
-            const { from, to } = editor.state.selection
-
-            if (data === undefined || data === null) return
+            if (item === null || !editor || exportedId === null) return
 
             const content = editor.getJSON()
 
             update('exportedData', {
-                id: data.id,
+                id: exportedId,
                 jsonData: content,
             })
-
-            delay = true
-
-            editor.commands.setTextSelection({ from, to })
-            delay = false
-            // editor.commands.focus()
         },
-        [item, exportedData.rows, update]
+        [item, update, exportedId]
     )
 
     const debouncedSave = useDebouncedCallback(saveData, 2000)
@@ -156,14 +131,6 @@ export default function AppLayout({
     // )
     // const debouncedInkSave = useDebouncedCallback(saveInkData, 1000)
 
-    // Memoize the params object to ensure stability
-    const params = useMemo(
-        () => ({
-            room: '',
-        }),
-        []
-    )
-
     // Memoize editorProps to prevent unnecessary re-renders
     const editorProps = useMemo(
         () => ({
@@ -191,24 +158,39 @@ export default function AppLayout({
     const handleUpdate = useCallback(
         (props) => {
             debouncedSave(props.editor)
+            console.log('Updating...')
         },
         [debouncedSave]
     )
+
+    const [readOnly, setReadOnly] = useState(false)
 
     return (
         <TooltipProvider>
             <SidebarProvider>
                 <QueryClientProvider client={queryClient}>
-                    <AppSidebar canvasRef={canvasRef} id={id!} />
+                    <AppSidebar canvasRef={canvasRef} id={evoluId!} />
                 </QueryClientProvider>
                 <SidebarInset>
                     <EditorProvider
-                        autofocus={true}
+                        autofocus={false}
                         immediatelyRender={true}
                         shouldRerenderOnTransaction={false}
                         extensions={extensions}
                         editorProps={editorProps}
                         onUpdate={handleUpdate}
+                        onTransaction={(editor) => {
+                            console.log('Transacting')
+                            // const { from, to } = editor.state.selection
+                            // console.log('From and to:', from, to)
+                        }}
+                        slotBefore={
+                            <MemoizedEditorHeader
+                                canvasRef={canvasRef}
+                                readOnly={readOnly}
+                                setReadOnly={setReadOnly}
+                            />
+                        }
                     >
                         {React.isValidElement(children)
                             ? React.cloneElement(children, {
@@ -221,3 +203,25 @@ export default function AppLayout({
         </TooltipProvider>
     )
 }
+
+const MemoizedEditorHeader = React.memo(
+    ({
+        canvasRef,
+        readOnly,
+        setReadOnly,
+    }: {
+        canvasRef: RefObject<ReactSketchCanvasRef> | null
+        readOnly: boolean
+        setReadOnly: (value: boolean) => void
+    }) => {
+        return (
+            <EditorHeader
+                canvasRef={canvasRef}
+                readOnly={readOnly}
+                setReadOnly={setReadOnly}
+            />
+        )
+    }
+)
+
+MemoizedEditorHeader.displayName = 'MemoizedEditorHeader'

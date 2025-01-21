@@ -6,6 +6,7 @@ import { Brand } from 'effect/Brand'
 import {
     BubbleMenu,
     EditorContent,
+    EditorProvider,
     PureEditorContent,
     useCurrentEditor,
     useEditor,
@@ -16,6 +17,7 @@ import React, {
     Suspense,
     useCallback,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -56,7 +58,7 @@ import ExtensionKit from '@/extensions/extension-kit'
 import { TiptapCollabProvider } from '@hocuspocus/provider'
 import { Doc as YDoc } from 'yjs'
 
-export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
+export const BlockEditor = forwardRef((canvasRef) => {
     const menuContainerRef = useRef<HTMLDivElement>(null)
 
     const { editor } = useCurrentEditor()
@@ -115,12 +117,6 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
         [readOnly]
     )
 
-    const editorClass = cn(
-        'w-full overflow-y-auto border-0',
-        readOnly && 'z-1',
-        !readOnly && '-z-10'
-    )
-
     const strokeColor = useMemo(
         () => (theme === 'light' ? 'black' : 'white'),
         [theme]
@@ -134,11 +130,6 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
 
     return (
         <div className="flex flex-col relative w-auto h-full border-0 overflow-hidden">
-            <EditorHeader
-                canvasRef={canvasRef?.current}
-                readOnly={readOnly}
-                setReadOnly={setReadOnly}
-            />
             <ReactSketchCanvas
                 ref={canvasRef?.current}
                 readOnly={readOnly}
@@ -154,7 +145,6 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
                 // }}
                 withTimestamp
             />
-            <EditorContent editor={editor} className={editorClass} />
             <ContentItemMenu editor={editor} />
             <LinkMenu editor={editor} appendTo={menuContainerRef} />
             <TextMenu editor={editor} />
@@ -165,36 +155,6 @@ export const BlockEditor = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
         </div>
     )
 })
-
-const MemoizedEditorHeader = React.memo(
-    ({
-        canvasRef,
-        readOnly,
-        setReadOnly,
-    }: {
-        canvasRef: HTMLCanvasElement | null
-        readOnly: boolean
-        setReadOnly: (value: boolean) => void
-    }) => {
-        return (
-            <EditorHeader
-                canvasRef={canvasRef?.current}
-                readOnly={readOnly}
-                setReadOnly={setReadOnly}
-            />
-        )
-    }
-)
-
-MemoizedEditorHeader.displayName = 'MemoizedEditorHeader'
-
-const MemoizedEditorContent = React.memo(
-    ({ editor, className }: { editor: any; className?: string }) => {
-        return <EditorContent editor={editor} className={className} />
-    }
-)
-
-MemoizedEditorContent.displayName = 'MemoizedEditorContent'
 
 BlockEditor.displayName = 'BlockEditor'
 

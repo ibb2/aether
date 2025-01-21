@@ -87,6 +87,8 @@ export default function NavNotes({
     const router = useRouter()
 
     const editor = useEditorStore((s) => s.editor)
+    const setNoteId = useNoteStore((s) => s.setNoteId)
+    const setId = useNoteStore((s) => s.setId)
 
     const [notebooks, sections, notes] = useQueries([
         notebooksQuery,
@@ -217,6 +219,9 @@ export default function NavNotes({
             } else {
                 editor.commands.setContent(data.jsonData!)
             }
+
+            setId(data.id)
+            setNoteId(data.noteId!)
         }
     }
 
