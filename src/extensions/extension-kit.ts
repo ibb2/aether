@@ -49,6 +49,7 @@ import { TableOfContentsNode } from './TableOfContentsNode'
 import { common, createLowlight } from 'lowlight'
 const lowlight = createLowlight(common)
 import BubbleMenu from '@tiptap/extension-bubble-menu'
+import Blockquote from '@tiptap/extension-blockquote'
 
 interface ExtensionKitProps {
     provider?: HocuspocusProvider | null
@@ -62,6 +63,15 @@ export const ExtensionKit = ({
     userId,
     userName = 'Maxi',
 }: ExtensionKitProps) => [
+    Blockquote.extend({
+        addAttributes() {
+            return {
+                class: {
+                    default: 'custom-blockquote',
+                },
+            }
+        },
+    }),
     Document,
     Columns,
     BubbleMenu.configure({}),
@@ -80,7 +90,8 @@ export const ExtensionKit = ({
         dropcursor: false,
         heading: false,
         horizontalRule: false,
-        // history: false,
+        blockquote: false,
+        history: false,
         codeBlock: false,
     }),
     CodeBlockLowlight.configure({
@@ -163,6 +174,7 @@ export const ExtensionKit = ({
     SlashCommand,
     Focus,
     Figcaption,
+    BlockquoteFigure,
     Dropcursor.configure({
         width: 2,
         class: 'ProseMirror-dropcursor border-black',
