@@ -19,12 +19,7 @@
 
     /* Default Placeholder */
     & > .is-editor-empty:nth-last-child(-n + 1)::before {
-        content: 'Click here to start writing …';
-    }
-
-    .ProseMirror h1.is-empty:nth-child(1)::before,
-    .ProseMirror p.is-empty:nth-child(2):last-child::before {
-        content: 'Click here to start writing …';
+        content: 'Click here to start writing';
     }
 
     /* Blockquote Placeholder */

@@ -189,7 +189,7 @@ export const ExtensionKit = ({
                 return 'Untitled' // Placeholder for headings
             }
 
-            return 'Click here to start writing' // Placeholder for paragraphs
+            return '' // Placeholder for paragraphs
         },
     }),
     SlashCommand,
