@@ -42,6 +42,7 @@ import {
     Column,
     TaskItem,
     TaskList,
+    History,
 } from '.'
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight'
 import { ImageUpload } from './ImageUpload'
@@ -120,6 +121,7 @@ export const ExtensionKit = ({
     Highlight.configure({ multicolor: true }),
     Underline,
     CharacterCount.configure({ limit: 50000 }),
+    History,
     TableOfContents,
     TableOfContentsNode,
     ImageUpload.configure({

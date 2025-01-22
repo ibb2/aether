@@ -27,6 +27,7 @@ export { Collaboration } from '@tiptap/extension-collaboration'
 export { TaskItem } from '@tiptap/extension-task-item'
 export { TaskList } from '@tiptap/extension-task-list'
 export { FileHandler } from '@tiptap-pro/extension-file-handler'
+export { History } from '@tiptap/extension-history'
 
 export { Selection } from './Selection'
 export { Table, TableCell, TableHeader, TableRow } from './Table'
