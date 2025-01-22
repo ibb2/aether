@@ -169,7 +169,16 @@ export const ExtensionKit = ({
     Placeholder.configure({
         includeChildren: true,
         showOnlyCurrent: false,
-        placeholder: () => '',
+        // placeholder: () => '',
+        placeholder: ({ node }) => {
+            if (node.type.name === 'heading') {
+                return 'Untitled' // Placeholder for headings
+            }
+            if (node.type.name === 'paragraph') {
+                return 'Click here to start writing' // Placeholder for paragraphs
+            }
+            return ''
+        },
     }),
     SlashCommand,
     Focus,
