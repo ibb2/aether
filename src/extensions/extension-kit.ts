@@ -58,6 +58,16 @@ interface ExtensionKitProps {
     userColor?: string
 }
 
+const Title = Heading.extend({
+    name: 'title',
+    group: 'title',
+    parseHTML: () => [{ tag: 'h1:first-child' }],
+}).configure({ levels: [1] })
+
+const DocumentWithTitle = Document.extend({
+    content: 'title block+',
+})
+
 export const ExtensionKit = ({
     provider,
     userId,
@@ -72,7 +82,8 @@ export const ExtensionKit = ({
             }
         },
     }),
-    Document,
+    DocumentWithTitle,
+    Title,
     Columns,
     BubbleMenu.configure({}),
     TaskList,
@@ -170,14 +181,15 @@ export const ExtensionKit = ({
         includeChildren: true,
         showOnlyCurrent: false,
         // placeholder: () => '',
-        placeholder: ({ node }) => {
-            if (node.type.name === 'heading') {
+        placeholder: ({ editor, node }) => {
+            const isTitleEmpty =
+                editor?.view.state.doc.firstChild?.textContent.trim() === ''
+
+            if (node.type.name === 'title') {
                 return 'Untitled' // Placeholder for headings
             }
-            if (node.type.name === 'paragraph') {
-                return 'Click here to start writing' // Placeholder for paragraphs
-            }
-            return ''
+
+            return 'Click here to start writing' // Placeholder for paragraphs
         },
     }),
     SlashCommand,
