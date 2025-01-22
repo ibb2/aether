@@ -177,7 +177,7 @@ export default function AppLayout({
                     <EditorProvider
                         autofocus={false}
                         immediatelyRender={true}
-                        content={initialContent}
+                        // content={initialContent}
                         shouldRerenderOnTransaction={false}
                         extensions={extensions}
                         editorProps={editorProps}
@@ -194,6 +194,7 @@ export default function AppLayout({
                                 setReadOnly={setReadOnly}
                             />
                         }
+                        content="<h1></h1><p></p>"
                     >
                         {React.isValidElement(children)
                             ? React.cloneElement(children, {

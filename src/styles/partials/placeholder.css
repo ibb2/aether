@@ -1,36 +1,43 @@
 .ProseMirror {
-  /* Placeholder Styles */
-  .is-empty::before {
-    @apply text-black/40 dark:text-white/40 float-left h-0 pointer-events-none w-full;
-  }
-
-  &.ProseMirror-focused {
-    /* Slashmenu Placeholder */
-    > p.has-focus.is-empty::before {
-      content: 'Type  /  to browse options';
+    /* Placeholder Styles */
+    .is-empty::before {
+        @apply text-black/40 dark:text-white/40 float-left h-0 pointer-events-none w-full;
     }
 
-    > [data-type='columns'] > [data-type='column'] > p.is-empty.has-focus::before {
-      content: 'Type  /  to browse options';
+    &.ProseMirror-focused {
+        /* Slashmenu Placeholder */
+        > p.has-focus.is-empty::before {
+            content: 'Type  /  to browse options';
+        }
+
+        > [data-type='columns']
+            > [data-type='column']
+            > p.is-empty.has-focus::before {
+            content: 'Type  /  to browse options';
+        }
     }
-  }
 
-  /* Default Placeholder */
-  & > .is-editor-empty::before {
-    content: 'Click here to start writing …';
-  }
+    /* Default Placeholder */
+    & > .is-editor-empty:nth-last-child(-n + 1)::before {
+        content: 'Click here to start writing …';
+    }
 
-  /* Blockquote Placeholder */
-  blockquote .is-empty:not(.is-editor-empty):first-child:last-child::before {
-    content: 'Enter a quote';
-  }
+    .ProseMirror h1.is-empty:nth-child(1)::before,
+    .ProseMirror p.is-empty:nth-child(2):last-child::before {
+        content: 'Click here to start writing …';
+    }
 
-  blockquote + figcaption.is-empty:not(.is-editor-empty)::before {
-    content: 'Author';
-  }
+    /* Blockquote Placeholder */
+    blockquote .is-empty:not(.is-editor-empty):first-child:last-child::before {
+        content: 'Enter a quote';
+    }
 
-  [data-placeholder][data-suggestion]::before,
-  [data-placeholder][data-suggestion] *::before {
-    content: none !important;
-  }
+    blockquote + figcaption.is-empty:not(.is-editor-empty)::before {
+        content: 'Author';
+    }
+
+    [data-placeholder][data-suggestion]::before,
+    [data-placeholder][data-suggestion] *::before {
+        content: none !important;
+    }
 }
