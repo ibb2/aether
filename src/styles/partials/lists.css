@@ -19,6 +19,10 @@
 
         p {
             @apply mt-0 mb-1;
+            content: 'Type  /  to browse options';
+        }
+        p.has-focus.is-empty::before {
+            content: 'Type  /  to browse options';
         }
     }
 
@@ -29,10 +33,6 @@
 
     ul[data-type='taskList'] {
         @apply list-none p-0;
-
-        /* p {
-            @apply m-0;
-        } */
     }
 
     ul[data-type='taskList'] p {
@@ -41,18 +41,14 @@
 
     ul[data-type='taskList'] li {
         @apply flex p-0;
+    }
 
-        > label {
-            @apply grow-0 shrink-0 flex-auto my-auto mr-2 select-none;
-        }
+    ul[data-type='taskList'] li div {
+        @apply flex-auto;
+    }
 
-        > div {
-            @apply flex-auto;
-        }
-
-        &[data-checked='true'] {
-            @apply line-through;
-        }
+    ul[data-type='taskList'] li &[data-checked='true'] {
+        @apply line-through;
     }
 
     ul[data-type='taskList'] li label {
