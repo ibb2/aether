@@ -138,25 +138,41 @@ export const ExtensionKit = ({
             'image/webp',
         ],
         onDrop: (currentEditor, files, pos) => {
-            files.forEach(async () => {
-                const url = await API.uploadImage()
+            files.forEach(async (file) => {
+                // const url = await API.uploadImage()
 
-                const encryptionKey = evolu.getOwner()?.encryptionKey
-                if (encryptionKey === undefined) return
-                deriveEncryptionKey(encryptionKey).then(async (derivedKey) => {
-                    const rawKey = await crypto.subtle.exportKey(
-                        'raw',
-                        derivedKey
-                    )
-                    const encryptionKey = new Uint8Array(rawKey)
-                    console.log('Derived Key:', encryptionKey)
-                })
+                // const encryptionKey = evolu.getOwner()?.encryptionKey
+                // if (encryptionKey === undefined) return
+                // deriveEncryptionKey(encryptionKey).then(async (derivedKey) => {
+                //     const rawKey = await crypto.subtle.exportKey(
+                //         'raw',
+                //         derivedKey
+                //     )
+                //     const encryptionKey = new Uint8Array(rawKey)
+                //     console.log('Derived Key:', encryptionKey)
+                // })
 
-                currentEditor
-                    .chain()
-                    .setImageBlockAt({ pos, src: url })
-                    .focus()
-                    .run()
+                // currentEditor
+                //     .chain()
+                //     .setImageBlockAt({ pos, src: url })
+                //     .focus()
+                //     .run()
+                //
+                const fileReader = new FileReader()
+
+                fileReader.readAsDataURL(file)
+                fileReader.onload = () => {
+                    currentEditor
+                        .chain()
+                        .insertContentAt(pos, {
+                            type: 'image',
+                            attrs: {
+                                src: fileReader.result,
+                            },
+                        })
+                        .focus()
+                        .run()
+                }
             })
         },
         onPaste: (currentEditor, files) => {
@@ -173,31 +189,31 @@ export const ExtensionKit = ({
                     .run()
             })
         },
-        onUpload: async (file) => {
-            try {
-                // Encrypt the file client-side
-                const encryptedData = await encryptFile(mnemonic, file)
+        // onUpload: async (file) => {
+        //     try {
+        //         // Encrypt the file client-side
+        //         const encryptedData = await encryptFile(mnemonic, file)
 
-                // Upload encrypted data to S3 via a Next.js API route
-                const response = await fetch('/api/upload-to-s3', {
-                    method: 'POST',
-                    body: encryptedData,
-                    headers: {
-                        'Content-Type': 'application/octet-stream',
-                        'X-File-Name': encodeURIComponent(file.name),
-                    },
-                })
+        //         // Upload encrypted data to S3 via a Next.js API route
+        //         const response = await fetch('/api/upload-to-s3', {
+        //             method: 'POST',
+        //             body: encryptedData,
+        //             headers: {
+        //                 'Content-Type': 'application/octet-stream',
+        //                 'X-File-Name': encodeURIComponent(file.name),
+        //             },
+        //         })
 
-                if (!response.ok) throw new Error('Upload failed')
+        //         if (!response.ok) throw new Error('Upload failed')
 
-                // Return the S3 URL for TipTap to embed
-                const { url } = await response.json()
-                return url
-            } catch (error) {
-                console.error('Encrypted upload failed:', error)
-                return null
-            }
-        },
+        //         // Return the S3 URL for TipTap to embed
+        //         const { url } = await response.json()
+        //         return url
+        //     } catch (error) {
+        //         console.error('Encrypted upload failed:', error)
+        //         return null
+        //     }
+        // },
     }),
     Emoji.configure({
         enableEmoticons: true,
