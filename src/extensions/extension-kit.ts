@@ -51,6 +51,8 @@ import { common, createLowlight } from 'lowlight'
 const lowlight = createLowlight(common)
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Blockquote from '@tiptap/extension-blockquote'
+import { evolu } from '@/db/db'
+import { useSession } from 'next-auth/react'
 
 interface ExtensionKitProps {
     provider?: HocuspocusProvider | null
@@ -139,6 +141,17 @@ export const ExtensionKit = ({
             files.forEach(async () => {
                 const url = await API.uploadImage()
 
+                const encryptionKey = evolu.getOwner()?.encryptionKey
+                if (encryptionKey === undefined) return
+                deriveEncryptionKey(encryptionKey).then(async (derivedKey) => {
+                    const rawKey = await crypto.subtle.exportKey(
+                        'raw',
+                        derivedKey
+                    )
+                    const encryptionKey = new Uint8Array(rawKey)
+                    console.log('Derived Key:', encryptionKey)
+                })
+
                 currentEditor
                     .chain()
                     .setImageBlockAt({ pos, src: url })
@@ -159,6 +172,31 @@ export const ExtensionKit = ({
                     .focus()
                     .run()
             })
+        },
+        onUpload: async (file) => {
+            try {
+                // Encrypt the file client-side
+                const encryptedData = await encryptFile(mnemonic, file)
+
+                // Upload encrypted data to S3 via a Next.js API route
+                const response = await fetch('/api/upload-to-s3', {
+                    method: 'POST',
+                    body: encryptedData,
+                    headers: {
+                        'Content-Type': 'application/octet-stream',
+                        'X-File-Name': encodeURIComponent(file.name),
+                    },
+                })
+
+                if (!response.ok) throw new Error('Upload failed')
+
+                // Return the S3 URL for TipTap to embed
+                const { url } = await response.json()
+                return url
+            } catch (error) {
+                console.error('Encrypted upload failed:', error)
+                return null
+            }
         },
     }),
     Emoji.configure({
