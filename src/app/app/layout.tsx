@@ -181,6 +181,56 @@ export default function AppLayout({
                         shouldRerenderOnTransaction={false}
                         extensions={extensions}
                         editorProps={editorProps}
+                        // onSelectionUpdate={async (e) => {
+                        //     // Convert stored file IDs to Blob URLs
+                        //     console.log(1)
+                        //     const editor = e.editor
+                        //     // Traverse the ProseMirror document for image nodes
+                        //     const imageNodes = []
+                        //     editor.state.doc.descendants((node, pos) => {
+                        //         if (node.type.name === 'image') {
+                        //             console.log(1.5, node.attrs)
+                        //             imageNodes.push({ node, pos })
+                        //         }
+                        //     })
+
+                        //     console.log(2, imageNodes)
+
+                        //     // Resolve Blob URLs for each image node
+                        //     for (const { node, pos } of imageNodes) {
+                        //         console.log(3, node)
+                        //         const fileId = node.attrs.dataFileId
+                        //         console.log(4, fileId)
+                        //         if (!fileId) continue
+                        //         console.log(5)
+                        //         // Fetch file from OPFS
+                        //         const opfs =
+                        //             await navigator.storage.getDirectory()
+                        //         const aetherDirectory =
+                        //             await opfs.getDirectoryHandle('aether', {
+                        //                 create: true,
+                        //             })
+
+                        //         console.log(6)
+                        //         const fileHandle =
+                        //             await aetherDirectory.getFileHandle(fileId)
+                        //         console.log(7, fileHandle)
+                        //         const file = await fileHandle.getFile()
+                        //         console.log(8, file.name)
+                        //         const blobUrl = URL.createObjectURL(file)
+                        //         console.log(9, blobUrl)
+
+                        //         // Update the node's `src` attribute
+                        //         editor.commands.command(({ chain }) => {
+                        //             return chain()
+                        //                 .setNodeSelection(pos)
+                        //                 .updateAttributes('image', {
+                        //                     src: blobUrl,
+                        //                 })
+                        //                 .run()
+                        //         })
+                        //     }
+                        // }}
                         onUpdate={handleUpdate}
                         onTransaction={(editor) => {
                             console.log('Transacting')

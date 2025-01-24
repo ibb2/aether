@@ -1,5 +1,7 @@
 'use client'
 
+import * as S from '@effect/schema/Schema'
+
 import { HocuspocusProvider } from '@hocuspocus/provider'
 
 import { API } from '@/lib/api'
@@ -54,6 +56,8 @@ import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Blockquote from '@tiptap/extension-blockquote'
 import { evolu } from '@/db/db'
 import { useSession } from 'next-auth/react'
+import { handleFileUploadOPFS } from '@/lib/images'
+import useNoteStore from '@/store/note'
 
 interface ExtensionKitProps {
     provider?: HocuspocusProvider | null
@@ -140,6 +144,9 @@ export const ExtensionKit = ({
             'image/webp',
         ],
         onDrop: (currentEditor, files, pos) => {
+            const encodedDocId = useNoteStore.getState().noteId
+            const docId = S.decodeSync(S.String)(encodedDocId!)
+
             files.forEach(async (file) => {
                 // const url = await API.uploadImage()
 
@@ -160,21 +167,24 @@ export const ExtensionKit = ({
                 //     .focus()
                 //     .run()
                 //
-                const fileReader = new FileReader()
 
-                fileReader.readAsDataURL(file)
-                fileReader.onload = () => {
-                    currentEditor
-                        .chain()
-                        .insertContentAt(pos, {
-                            type: 'image',
-                            attrs: {
-                                src: fileReader.result,
-                            },
-                        })
-                        .focus()
-                        .run()
-                }
+                const fileId = await handleFileUploadOPFS(docId, file)
+                const url = URL.createObjectURL(file)
+
+                console.log('FileID ', fileId)
+
+                currentEditor
+                    .chain()
+                    .insertContentAt(pos, {
+                        type: 'image',
+                        attrs: {
+                            src: url,
+                            dataFileId: fileId,
+                            alt: file.name,
+                        },
+                    })
+                    .focus()
+                    .run()
             })
         },
         onPaste: (currentEditor, files) => {

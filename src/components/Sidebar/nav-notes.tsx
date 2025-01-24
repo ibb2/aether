@@ -51,6 +51,7 @@ import { Editor, useCurrentEditor } from '@tiptap/react'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useSidebarStore from '@/store/sidebar'
 import useEditorStore from '@/store/editor'
+import { processImages } from '@/lib/processImages'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -219,7 +220,7 @@ export default function NavNotes({
             } else {
                 editor.commands.setContent(data.jsonData!)
             }
-
+            setTimeout(() => processImages(editor), 0)
             setId(data.id)
             setNoteId(data.noteId!)
         }

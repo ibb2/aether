@@ -53,6 +53,7 @@ import {
 import useEditorStore from '@/store/editor'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import { Editor } from '@tiptap/react'
+import { processImages } from '@/lib/processImages'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -277,9 +278,12 @@ export default function NavFragmentNotes({
                     canvasRef.current.loadPaths(inkData)
                 }
                 editor.commands.setContent(data.jsonData!)
+                // Extend the editor instance
+                const originalSetContent = editor.commands.setContent
             } else {
                 editor.commands.setContent(data.jsonData!)
             }
+            setTimeout(() => processImages(editor), 0)
         }
     }
 
