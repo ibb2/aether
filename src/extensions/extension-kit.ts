@@ -19,6 +19,7 @@ import {
     Heading,
     Highlight,
     HorizontalRule,
+    Image,
     ImageBlock,
     Link,
     Placeholder,
@@ -126,6 +127,7 @@ export const ExtensionKit = ({
     History,
     TableOfContents,
     TableOfContentsNode,
+    Image,
     ImageUpload.configure({
         clientId: provider?.document?.clientID,
     }),
