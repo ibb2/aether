@@ -1,24 +1,18 @@
-const AWS = require('aws-sdk')
-const crypto = require('crypto')
+import AWS, { S3Client } from '@aws-sdk/client-s3'
+import crypto from 'crypto'
 
-const ACCOUNT_ID = process.env.R2_ACCOUNT_ID
-const ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID
-const SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY
-const BUCKET_NAME = process.env.R2_BUCKET_NAME
+const ACCOUNT_ID = process.env.ACCOUNT_ID
+const ACCESS_KEY_ID = process.env.ACCESS_KEY_ID
+const SECRET_ACCESS_KEY = process.env.SECRET_ACCESS_KEY
+const BUCKET_NAME = process.env.BUCKET_NAME
 
-// Hash the secret access key
-const hashedSecretKey = crypto
-    .createHash('sha256')
-    .update(SECRET_ACCESS_KEY)
-    .digest('hex')
-
-// Configure the S3 client for Cloudflare R2
-export const S3Client = new AWS.S3({
+export const S3 = new S3Client({
+    region: 'auto',
     endpoint: `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`,
-    accessKeyId: ACCESS_KEY_ID,
-    secretAccessKey: hashedSecretKey,
-    signatureVersion: 'v4',
-    region: 'auto', // Cloudflare R2 doesn't use regions, but this is required by the SDK
+    credentials: {
+        accessKeyId: ACCESS_KEY_ID,
+        secretAccessKey: SECRET_ACCESS_KEY,
+    },
 })
 
 // Specify the object key

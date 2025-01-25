@@ -144,11 +144,22 @@ export const ExtensionKit = ({
             'image/webp',
         ],
         onDrop: (currentEditor, files, pos) => {
-            const encodedDocId = useNoteStore.getState().noteId
-            const docId = S.decodeSync(S.String)(encodedDocId!)
-
             files.forEach(async (file) => {
                 // const url = await API.uploadImage()
+                const presignedUrl = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: file.name,
+                        contentType: file.type,
+                    }),
+                })
+
+                const res = await presignedUrl.json()
+
+                console.log('S3 Presigned URL ', res)
 
                 // const encryptionKey = evolu.getOwner()?.encryptionKey
                 // if (encryptionKey === undefined) return
@@ -168,23 +179,23 @@ export const ExtensionKit = ({
                 //     .run()
                 //
 
-                const fileId = await handleFileUploadOPFS(docId, file)
-                const url = URL.createObjectURL(file)
+                // const fileId = await handleFileUploadOPFS(docId, file)
+                // const url = URL.createObjectURL(file)
 
-                console.log('FileID ', fileId)
+                // console.log('FileID ', fileId)
 
-                currentEditor
-                    .chain()
-                    .insertContentAt(pos, {
-                        type: 'image',
-                        attrs: {
-                            src: url,
-                            dataFileId: fileId,
-                            alt: file.name,
-                        },
-                    })
-                    .focus()
-                    .run()
+                // currentEditor
+                //     .chain()
+                //     .insertContentAt(pos, {
+                //         type: 'image',
+                //         attrs: {
+                //             src: url,
+                //             dataFileId: fileId,
+                //             alt: file.name,
+                //         },
+                //     })
+                //     .focus()
+                //     .run()
             })
         },
         onPaste: (currentEditor, files) => {
