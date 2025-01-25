@@ -146,7 +146,7 @@ export const ExtensionKit = ({
         onDrop: (currentEditor, files, pos) => {
             files.forEach(async (file) => {
                 // const url = await API.uploadImage()
-                const presignedUrl = await fetch('/api/upload', {
+                const response = await fetch('/api/upload', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -157,9 +157,13 @@ export const ExtensionKit = ({
                     }),
                 })
 
-                const res = await presignedUrl.json()
+                const { url: presignedUrl } = await response.json()
 
-                console.log('S3 Presigned URL ', res)
+                console.log('R2 Presigned URL ', presignedUrl)
+                await fetch(presignedUrl, {
+                    method: 'PUT',
+                    body: file,
+                })
 
                 // const encryptionKey = evolu.getOwner()?.encryptionKey
                 // if (encryptionKey === undefined) return

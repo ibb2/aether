@@ -1,27 +1,27 @@
-import { S3, s3Client } from '@/lib/aws/s3client'
-import { createPresignedPost } from '@aws-sdk/s3-presigned-post'
-import { v4 as uuidv4 } from 'uuid'
+import { auth } from '@/auth'
+import { S3 } from '@/lib/aws/s3client'
+import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 export async function POST(request: Request) {
+    const data = await auth()
+    if (data?.user === undefined) return Response.error()
+
     const { filename, contentType } = await request.json()
 
     try {
-        const { url, fields } = await createPresignedPost(S3, {
-            Bucket: process.env.BUCKET_NAME!,
-            Key: uuidv4(),
-            Conditions: [
-                ['content-length-range', 0, 10485760], // up to 10 MB
-                ['starts-with', '$Content-Type', contentType],
-            ],
-            Fields: {
-                acl: 'public-read',
-                'Content-Type': contentType,
-            },
-            Expires: 600, // Seconds before the presigned post expires. 3600 by default.
-        })
+        const key = data?.user.email + '-' + data?.user?.id + '/' + filename
+        const url = await getSignedUrl(
+            S3,
+            new PutObjectCommand({
+                Bucket: process.env.BUCKET_NAME!,
+                Key: key,
+            }),
+            { expiresIn: 3600 }
+        )
 
-        return Response.json({ url, fields })
-    } catch (error) {
+        return Response.json({ url })
+    } catch (error: any) {
         return Response.json({ error: error.message })
     }
 }
