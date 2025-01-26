@@ -76,9 +76,10 @@ export default function AppLayout({
     const { update } = useEvolu<Database>()
 
     // Zustand Stores
-    const { item, exportedId } = useNoteStore((state) => ({
+    const { item, exportedId, noteId } = useNoteStore((state) => ({
         item: state.item,
         exportedId: state.id,
+        noteId: state.noteId,
     }))
 
     /**
@@ -156,6 +157,51 @@ export default function AppLayout({
         [provider]
     )
 
+    // Memoize the delete handler till extension is released
+    const [content, setContent] = useState<any>(null)
+    const [previousImages, setPreviousImages] = useState<string[]>([])
+    const [imagesList, setImagesList] = useState<string[]>([])
+
+    // const handleImageDelete = useCallback(
+    //     async (props: { editor: Editor }) => {
+    //         console.log('❌ Deleting')
+    //         const editor = props.editor
+    //         setContent(editor.getJSON())
+    //         console.log(editor.getJSON())
+    //         const currentImages: { src: string; fileId: string }[] = []
+    //         editor.getJSON().content?.forEach((item) => {
+    //             if (
+    //                 item.type === 'image' &&
+    //                 item.attrs?.src &&
+    //                 item.attrs?.fileId
+    //             ) {
+    //                 currentImages.push({
+    //                     src: item.attrs.src,
+    //                     fileId: item.attrs.fileId,
+    //                 })
+    //             }
+    //         })
+    //         const deletedImages = previousImages.filter(
+    //             (url: string) =>
+    //                 !currentImages.map((img) => img.src).includes(url)
+    //         )
+    //         for (const url of deletedImages) {
+    //             console.log('Deleting image from blob storage:', url)
+    //             const fileId = currentImages.find(
+    //                 (img) => img.src === url
+    //             )?.fileId
+    //             await fetch(`/api/r2/upload?fileId=${fileId}&docId=${noteId}`, {
+    //                 method: 'DELETE',
+    //             })
+    //         }
+
+    //         setPreviousImages(currentImages.map((img) => img.src))
+    //         setImagesList(currentImages.map((img) => img.src))
+    //         console.log(currentImages)
+    //     },
+    //     [previousImages, noteId]
+    // )
+
     // Memoize the onUpdate handler
     const handleUpdate = useCallback(
         (props) => {
@@ -181,7 +227,10 @@ export default function AppLayout({
                         shouldRerenderOnTransaction={false}
                         extensions={extensions}
                         editorProps={editorProps}
-                        onUpdate={handleUpdate}
+                        onUpdate={(props) => {
+                            handleUpdate(props)
+                            // await handleImageDelete(props)
+                        }}
                         onTransaction={(editor) => {
                             console.log('Transacting')
                             // const { from, to } = editor.state.selection
