@@ -235,10 +235,16 @@ export default function NavNotes({
         }
     }
 
-    const deleteNote = (item) => {
+    const deleteNote = async (item: any, editor: Editor) => {
         update('notes', {
             id: S.decodeSync(NoteId)(item.id),
             isDeleted: true,
+        })
+
+        editor.commands.clearContent()
+
+        await fetch(`api/r2/delete?docId=${item.id}`, {
+            method: 'DELETE',
         })
     }
 
@@ -252,9 +258,9 @@ export default function NavNotes({
                             <Tree
                                 key={item.id}
                                 item={item}
-                                selectNote={(item) => selectNote(item, editor)}
+                                selectNote={(item) => selectNote(item, editor!)}
                                 deleteNode={deleteNode}
-                                deleteNote={deleteNote}
+                                deleteNote={(item) => deleteNote(item, editor!)}
                                 editor={editor!}
                             />
                         ))}

@@ -287,10 +287,16 @@ export default function NavFragmentNotes({
         }
     }
 
-    const deleteNote = (item) => {
+    const deleteNote = async (item: any, editor: Editor) => {
         update('notes', {
             id: S.decodeSync(NoteId)(item.id),
             isDeleted: true,
+        })
+
+        editor.commands.clearContent()
+
+        await fetch(`api/r2/delete?docId=${item.id}`, {
+            method: 'DELETE',
         })
     }
 
@@ -305,8 +311,12 @@ export default function NavFragmentNotes({
                             <Tree
                                 key={item.id}
                                 item={item}
-                                selectNote={(item) => selectNote(item, editor)}
-                                deleteNote={deleteNote}
+                                selectNote={(item: any) =>
+                                    selectNote(item, editor)
+                                }
+                                deleteNote={(item: any) =>
+                                    deleteNote(item, editor)
+                                }
                                 editor={editor!}
                             />
                         ))}
