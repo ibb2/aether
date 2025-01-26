@@ -181,56 +181,6 @@ export default function AppLayout({
                         shouldRerenderOnTransaction={false}
                         extensions={extensions}
                         editorProps={editorProps}
-                        // onSelectionUpdate={async (e) => {
-                        //     // Convert stored file IDs to Blob URLs
-                        //     console.log(1)
-                        //     const editor = e.editor
-                        //     // Traverse the ProseMirror document for image nodes
-                        //     const imageNodes = []
-                        //     editor.state.doc.descendants((node, pos) => {
-                        //         if (node.type.name === 'image') {
-                        //             console.log(1.5, node.attrs)
-                        //             imageNodes.push({ node, pos })
-                        //         }
-                        //     })
-
-                        //     console.log(2, imageNodes)
-
-                        //     // Resolve Blob URLs for each image node
-                        //     for (const { node, pos } of imageNodes) {
-                        //         console.log(3, node)
-                        //         const fileId = node.attrs.dataFileId
-                        //         console.log(4, fileId)
-                        //         if (!fileId) continue
-                        //         console.log(5)
-                        //         // Fetch file from OPFS
-                        //         const opfs =
-                        //             await navigator.storage.getDirectory()
-                        //         const aetherDirectory =
-                        //             await opfs.getDirectoryHandle('aether', {
-                        //                 create: true,
-                        //             })
-
-                        //         console.log(6)
-                        //         const fileHandle =
-                        //             await aetherDirectory.getFileHandle(fileId)
-                        //         console.log(7, fileHandle)
-                        //         const file = await fileHandle.getFile()
-                        //         console.log(8, file.name)
-                        //         const blobUrl = URL.createObjectURL(file)
-                        //         console.log(9, blobUrl)
-
-                        //         // Update the node's `src` attribute
-                        //         editor.commands.command(({ chain }) => {
-                        //             return chain()
-                        //                 .setNodeSelection(pos)
-                        //                 .updateAttributes('image', {
-                        //                     src: blobUrl,
-                        //                 })
-                        //                 .run()
-                        //         })
-                        //     }
-                        // }}
                         onUpdate={handleUpdate}
                         onTransaction={(editor) => {
                             console.log('Transacting')
@@ -244,7 +194,11 @@ export default function AppLayout({
                                 setReadOnly={setReadOnly}
                             />
                         }
-                        content="<h1></h1><p></p>"
+                        content={`
+                            <h1></h1>
+                            <p></p>
+                            <img src=https://aether.3bf9d2c1c80d5452c351ebb43f912798.r2.cloudflarestorage.com/80fc3e95-0805-4935-8342-64a02b9fb572/1cFcDlesr26nr7MwIiEfA/48aadddc-2980-45a8-92dd-34ba456c6e56?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=fc9353b37a890c43fce90441ce1234bb%2F20250126%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20250126T053731Z&X-Amz-Expires=86400&X-Amz-Signature=beb761bbe7c4ab7ec5f2544d19b245b9db63dcf57ac0ab8fdfcda0b2f4e5ce12&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject
+                        `}
                     >
                         {React.isValidElement(children)
                             ? React.cloneElement(children, {

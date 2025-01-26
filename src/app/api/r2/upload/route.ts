@@ -7,10 +7,10 @@ export async function POST(request: Request) {
     const data = await auth()
     if (data?.user === undefined) return Response.error()
 
-    const { filename, contentType } = await request.json()
+    const { filename, contentType, docId, fileId } = await request.json()
 
     try {
-        const key = data?.user.email + '-' + data?.user?.id + '/' + filename
+        const key = data?.user?.id + '/' + docId + '/' + fileId
         const url = await getSignedUrl(
             S3,
             new PutObjectCommand({

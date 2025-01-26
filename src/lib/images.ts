@@ -8,9 +8,9 @@ export async function handleFileUploadOPFS(docId: string, file: File) {
         const aetherDirectory = await opfs.getDirectoryHandle('aether', {
             create: true,
         })
-        // const docDirectory = await aetherDirectory.getDirectoryHandle(docId, {
-        //     create: true,
-        // })
+        const docDirectory = await aetherDirectory.getDirectoryHandle(docId, {
+            create: true,
+        })
 
         const fileReader = new FileReader()
         fileReader.readAsDataURL(file)
