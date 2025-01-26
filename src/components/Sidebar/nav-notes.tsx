@@ -51,6 +51,7 @@ import { Editor, useCurrentEditor } from '@tiptap/react'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useSidebarStore from '@/store/sidebar'
 import useEditorStore from '@/store/editor'
+import { processImages } from '@/lib/processImages'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -219,7 +220,7 @@ export default function NavNotes({
             } else {
                 editor.commands.setContent(data.jsonData!)
             }
-
+            setTimeout(() => processImages(editor), 0)
             setId(data.id)
             setNoteId(data.noteId!)
         }
@@ -234,10 +235,16 @@ export default function NavNotes({
         }
     }
 
-    const deleteNote = (item) => {
+    const deleteNote = async (item: any, editor: Editor) => {
         update('notes', {
             id: S.decodeSync(NoteId)(item.id),
             isDeleted: true,
+        })
+
+        editor.commands.clearContent()
+
+        await fetch(`api/r2/delete?docId=${item.id}`, {
+            method: 'DELETE',
         })
     }
 
@@ -251,9 +258,9 @@ export default function NavNotes({
                             <Tree
                                 key={item.id}
                                 item={item}
-                                selectNote={(item) => selectNote(item, editor)}
+                                selectNote={(item) => selectNote(item, editor!)}
                                 deleteNode={deleteNode}
-                                deleteNote={deleteNote}
+                                deleteNote={(item) => deleteNote(item, editor!)}
                                 editor={editor!}
                             />
                         ))}

@@ -53,6 +53,7 @@ import {
 import useEditorStore from '@/store/editor'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import { Editor } from '@tiptap/react'
+import { processImages } from '@/lib/processImages'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -277,16 +278,25 @@ export default function NavFragmentNotes({
                     canvasRef.current.loadPaths(inkData)
                 }
                 editor.commands.setContent(data.jsonData!)
+                // Extend the editor instance
+                const originalSetContent = editor.commands.setContent
             } else {
                 editor.commands.setContent(data.jsonData!)
             }
+            setTimeout(() => processImages(editor), 0)
         }
     }
 
-    const deleteNote = (item) => {
+    const deleteNote = async (item: any, editor: Editor) => {
         update('notes', {
             id: S.decodeSync(NoteId)(item.id),
             isDeleted: true,
+        })
+
+        editor.commands.clearContent()
+
+        await fetch(`api/r2/delete?docId=${item.id}`, {
+            method: 'DELETE',
         })
     }
 
@@ -301,8 +311,12 @@ export default function NavFragmentNotes({
                             <Tree
                                 key={item.id}
                                 item={item}
-                                selectNote={(item) => selectNote(item, editor)}
-                                deleteNote={deleteNote}
+                                selectNote={(item: any) =>
+                                    selectNote(item, editor)
+                                }
+                                deleteNote={(item: any) =>
+                                    deleteNote(item, editor)
+                                }
                                 editor={editor!}
                             />
                         ))}

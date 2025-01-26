@@ -1,5 +1,7 @@
 'use client'
 
+import * as S from '@effect/schema/Schema'
+
 import { HocuspocusProvider } from '@hocuspocus/provider'
 
 import { API } from '@/lib/api'
@@ -19,6 +21,7 @@ import {
     Heading,
     Highlight,
     HorizontalRule,
+    Image,
     ImageBlock,
     Link,
     Placeholder,
@@ -51,6 +54,7 @@ import { common, createLowlight } from 'lowlight'
 const lowlight = createLowlight(common)
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Blockquote from '@tiptap/extension-blockquote'
+import { handlePasteAndDrop } from '@/lib/upload'
 
 interface ExtensionKitProps {
     provider?: HocuspocusProvider | null
@@ -124,6 +128,7 @@ export const ExtensionKit = ({
     History,
     TableOfContents,
     TableOfContentsNode,
+    Image,
     ImageUpload.configure({
         clientId: provider?.document?.clientID,
     }),
@@ -136,28 +141,14 @@ export const ExtensionKit = ({
             'image/webp',
         ],
         onDrop: (currentEditor, files, pos) => {
-            files.forEach(async () => {
-                const url = await API.uploadImage()
-
-                currentEditor
-                    .chain()
-                    .setImageBlockAt({ pos, src: url })
-                    .focus()
-                    .run()
+            files.forEach(async (file) => {
+                await handlePasteAndDrop(currentEditor, file, pos)
             })
         },
         onPaste: (currentEditor, files) => {
-            files.forEach(async () => {
-                const url = await API.uploadImage()
-
-                return currentEditor
-                    .chain()
-                    .setImageBlockAt({
-                        pos: currentEditor.state.selection.anchor,
-                        src: url,
-                    })
-                    .focus()
-                    .run()
+            files.forEach(async (file) => {
+                const pos = currentEditor.state.selection.$anchor.pos
+                await handlePasteAndDrop(currentEditor, file, pos)
             })
         },
     }),

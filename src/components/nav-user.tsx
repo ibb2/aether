@@ -79,7 +79,12 @@ export function NavUser({
         },
     })
 
-    if (isPending || status === 'loading' || user === undefined)
+    if (
+        isPending ||
+        status === 'loading' ||
+        user === undefined ||
+        data?.plan === undefined
+    )
         return <UserProfileSkeleton user={defaultUser} />
 
     if (error) return 'An error has occurred: ' + error.message
