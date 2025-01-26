@@ -1,6 +1,6 @@
 // CustomImage.js
 import { mergeAttributes, Node } from '@tiptap/core'
-import { Image as BaseImage } from '@tiptap/extension-image'
+import { ImageResize as BaseImage } from 'tiptap-extension-resize-image'
 
 export const Image = BaseImage.extend({
     name: 'image', // Overriding the name to ensure it works with existing image handling

@@ -128,6 +128,7 @@
         "stripe": "^17.5.0",
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
+        "tiptap-extension-resize-image": "^1.2.1",
         "tsx": "^4.19.2",
         "use-debounce": "^10.0.4",
         "use-resize-observer": "^9.1.0",
