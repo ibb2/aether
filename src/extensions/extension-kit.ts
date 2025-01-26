@@ -54,10 +54,7 @@ import { common, createLowlight } from 'lowlight'
 const lowlight = createLowlight(common)
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Blockquote from '@tiptap/extension-blockquote'
-import { evolu } from '@/db/db'
-import { useSession } from 'next-auth/react'
-import { handleFileUploadOPFS } from '@/lib/images'
-import useNoteStore from '@/store/note'
+import { handlePasteAndDrop } from '@/lib/upload'
 
 interface ExtensionKitProps {
     provider?: HocuspocusProvider | null
@@ -144,59 +141,14 @@ export const ExtensionKit = ({
             'image/webp',
         ],
         onDrop: (currentEditor, files, pos) => {
-            const encodedDocId = useNoteStore.getState().noteId
-            const docId = S.decodeSync(S.String)(encodedDocId!)
-
             files.forEach(async (file) => {
-                const fileId = await handleFileUploadOPFS(docId, file)
-                const url = URL.createObjectURL(file)
-
-                currentEditor
-                    .chain()
-                    .insertContentAt(pos, {
-                        type: 'image',
-                        attrs: {
-                            src: url,
-                            dataFileId: fileId,
-                            alt: file.name,
-                        },
-                    })
-                    .focus()
-                    .run()
-
-                const response = await fetch('/api/r2/upload', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        filename: file.name,
-                        contentType: file.type,
-                        docId: docId,
-                        fileId: fileId,
-                    }),
-                })
-
-                const { url: presignedUrl } = await response.json()
-
-                await fetch(presignedUrl, {
-                    method: 'PUT',
-                    body: file,
-                })
+                await handlePasteAndDrop(currentEditor, file, pos)
             })
         },
         onPaste: (currentEditor, files) => {
-            files.forEach(async () => {
-                const url = await API.uploadImage()
-
-                return currentEditor
-                    .chain()
-                    .setImageBlockAt({
-                        pos: currentEditor.state.selection.anchor,
-                        src: url,
-                    })
-                    .focus()
-                    .run()
+            files.forEach(async (file) => {
+                const pos = currentEditor.state.selection.$anchor.pos
+                await handlePasteAndDrop(currentEditor, file, pos)
             })
         },
     }),
