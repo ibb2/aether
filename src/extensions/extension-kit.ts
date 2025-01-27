@@ -49,6 +49,7 @@ import {
     TaskItem,
     TaskList,
     History,
+    Youtube,
 } from '.'
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight'
 import { ImageUpload } from './ImageUpload'
@@ -203,6 +204,10 @@ export const ExtensionKit = ({
     Dropcursor.configure({
         width: 2,
         class: 'ProseMirror-dropcursor border-black',
+    }),
+    Youtube.configure({
+        // inline: true,
+        nocookie: true,
     }),
 ]
 

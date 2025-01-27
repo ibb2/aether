@@ -31,6 +31,7 @@ export { History } from '@tiptap/extension-history'
 export { Details } from '@tiptap-pro/extension-details'
 export { DetailsContent } from '@tiptap-pro/extension-details-content'
 export { DetailsSummary } from '@tiptap-pro/extension-details-summary'
+export { Youtube } from '@tiptap/extension-youtube'
 
 export { Selection } from './Selection'
 export { Table, TableCell, TableHeader, TableRow } from './Table'
