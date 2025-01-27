@@ -205,7 +205,10 @@ export const ExtensionKit = ({
         width: 2,
         class: 'ProseMirror-dropcursor border-black',
     }),
-    Youtube,
+    Youtube.configure({
+        // inline: true,
+        nocookie: true,
+    }),
 ]
 
 export default ExtensionKit
