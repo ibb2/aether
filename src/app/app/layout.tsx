@@ -103,7 +103,7 @@ export default function AppLayout({
         [item, update, exportedId]
     )
 
-    const debouncedSave = useDebouncedCallback(saveData, 2000)
+    const debouncedSave = useDebouncedCallback(saveData, 500) // Allow use to adjust this setting?
 
     // const saveInkData = React.useCallback(
     //     async (canvasRef: ReactSketchCanvasRef) => {
