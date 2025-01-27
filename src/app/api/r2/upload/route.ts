@@ -34,8 +34,6 @@ export async function DELETE(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const fileId = searchParams.get('fileId')
     const docId = searchParams.get('docId')
-    console.log('fileid', fileId)
-    console.log('docId', docId)
 
     if (fileId === null || docId === null)
         return NextResponse.json({ error: 'No id passed' })

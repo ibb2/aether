@@ -55,14 +55,10 @@ async function initializeDatabase() {
     try {
         const db = await openDB('FileStorage', 1, {
             upgrade(database) {
-                console.log('Upgrading database...')
                 // Check if the 'files' object store already exists
                 if (!database.objectStoreNames.contains('files')) {
-                    console.log('Creating "files" object store')
                     // Create the 'files' object store with 'id' as the key
                     database.createObjectStore('files', { keyPath: 'id' })
-                } else {
-                    console.log('"files" object store already exists')
                 }
             },
         })
@@ -80,11 +76,6 @@ async function storeFileMetadata(fileId: string, file: File) {
         const tx = db.transaction('files', 'readwrite')
         const store = tx.objectStore('files')
 
-        console.log('Attempting to store file metadata:', {
-            fileId,
-            fileName: file.name,
-        })
-
         await store.put({
             id: fileId, // Unique ID for the file
             name: file.name, // File name
@@ -92,7 +83,6 @@ async function storeFileMetadata(fileId: string, file: File) {
         })
 
         await tx.done
-        console.log(`Metadata for file ${file.name} saved successfully.`)
     } catch (error) {
         console.error('Error storing file metadata:', error)
         throw error

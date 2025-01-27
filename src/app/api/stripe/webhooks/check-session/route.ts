@@ -8,7 +8,6 @@ export async function POST(request) {
     try {
         const session = await stripe.checkout.sessions.retrieve(sessionId)
 
-        console.log(session)
         if (session.payment_status === 'paid') {
             // Update your database to mark the user as subscribed
             // await updateUserSubscriptionStatus(session.client_reference_id, 'active');
