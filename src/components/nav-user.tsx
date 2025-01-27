@@ -69,11 +69,9 @@ export function NavUser({
                     : process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
             const subdirectory = '/api/stripe/subscription/' + user?.email!
             const url = scheme + domain + subdirectory
-            console.log('URL', url)
             const response = await fetch(url, { cache: 'no-store' })
 
             const res = await response.json()
-            console.log('response', res)
 
             return res
         },

@@ -94,7 +94,6 @@ export default function AppLayout({
             if (item === null || !editor || exportedId === null) return
 
             const content = editor.getJSON()
-            console.log('content', content)
 
             update('exportedData', {
                 id: exportedId,
@@ -206,7 +205,6 @@ export default function AppLayout({
     const handleUpdate = useCallback(
         (props) => {
             debouncedSave(props.editor)
-            console.log('Updating...')
         },
         [debouncedSave]
     )
@@ -230,11 +228,6 @@ export default function AppLayout({
                         onUpdate={(props) => {
                             handleUpdate(props)
                             // await handleImageDelete(props)
-                        }}
-                        onTransaction={(editor) => {
-                            console.log('Transacting')
-                            // const { from, to } = editor.state.selection
-                            // console.log('From and to:', from, to)
                         }}
                         slotBefore={
                             <MemoizedEditorHeader
