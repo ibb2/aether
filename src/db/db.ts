@@ -44,9 +44,6 @@ export type Database = typeof Database.Type
 
 export const evolu = createEvolu(Database, {
     indexes,
-    syncUrl:
-        process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
-            ? 'http://localhost:4000'
-            : 'https://evolu.onrender.com',
-    // minimumLogLevel: 'trace',
+    syncUrl: process.env.EVOLU_SERVER_URL,
+    minimumLogLevel: 'trace',
 })
