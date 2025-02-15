@@ -50,5 +50,4 @@ console.log(
 export const evolu = createEvolu(Database, {
     indexes,
     syncUrl: process.env.NEXT_PUBLIC_EVOLU_SERVER_URL,
-    minimumLogLevel: 'trace',
 })
