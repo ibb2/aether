@@ -113,7 +113,7 @@ export const BlockEditor = forwardRef((canvasRef) => {
     }, [theme, debouncedChangeExistingStrokeColor])
 
     const reactSketchCanvasClass = useMemo(
-        () => cn('absolute', readOnly && 'z-0'),
+        () => cn('absolute', readOnly && 'z-[-1]'),
         [readOnly]
     )
 
@@ -129,7 +129,7 @@ export const BlockEditor = forwardRef((canvasRef) => {
     }
 
     return (
-        <div className="flex flex-col relative w-auto h-full border-0 overflow-hidden">
+        <div className="flex flex-col absolute w-auto h-full border-0 overflow-hidden">
             <ReactSketchCanvas
                 ref={canvasRef?.current}
                 readOnly={readOnly}

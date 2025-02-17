@@ -219,6 +219,9 @@ export default function AppLayout({
                 </QueryClientProvider>
                 <SidebarInset>
                     <EditorProvider
+                        editorContainerProps={{
+                            className: 'grow',
+                        }}
                         autofocus={false}
                         immediatelyRender={true}
                         // content={initialContent}
