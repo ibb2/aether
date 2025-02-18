@@ -258,7 +258,7 @@ export default function NavNotes({
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Notes</SidebarGroupLabel>
-            <SidebarMenu>
+            <SidebarMenu className="overflow-scroll">
                 {treeData !== undefined && (
                     <>
                         {treeData.map((item) => (
@@ -350,7 +350,10 @@ function Tree({
                 >
                     <CollapsibleTrigger asChild>
                         <ContextMenuTrigger asChild>
-                            <SidebarMenuButton onClick={toggleOpen}>
+                            <SidebarMenuButton
+                                onClick={toggleOpen}
+                                className="flex-nowrap whitespace-nowrap pr-2"
+                            >
                                 {/* Toggle on button click */}
                                 <div className="flex relative justify-center">
                                     <AnimatePresence
@@ -397,7 +400,7 @@ function Tree({
 
                     <CollapsibleContent>
                         {item.children !== undefined && (
-                            <SidebarMenuSub>
+                            <SidebarMenuSub className="min-w-max overflow-ellipsis">
                                 {item.children.length > 0 && (
                                     <>
                                         {item.children.map((note) => (
