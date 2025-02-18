@@ -19,7 +19,6 @@ import {
 import { Doc as YDoc } from 'yjs'
 import { AppSidebar } from '@/components/app-sidebar'
 import { Editor, EditorProvider, useEditor } from '@tiptap/react'
-import { initialContent } from '@/lib/data/initialContent'
 import ExtensionKit from '@/extensions/extension-kit'
 import { TiptapCollabProvider } from '@hocuspocus/provider'
 import { useSearchParams } from 'next/navigation'
@@ -36,8 +35,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { EditorHeader } from '@/components/BlockEditor/components/EditorHeader'
 import { Cone } from 'lucide-react'
 import { releaseVersion_0_4_0 } from '@/lib/data/whats-new/release-v0.4.0'
+import { getCookie, setCookie } from '@/lib/utils/cookies'
+import Cookies from 'js-cookie'
 
 const queryClient = new QueryClient()
+
+const VERSION = process.env.NEXT_PUBLIC_VISITED_VERSION
+const COOKIE_NAME = `hasVisited_${VERSION}`
+const DEFAULT_CONTENT = '<h1></h1><p></p>'
 
 export default function AppLayout({
     children, // will be a page or nested layout
@@ -71,6 +76,24 @@ export default function AppLayout({
             )
         }
     }, [setProvider, collabToken, ydoc, room, hasCollab])
+
+    // Check synchronously if we’re in a browser and if the cookie exists.
+    const isClient = typeof window !== 'undefined'
+    const initialFirstVisit = isClient ? !Cookies.get(COOKIE_NAME) : false
+
+    // Initialize state with the computed value.
+    const [isFirstVisit, setIsFirstVisit] = useState(initialFirstVisit)
+    const [hasNewUpdate] = useState(true) // Adjust this flag based on your update logic.
+
+    // In a useEffect, set the cookie if it's the first visit.
+    React.useEffect(() => {
+        if (isClient && isFirstVisit) {
+            Cookies.set(COOKIE_NAME, 'true', {
+                path: '/',
+                expires: 30, // Cookie expires in 30 days.
+            })
+        }
+    }, [isClient, isFirstVisit])
 
     // Editor related
     // Evolu
@@ -158,7 +181,6 @@ export default function AppLayout({
     )
 
     // Memoize the delete handler till extension is released
-    const [content, setContent] = useState<any>(null)
     const [previousImages, setPreviousImages] = useState<string[]>([])
     const [imagesList, setImagesList] = useState<string[]>([])
 
@@ -201,6 +223,12 @@ export default function AppLayout({
     //     },
     //     [previousImages, noteId]
     // )
+    //
+
+    const content =
+        isFirstVisit && hasNewUpdate
+            ? releaseVersion_0_4_0 // Change on version bump
+            : DEFAULT_CONTENT
 
     // Memoize the onUpdate handler
     const handleUpdate = useCallback(
@@ -225,7 +253,6 @@ export default function AppLayout({
                         }}
                         autofocus={false}
                         immediatelyRender={true}
-                        // content={initialContent}
                         shouldRerenderOnTransaction={false}
                         extensions={extensions}
                         editorProps={editorProps}
@@ -241,7 +268,7 @@ export default function AppLayout({
                                 setReadOnly={setReadOnly}
                             />
                         }
-                        content={releaseVersion_0_4_0}
+                        content={content}
                     >
                         {React.isValidElement(children)
                             ? React.cloneElement(children, {
