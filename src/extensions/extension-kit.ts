@@ -132,7 +132,7 @@ export const ExtensionKit = ({
     Color,
     TrailingNode,
     Link.configure({
-        openOnClick: false,
+        openOnClick: true,
     }),
     Highlight.configure({ multicolor: true }),
     Underline,
