@@ -35,6 +35,7 @@ import Document from '@/app/app/page'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { EditorHeader } from '@/components/BlockEditor/components/EditorHeader'
 import { Cone } from 'lucide-react'
+import { releaseVersion_0_4_0 } from '@/lib/data/whats-new/release-v0.4.0'
 
 const queryClient = new QueryClient()
 
@@ -229,8 +230,9 @@ export default function AppLayout({
                         extensions={extensions}
                         editorProps={editorProps}
                         onUpdate={(props) => {
-                            handleUpdate(props)
+                            // handleUpdate(props)
                             // await handleImageDelete(props)
+                            console.log(props.editor.getJSON())
                         }}
                         slotBefore={
                             <MemoizedEditorHeader
@@ -239,10 +241,7 @@ export default function AppLayout({
                                 setReadOnly={setReadOnly}
                             />
                         }
-                        content={`
-                            <h1></h1>
-                            <p></p>
-                        `}
+                        content={releaseVersion_0_4_0}
                     >
                         {React.isValidElement(children)
                             ? React.cloneElement(children, {
