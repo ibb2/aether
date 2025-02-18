@@ -1,7 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronRight, File, Folder } from 'lucide-react'
+import {
+    ChevronRight,
+    File,
+    Folder,
+    FolderClosed,
+    FolderOpen,
+} from 'lucide-react'
 
 import {
     Collapsible,
@@ -52,6 +58,7 @@ import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useSidebarStore from '@/store/sidebar'
 import useEditorStore from '@/store/editor'
 import { processImages } from '@/lib/processImages'
+import { motion, AnimatePresence } from 'framer-motion'
 
 function searchTree(items: TreeDataItem[], query: string): TreeDataItem[] {
     return (
@@ -251,7 +258,7 @@ export default function NavNotes({
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Notes</SidebarGroupLabel>
-            <SidebarMenu>
+            <SidebarMenu className="overflow-scroll">
                 {treeData !== undefined && (
                     <>
                         {treeData.map((item) => (
@@ -286,6 +293,10 @@ function Tree({
 }) {
     const [dialogType, setDialogType] = React.useState<string>('')
     const [openDialog, setOpenDialog] = React.useState<boolean>(false)
+
+    const [isOpen, setIsOpen] = React.useState(false) // State for collapsible
+
+    const toggleOpen = () => setIsOpen(!isOpen)
 
     if (item.type === 'note') {
         return (
@@ -332,19 +343,64 @@ function Tree({
     return (
         <ContextMenu>
             <SidebarMenuItem>
-                <Collapsible className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90">
+                <Collapsible
+                    className="group/collapsible [&[data-state=open]>button>svg.folder-icon]:rotate-180"
+                    open={isOpen} // Control Collapsible with isOpen state
+                    onOpenChange={toggleOpen} // Toggle on open change
+                >
                     <CollapsibleTrigger asChild>
                         <ContextMenuTrigger asChild>
-                            <SidebarMenuButton>
-                                <ChevronRight className="transition-transform" />
-                                <Folder />
+                            <SidebarMenuButton
+                                onClick={toggleOpen}
+                                className="flex-nowrap whitespace-nowrap pr-2"
+                            >
+                                {/* Toggle on button click */}
+                                <div className="flex relative justify-center">
+                                    <AnimatePresence
+                                        // exitBeforeEnter
+                                        initial={false}
+                                    >
+                                        {isOpen ? (
+                                            <motion.div
+                                                key="open-folder"
+                                                initial={{
+                                                    opacity: 0,
+                                                    scale: 0.8,
+                                                }}
+                                                animate={{
+                                                    opacity: 1,
+                                                    scale: 1,
+                                                }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <FolderOpen className="w-4 h-4" />
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="closed-folder"
+                                                initial={{
+                                                    opacity: 0,
+                                                    scale: 0.8,
+                                                }}
+                                                animate={{
+                                                    opacity: 1,
+                                                    scale: 1,
+                                                }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <Folder className="w-4 h-4" />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                                 {item.name}
                             </SidebarMenuButton>
                         </ContextMenuTrigger>
                     </CollapsibleTrigger>
+
                     <CollapsibleContent>
                         {item.children !== undefined && (
-                            <SidebarMenuSub>
+                            <SidebarMenuSub className="min-w-max overflow-ellipsis">
                                 {item.children.length > 0 && (
                                     <>
                                         {item.children.map((note) => (
