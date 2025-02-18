@@ -133,6 +133,19 @@ export const ExtensionKit = ({
     TrailingNode,
     Link.configure({
         openOnClick: true,
+        protocols: [
+            {
+                scheme: 'tel',
+                optionalSlashes: true,
+            },
+            'mailto',
+        ],
+        autolink: true,
+        linkOnPaste: true,
+        defaultProtocol: 'https',
+        HTMLAttributes: {
+            class: 'tlink',
+        },
     }),
     Highlight.configure({ multicolor: true }),
     Underline,
