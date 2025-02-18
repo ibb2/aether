@@ -442,7 +442,39 @@ export const releaseVersion_0_4_0 = {
                 },
                 {
                     type: 'text',
-                    text: ' For a full list of changes, check out our [changelog/documentation link].',
+                    text: ' For a full list of changes, check out our ',
+                },
+                {
+                    type: 'text',
+                    marks: [
+                        {
+                            type: 'bold',
+                        },
+                    ],
+                    text: 'Full Changelog',
+                },
+                {
+                    type: 'text',
+                    text: ': ',
+                },
+                {
+                    type: 'text',
+                    marks: [
+                        {
+                            type: 'link',
+                            attrs: {
+                                href: 'https://github.com/ibb2/aether/compare/v0.3.1...v0.4.0',
+                                target: '_blank',
+                                rel: 'noopener noreferrer nofollow',
+                                class: null,
+                            },
+                        },
+                    ],
+                    text: 'https://github.com/ibb2/aether/compare/v0.3.1...v0.4.0',
+                },
+                {
+                    type: 'text',
+                    text: '.',
                 },
             ],
         },

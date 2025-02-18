@@ -35,7 +35,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { EditorHeader } from '@/components/BlockEditor/components/EditorHeader'
 import { Cone } from 'lucide-react'
 import { releaseVersion_0_4_0 } from '@/lib/data/whats-new/release-v0.4.0'
-import { getCookie, setCookie } from '@/lib/utils/cookies'
 import Cookies from 'js-cookie'
 
 const queryClient = new QueryClient()
@@ -257,9 +256,8 @@ export default function AppLayout({
                         extensions={extensions}
                         editorProps={editorProps}
                         onUpdate={(props) => {
-                            // handleUpdate(props)
+                            handleUpdate(props)
                             // await handleImageDelete(props)
-                            console.log(props.editor.getJSON())
                         }}
                         slotBefore={
                             <MemoizedEditorHeader
