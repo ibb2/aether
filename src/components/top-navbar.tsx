@@ -14,6 +14,11 @@ import { useSession } from 'next-auth/react'
 export function TopNavbar() {
     const { data: session } = useSession()
 
+    const callbackUrl =
+        process.env.NODE_ENV === 'production'
+            ? 'https://' + process.env.NEXT_PUBLIC_VERCEL_URL
+            : 'http://localhost:3000'
+
     return (
         <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
             <div className="w-full max-w-7xl px-4">
@@ -60,7 +65,9 @@ export function TopNavbar() {
                             <div className="flex gap-x-2">
                                 <Button asChild>
                                     <Link
-                                        href="/login?callbackUrl=http://localhost:3000"
+                                        href={
+                                            '/login?callbackUrl=' + callbackUrl
+                                        }
                                         className="flex items-center"
                                     >
                                         Login
@@ -68,7 +75,10 @@ export function TopNavbar() {
                                 </Button>
                                 <Button variant="secondary" asChild>
                                     <Link
-                                        href="/sign-up?callbackUrl=http://localhost:3000"
+                                        href={
+                                            '/sign-up?callbackUrl=' +
+                                            callbackUrl
+                                        }
                                         className="flex items-center"
                                     >
                                         Sign up
