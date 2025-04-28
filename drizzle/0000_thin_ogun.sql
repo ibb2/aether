@@ -1,4 +1,4 @@
-CREATE TABLE `account` (
+CREATE TABLE IF NOT EXISTS `account` (
 	`userId` text NOT NULL,
 	`type` text NOT NULL,
 	`provider` text NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE `account` (
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `authenticator` (
+CREATE TABLE IF NOT EXISTS `authenticator` (
 	`credentialID` text NOT NULL,
 	`userId` text NOT NULL,
 	`providerAccountId` text NOT NULL,
@@ -28,14 +28,14 @@ CREATE TABLE `authenticator` (
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `session` (
+CREATE TABLE IF NOT EXISTS `session` (
 	`sessionToken` text PRIMARY KEY NOT NULL,
 	`userId` text NOT NULL,
 	`expires` integer NOT NULL,
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `subscription` (
+CREATE TABLE IF NOT EXISTS `subscription` (
 	`id` text PRIMARY KEY NOT NULL,
 	`userId` text NOT NULL,
 	`status` text NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE `subscription` (
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
 	`id` text PRIMARY KEY NOT NULL,
 	`evoluOwnerId` text,
 	`name` text,
@@ -60,14 +60,14 @@ CREATE TABLE `user` (
 	`stripeCustomerId` text
 );
 --> statement-breakpoint
-CREATE TABLE `verificationToken` (
+CREATE TABLE IF NOT EXISTS `verificationToken` (
 	`identifier` text NOT NULL,
 	`token` text NOT NULL,
 	`expires` integer NOT NULL,
 	PRIMARY KEY(`identifier`, `token`)
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `account_evoluOwnerId_unique` ON `account` (`evoluOwnerId`);--> statement-breakpoint
-CREATE UNIQUE INDEX `authenticator_credentialID_unique` ON `authenticator` (`credentialID`);--> statement-breakpoint
-CREATE UNIQUE INDEX `user_evoluOwnerId_unique` ON `user` (`evoluOwnerId`);--> statement-breakpoint
-CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);
+CREATE UNIQUE INDEX IF NOT EXISTS `account_evoluOwnerId_unique` ON `account` (`evoluOwnerId`);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `authenticator_credentialID_unique` ON `authenticator` (`credentialID`);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `user_evoluOwnerId_unique` ON `user` (`evoluOwnerId`);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `user_email_unique` ON `user` (`email`);
