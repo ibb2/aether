@@ -1,5 +1,6 @@
 import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core'
 import type { AdapterAccountType } from 'next-auth/adapters'
+import { create } from 'zustand'
 
 export const users = sqliteTable('user', {
     id: text('id')
@@ -19,17 +20,16 @@ export const accounts = sqliteTable(
         userId: text('userId')
             .notNull()
             .references(() => users.id, { onDelete: 'cascade' }),
-        type: text('type').$type<AdapterAccountType>().notNull(),
         provider: text('provider').notNull(),
         providerAccountId: text('providerAccountId').notNull(),
         evoluOwnerId: text('evoluOwnerId').unique(),
         refresh_token: text('refresh_token'),
         access_token: text('access_token'),
         expires_at: integer('expires_at'),
-        token_type: text('token_type'),
         scope: text('scope'),
         id_token: text('id_token'),
-        session_state: text('session_state'),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }),
+        updatedAt: integer('updatedAt', { mode: 'timestamp_ms' }),
     },
     (account) => ({
         compoundKey: primaryKey({
@@ -44,6 +44,8 @@ export const sessions = sqliteTable('session', {
         .notNull()
         .references(() => users.id, { onDelete: 'cascade' }),
     expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+    createdAt: integer('createdAt', { mode: 'timestamp_ms' }),
+    updatedAt: integer('updatedAt', { mode: 'timestamp_ms' }),
 })
 
 export const verificationTokens = sqliteTable(
@@ -84,7 +86,9 @@ export const authenticators = sqliteTable(
 )
 
 export const subscriptions = sqliteTable('subscription', {
-    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
     userId: text('userId')
         .notNull()
         .references(() => users.id, { onDelete: 'cascade' }),
@@ -93,9 +97,16 @@ export const subscriptions = sqliteTable('subscription', {
     interval: text('interval').notNull(),
     stripeCustomerId: text('stripeCustomerId').notNull(),
     stripeSubscriptionId: text('stripeSubscriptionId').notNull(),
-    currentPeriodStart: integer('currentPeriodStart', { mode: 'timestamp_ms' }).notNull(),
-    currentPeriodEnd: integer('currentPeriodEnd', { mode: 'timestamp_ms' }).notNull(),
-    createdAt: integer('createdAt', { mode: 'timestamp_ms' }).$defaultFn(() => new Date()), // Use `new Date()`
-    updatedAt: integer('updatedAt', { mode: 'timestamp_ms' }).$defaultFn(() => new Date()), // Use `new Date()`
-});
-
+    currentPeriodStart: integer('currentPeriodStart', {
+        mode: 'timestamp_ms',
+    }).notNull(),
+    currentPeriodEnd: integer('currentPeriodEnd', {
+        mode: 'timestamp_ms',
+    }).notNull(),
+    createdAt: integer('createdAt', { mode: 'timestamp_ms' }).$defaultFn(
+        () => new Date()
+    ), // Use `new Date()`
+    updatedAt: integer('updatedAt', { mode: 'timestamp_ms' }).$defaultFn(
+        () => new Date()
+    ), // Use `new Date()`
+})

@@ -12,7 +12,6 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SessionProvider } from 'next-auth/react'
 import { EditorProvider } from '@tiptap/react'
 import { auth } from '@/auth'
-import { initializeDB } from '@/lib/images'
 
 // import ClientComponents from "@/components/Layout/ClientComponents";
 
