@@ -14,7 +14,10 @@ import { useSession } from 'next-auth/react'
 export function TopNavbar() {
     const { data: session } = useSession()
 
-    const callbackUrl = 'https://preview.aethernotes.ink'
+    const callbackUrl =
+        process.env.NODE_ENV === 'production'
+            ? 'https://' + process.env.NEXT_PUBLIC_VERCEL_URL
+            : 'http://localhost:3000'
 
     return (
         <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
