@@ -1,12 +1,17 @@
-import { auth } from '@/auth'
+import { auth } from '@/lib/auth'
 import { S3 } from '@/lib/aws/s3client'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
-    const session = await auth()
-    if (session?.user === undefined) return NextResponse.error()
+    const session = await auth.api.getSession({
+        headers: await headers(), // you need to pass the headers object.
+    })
+    if (!session?.user) {
+        return new NextResponse('Unauthorized', { status: 401 })
+    }
 
     const searchParams = request.nextUrl.searchParams
     const fileId = searchParams.get('fileId')
