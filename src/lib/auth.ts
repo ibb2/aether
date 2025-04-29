@@ -3,6 +3,10 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import * as schema from '@/db/drizzle/schema'
 import { LibsqlDialect } from '@libsql/kysely-libsql'
+import { magicLink } from 'better-auth/plugins'
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.AUTH_RESEND_KEY as string)
 
 // const dialect = new LibsqlDialect({
 //     url: process.env.DATABASE_URL as string,
@@ -36,10 +40,19 @@ export const auth = betterAuth({
             clientSecret: process.env.AUTH_GITHUB_SECRET as string,
         },
     },
-    // database: {
-    //     dialect,
-    //     type: 'sqlite',
-    // },
+    plugins: [
+        magicLink({
+            sendMagicLink: async ({ email, token, url }, request) => {
+                // send email to user
+                await resend.emails.send({
+                    from: 'noreply@aethernotes.ink',
+                    to: email,
+                    subject: 'Verify your email address',
+                    text: `Click the link to verify your email: ${url}`,
+                })
+            },
+        }),
+    ],
     database: drizzleAdapter(db, {
         provider: 'sqlite', // or "mysql", "sqlite",
         schema: {

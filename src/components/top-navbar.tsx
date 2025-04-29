@@ -65,20 +65,15 @@ export function TopNavbar() {
                             <div className="flex gap-x-2">
                                 <Button asChild>
                                     <Link
-                                        href={
-                                            '/login?callbackUrl=' + callbackUrl
-                                        }
+                                        href="/sign-in"
                                         className="flex items-center"
                                     >
-                                        Login
+                                        Sign in
                                     </Link>
                                 </Button>
                                 <Button variant="secondary" asChild>
                                     <Link
-                                        href={
-                                            '/sign-up?callbackUrl=' +
-                                            callbackUrl
-                                        }
+                                        href="/sign-up"
                                         className="flex items-center"
                                     >
                                         Sign up

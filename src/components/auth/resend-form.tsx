@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
+import { authClient } from '@/lib/auth-client'
 
 const formSchema = z.object({
     email: z.string().email('Please enter a valid email address'),
@@ -33,19 +34,23 @@ export function ResendForm({ signingUp }: { signingUp?: boolean }) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true)
         try {
-            await signIn('resend', {
+            const { data, error } = await authClient.signIn.magicLink({
                 email: values.email,
-                redirect: false,
-            }).catch((error) => {
-                // If we get here, the email was likely sent successfully
-                // despite the JSON parsing error
-                if (error instanceof SyntaxError) {
-                    setStatus('success')
-                    form.reset()
-                    return
-                }
-                throw error
             })
+
+            // await signIn('resend', {
+            //     email: values.email,
+            //     redirect: false,
+            // }).catch((error) => {
+            //     // If we get here, the email was likely sent successfully
+            //     // despite the JSON parsing error
+            //     if (error instanceof SyntaxError) {
+            //         setStatus('success')
+            //         form.reset()
+            //         return
+            //     }
+            //     throw error
+            // })
 
             setStatus('success')
             form.reset()

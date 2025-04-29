@@ -133,6 +133,7 @@
         "react-hot-toast": "^2.5.1",
         "react-resizable-panels": "^2.1.7",
         "react-sketch-canvas": "^7.0.0-next.4",
+        "resend": "^4.4.1",
         "stripe": "^17.5.0",
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
