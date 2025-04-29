@@ -9,10 +9,10 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud } from 'lucide-react'
-import { authClient } from '@/lib/auth-client'
+import { useSession } from '@/lib/auth-client'
 
 export function TopNavbar() {
-    const { data: session } = authClient.useSession()
+    const { data: session } = useSession()
 
     const callbackUrl =
         process.env.NODE_ENV === 'production'
