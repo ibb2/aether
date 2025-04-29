@@ -11,7 +11,8 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SessionProvider } from 'next-auth/react'
 import { EditorProvider } from '@tiptap/react'
-import { auth } from '@/auth'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
 // import ClientComponents from "@/components/Layout/ClientComponents";
 
@@ -53,7 +54,9 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode
 }>) {
-    const session = await auth()
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    })
 
     return (
         <html
@@ -75,17 +78,15 @@ export default async function RootLayout({
             </head>
             <body className="flex min-h-svh items-center justify-center">
                 <PHProvider>
-                    <SessionProvider session={session}>
-                        <EvoluProvider value={evolu}>
-                            <ThemeProvider
-                                attribute="class"
-                                defaultTheme="system"
-                                enableSystem
-                            >
-                                <ClientComponents>{children}</ClientComponents>
-                            </ThemeProvider>
-                        </EvoluProvider>
-                    </SessionProvider>
+                    <EvoluProvider value={evolu}>
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="system"
+                            enableSystem
+                        >
+                            <ClientComponents>{children}</ClientComponents>
+                        </ThemeProvider>
+                    </EvoluProvider>
                 </PHProvider>
                 <Analytics />
                 <SpeedInsights />

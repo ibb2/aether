@@ -1,21 +1,38 @@
-import { signIn } from '@/auth'
+'use client'
+
 import { Button } from '@/components/ui/button'
+import { authClient } from '@/lib/auth-client'
 import { AuthError } from 'next-auth'
 
-export default function GoogleSignIn({
-    callbackUrl,
-    signingUp,
-}: {
-    callbackUrl: string
-    signingUp?: boolean
-}) {
+export default function GoogleSignIn({ signingUp }: { signingUp?: boolean }) {
     return (
         <form
             action={async () => {
-                'use server'
                 try {
-                    await signIn('google', {
-                        redirectTo: callbackUrl,
+                    await authClient.signIn.social({
+                        /**
+                         * The social provider id
+                         * @example "github", "google", "apple"
+                         */
+                        provider: 'google',
+                        /**
+                         * A URL to redirect after the user authenticates with the provider
+                         * @default "/"
+                         */
+                        // callbackURL: '/dashboard',
+                        /**
+                         * A URL to redirect if an error occurs during the sign in process
+                         */
+                        // errorCallbackURL: '/error',
+                        /**
+                         * A URL to redirect if the user is newly registered
+                         */
+                        // newUserCallbackURL: '/welcome',
+                        /**
+                         * disable the automatic redirect to the provider.
+                         * @default false
+                         */
+                        // disableRedirect: true,
                     })
                 } catch (error) {
                     // Signin can fail for a number of reasons, such as the user

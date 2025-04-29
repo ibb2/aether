@@ -16,8 +16,7 @@ const authToken =
 export default defineConfig({
     schema: './src/db/drizzle/schema.ts',
     out: './drizzle',
-    dialect: 'sqlite',
-    driver: 'turso',
+    dialect: 'turso',
     dbCredentials: {
         url: url,
         authToken: authToken,

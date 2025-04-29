@@ -9,7 +9,7 @@ import React, {
     useCallback,
     RefObject,
 } from 'react'
-import { SessionProvider, useSession } from 'next-auth/react'
+import { useSession } from '@/lib/auth-client'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import {
     SidebarInset,

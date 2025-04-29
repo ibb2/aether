@@ -7,32 +7,11 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import GoogleSignIn from './auth/sign-in-google'
 import GithubSignIn from './auth/sign-in-github'
-import { Button } from '@/components/ui/button'
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
-import { AuthError } from 'next-auth'
-import { signIn } from '@/auth'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
 import { ResendForm } from './auth/resend-form'
 
-export function SignUpForm({
-    callbackUrl,
-}: {
-    callbackUrl: string | undefined
-}) {
+export function SignUpForm() {
     return (
         <Card className="mx-auto max-w-sm">
             <CardHeader>
@@ -54,14 +33,8 @@ export function SignUpForm({
                             </span>
                         </div>
                     </div>
-                    <GoogleSignIn
-                        callbackUrl={callbackUrl ?? ''}
-                        signingUp={true}
-                    />
-                    <GithubSignIn
-                        callbackUrl={callbackUrl ?? ''}
-                        signingUp={true}
-                    />
+                    <GoogleSignIn signingUp={true} />
+                    <GithubSignIn signingUp={true} />
                 </div>
 
                 <div className="mt-4 text-center text-sm">
