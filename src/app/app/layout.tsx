@@ -35,6 +35,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { EditorHeader } from '@/components/BlockEditor/components/EditorHeader'
 import { Cone } from 'lucide-react'
 import { releaseVersion_0_4_0 } from '@/lib/data/whats-new/release-v0.4.0'
+import { releaseVersion_0_4_1 } from '@/lib/data/whats-new/release-v0.4.1'
 import Cookies from 'js-cookie'
 
 const queryClient = new QueryClient()
@@ -226,7 +227,7 @@ export default function AppLayout({
 
     const content =
         isFirstVisit && hasNewUpdate
-            ? releaseVersion_0_4_0 // Change on version bump
+            ? releaseVersion_0_4_1 // Change on version bump
             : DEFAULT_CONTENT
 
     // Memoize the onUpdate handler
