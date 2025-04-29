@@ -9,10 +9,15 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useSession } from '@/lib/auth-client'
 
 export function TopNavbar() {
     const { data: session } = useSession()
+
+    const callbackUrl =
+        process.env.NODE_ENV === 'production'
+            ? 'https://' + process.env.NEXT_PUBLIC_VERCEL_URL
+            : 'http://localhost:3000'
 
     return (
         <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
@@ -60,15 +65,15 @@ export function TopNavbar() {
                             <div className="flex gap-x-2">
                                 <Button asChild>
                                     <Link
-                                        href="/login?callbackUrl=http://localhost:3000"
+                                        href="/sign-in"
                                         className="flex items-center"
                                     >
-                                        Login
+                                        Sign in
                                     </Link>
                                 </Button>
                                 <Button variant="secondary" asChild>
                                     <Link
-                                        href="/sign-up?callbackUrl=http://localhost:3000"
+                                        href="/sign-up"
                                         className="flex items-center"
                                     >
                                         Sign up

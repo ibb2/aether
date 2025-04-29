@@ -28,7 +28,6 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar'
-import { signOut, useSession } from 'next-auth/react'
 import { SettingsDialog } from './settings-dialog'
 import Link from 'next/link'
 import Usage from './usage'
@@ -38,6 +37,7 @@ import { useEffect, useState } from 'react'
 import UserCard from '@/components/Sidebar/nav/UserCard'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
+import { authClient, signOut, useSession } from '@/lib/auth-client'
 
 export function NavUser({
     defaultUser,
@@ -173,7 +173,7 @@ export function NavUser({
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() => signOut({ redirectTo: '/' })}
+                            onClick={async () => await authClient.signOut()}
                         >
                             <LogOut className="h-4 w-4" />
                             Log out

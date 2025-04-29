@@ -4,20 +4,29 @@
 import { drizzle } from 'drizzle-orm/libsql'
 import { createClient } from '@libsql/client'
 import * as dotenv from 'dotenv'
-
-const url =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
-        ? process.env.DATABASE_URL!
-        : process.env.NEXT_PUBLIC_TURSO_DATABASE_URL!
+import * as schema from './schema'
 
 const authToken =
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'development'
+    process.env.VERCEL_ENV === 'development'
         ? undefined
         : process.env.TURSO_AUTH_TOKEN
 
+console.log(`${process.env.DATABASE_URL}`)
+
 const client = createClient({
-    url: url,
+    url: process.env.DATABASE_URL as string,
     authToken: authToken,
 })
 
-export const db = drizzle(client)
+export const db = drizzle(client, {
+    schema: {
+        user: schema.users,
+        session: schema.sessions,
+        account: schema.accounts,
+        verification: schema.verification,
+        verificationToken: schema.verificationTokens,
+        authenticator: schema.authenticators,
+        subscription: schema.subscriptions,
+    },
+    logger: true,
+})

@@ -4,13 +4,13 @@ import { TopNavbar } from '@/components/top-navbar'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { PLANS, type Plan } from '@/config/plans'
 import { PricingCard } from '@/components/pricing/pricing-card'
 import { PricingSkeleton } from '@/components/pricing/pricing-skeleton'
 import type Stripe from 'stripe'
+import { useSession } from '@/lib/auth-client'
 
 export default function PricingSectionCards() {
     const { data: session } = useSession()

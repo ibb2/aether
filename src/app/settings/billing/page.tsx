@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import { auth } from '@/auth'
 import { db } from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
 import { subscriptions, users } from '@/db/drizzle/schema'
@@ -15,16 +14,20 @@ import { Button } from '@/components/ui/button'
 import { PLANS, type Plan } from '@/config/plans'
 import Link from 'next/link'
 import { string } from 'zod'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { NextResponse } from 'next/server'
 
 const APP_URL = process.env.VERCEL_URL
     ? process.env.VERCEL_URL
     : 'http://localhost:3000'
 
 export default async function BillingPage() {
-    const session = await auth()
-
+    const session = await auth.api.getSession({
+        headers: await headers(), // you need to pass the headers object.
+    })
     if (!session?.user) {
-        redirect('/login')
+        return new NextResponse('Unauthorized', { status: 401 })
     }
 
     const existingUser = await db

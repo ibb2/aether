@@ -1,49 +1,69 @@
 import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core'
-import type { AdapterAccountType } from 'next-auth/adapters'
 
 export const users = sqliteTable('user', {
     id: text('id')
         .primaryKey()
         .$defaultFn(() => crypto.randomUUID()),
-    evoluOwnerId: text('evoluOwnerId').unique(),
+    evoluOwnerId: text('evolu_user_id'),
     name: text('name'),
     email: text('email').unique(),
-    emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
+    emailVerified: integer('emailVerified', { mode: 'boolean' }),
     image: text('image'),
     stripeCustomerId: text('stripeCustomerId'),
+    createdAt: integer('created_at', { mode: 'timestamp' }),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }),
 })
 
 export const accounts = sqliteTable(
     'account',
     {
+        id: text('id'),
         userId: text('userId')
             .notNull()
             .references(() => users.id, { onDelete: 'cascade' }),
-        type: text('type').$type<AdapterAccountType>().notNull(),
-        provider: text('provider').notNull(),
+        providerId: text('provider_id'),
         providerAccountId: text('providerAccountId').notNull(),
-        evoluOwnerId: text('evoluOwnerId').unique(),
+        evoluOwnerId: text('evolu_owner_id'),
         refresh_token: text('refresh_token'),
+        refreshTokenExpiresAt: integer('refresh_token_expires_at', {
+            mode: 'timestamp',
+        }),
         access_token: text('access_token'),
         expires_at: integer('expires_at'),
-        token_type: text('token_type'),
         scope: text('scope'),
+        password: text('password'),
         id_token: text('id_token'),
-        session_state: text('session_state'),
+        createdAt: integer('created_at', { mode: 'timestamp' }),
+        updatedAt: integer('updatedAt', { mode: 'timestamp' }),
     },
     (account) => ({
         compoundKey: primaryKey({
-            columns: [account.provider, account.providerAccountId],
+            columns: [account.providerId, account.providerAccountId],
         }),
     })
 )
 
 export const sessions = sqliteTable('session', {
+    id: text('id'),
     sessionToken: text('sessionToken').primaryKey(),
+    token: text('token').unique(),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
     userId: text('userId')
         .notNull()
         .references(() => users.id, { onDelete: 'cascade' }),
-    expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+    expires: integer('expires', { mode: 'timestamp' }).notNull(),
+    createdAt: integer('createdAt', { mode: 'timestamp' }),
+    updatedAt: integer('updatedAt', { mode: 'timestamp' }),
+})
+
+export const verification = sqliteTable('verification', {
+    id: text('id').primaryKey(),
+    identifier: text('identifier').notNull(),
+    value: text('value').notNull(),
+    expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' }),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }),
 })
 
 export const verificationTokens = sqliteTable(
@@ -51,7 +71,7 @@ export const verificationTokens = sqliteTable(
     {
         identifier: text('identifier').notNull(),
         token: text('token').notNull(),
-        expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
+        expires: integer('expires', { mode: 'timestamp' }).notNull(),
     },
     (verificationToken) => ({
         compositePk: primaryKey({
@@ -84,7 +104,9 @@ export const authenticators = sqliteTable(
 )
 
 export const subscriptions = sqliteTable('subscription', {
-    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text('id')
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
     userId: text('userId')
         .notNull()
         .references(() => users.id, { onDelete: 'cascade' }),
@@ -93,9 +115,16 @@ export const subscriptions = sqliteTable('subscription', {
     interval: text('interval').notNull(),
     stripeCustomerId: text('stripeCustomerId').notNull(),
     stripeSubscriptionId: text('stripeSubscriptionId').notNull(),
-    currentPeriodStart: integer('currentPeriodStart', { mode: 'timestamp_ms' }).notNull(),
-    currentPeriodEnd: integer('currentPeriodEnd', { mode: 'timestamp_ms' }).notNull(),
-    createdAt: integer('createdAt', { mode: 'timestamp_ms' }).$defaultFn(() => new Date()), // Use `new Date()`
-    updatedAt: integer('updatedAt', { mode: 'timestamp_ms' }).$defaultFn(() => new Date()), // Use `new Date()`
-});
-
+    currentPeriodStart: integer('currentPeriodStart', {
+        mode: 'timestamp',
+    }).notNull(),
+    currentPeriodEnd: integer('currentPeriodEnd', {
+        mode: 'timestamp',
+    }).notNull(),
+    createdAt: integer('createdAt', { mode: 'timestamp' }).$defaultFn(
+        () => new Date()
+    ), // Use `new Date()`
+    updatedAt: integer('updatedAt', { mode: 'timestamp' }).$defaultFn(
+        () => new Date()
+    ), // Use `new Date()`
+})

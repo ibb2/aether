@@ -1,17 +1,22 @@
-import { auth } from '@/auth'
+import { auth } from '@/lib/auth'
 import { S3 } from '@/lib/aws/s3client'
 import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
-    const data = await auth()
-    if (data?.user === undefined) return Response.error()
+    const session = await auth.api.getSession({
+        headers: await headers(), // you need to pass the headers object.
+    })
+    if (!session?.user) {
+        return new NextResponse('Unauthorized', { status: 401 })
+    }
 
     const { filename, contentType, docId, fileId } = await request.json()
 
     try {
-        const key = data?.user?.id + '/' + docId + '/' + fileId
+        const key = session?.user?.id + '/' + docId + '/' + fileId
         const url = await getSignedUrl(
             S3,
             new PutObjectCommand({
@@ -28,8 +33,12 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-    const session = await auth()
-    if (session?.user === undefined) return NextResponse.error()
+    const session = await auth.api.getSession({
+        headers: await headers(), // you need to pass the headers object.
+    })
+    if (!session?.user) {
+        return new NextResponse('Unauthorized', { status: 401 })
+    }
 
     const searchParams = request.nextUrl.searchParams
     const fileId = searchParams.get('fileId')

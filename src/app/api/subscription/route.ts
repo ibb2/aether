@@ -1,13 +1,15 @@
-import { auth } from '@/auth'
 import { db } from '@/db/drizzle'
 import { subscriptions } from '@/db/drizzle/schema'
+import { auth } from '@/lib/auth'
 import { eq } from 'drizzle-orm'
+import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
     try {
-        const session = await auth()
-
+        const session = await auth.api.getSession({
+            headers: await headers(), // you need to pass the headers object.
+        })
         if (!session?.user) {
             return new NextResponse('Unauthorized', { status: 401 })
         }

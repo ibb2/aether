@@ -1,21 +1,22 @@
 import { stripe } from '@/lib/stripe'
-import { auth } from '@/auth'
 import { db } from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
 import { users } from '@/db/drizzle/schema'
 import { NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
 const APP_URL = process.env.VERCEL_URL || 'http://localhost:3000'
 
 export async function POST(req: Request) {
     try {
         const { priceId, isYearly } = await req.json()
-        const session = await auth()
-
-        if (!session?.user?.id) {
+        const session = await auth.api.getSession({
+            headers: await headers(), // you need to pass the headers object.
+        })
+        if (!session?.user) {
             return new NextResponse('Unauthorized', { status: 401 })
         }
-
         // Get or create stripe customer
         const [user] = await db
             .select()

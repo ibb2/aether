@@ -2,7 +2,6 @@
 import * as S from '@effect/schema/Schema'
 import useNoteStore from '@/store/note'
 import { Editor } from '@tiptap/core'
-import { auth } from '@/auth'
 
 const urlCache = new Map<string, string>()
 
