@@ -1,5 +1,6 @@
-import { auth } from '@/auth'
+import { auth } from '@/lib/auth'
 import { stripe } from '@/lib/stripe'
+import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 const APP_URL = process.env.VERCEL_URL
@@ -8,8 +9,9 @@ const APP_URL = process.env.VERCEL_URL
 
 export async function POST(req: Request) {
     try {
-        const session = await auth()
-
+        const session = await auth.api.getSession({
+            headers: await headers(), // you need to pass the headers object.
+        })
         if (!session?.user) {
             return new NextResponse('Unauthorized', { status: 401 })
         }
