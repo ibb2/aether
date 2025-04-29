@@ -3,11 +3,6 @@ import * as dotenv from 'dotenv'
 
 dotenv.config({ path: '.env.local' })
 
-const url =
-    process.env.VERCEL_ENV === 'development'
-        ? process.env.DATABASE_URL!
-        : process.env.TURSO_DATABASE_URL!
-
 const authToken =
     process.env.VERCEL_ENV === 'development'
         ? undefined!
@@ -18,7 +13,7 @@ export default defineConfig({
     out: './drizzle',
     dialect: 'turso',
     dbCredentials: {
-        url: url,
-        authToken: authToken,
+        url: process.env.DATABASE_URL as string,
+        authToken: process.env.TURSO_AUTH_TOKEN as string,
     },
 })
