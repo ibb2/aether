@@ -53,6 +53,7 @@ export const auth = betterAuth({
             },
         }),
     ],
+    trustedOrigins: [process.env.VERCEL_URL as string],
     database: drizzleAdapter(db, {
         provider: 'sqlite', // or "mysql", "sqlite",
         schema: {
