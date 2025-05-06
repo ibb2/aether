@@ -40,7 +40,7 @@ import {
 } from '@/db/queries'
 
 import { Database, evolu } from '@/db/db'
-import { NonEmptyString50, NoteId, SectionId } from '@/db/schema'
+import { NonEmptyString50, NotebookId, NoteId, SectionId } from '@/db/schema'
 import { initialContent } from '@/lib/data/initialContent'
 import useNoteStore from '@/store/note'
 import { useRouter } from 'next/navigation'
@@ -240,6 +240,15 @@ export default function NavNotes({
                 isDeleted: true,
             })
         }
+
+        if (item.type === 'notebook') {
+            update('notebooks', {
+                id: S.decodeSync(NotebookId)(item.id),
+                isDeleted: true,
+            })
+        }
+
+        console.log('Deleted notebook')
     }
 
     const deleteNote = async (item: any, editor: Editor) => {
@@ -248,6 +257,7 @@ export default function NavNotes({
             isDeleted: true,
         })
 
+        console.log('Deleted Note')
         editor.commands.clearContent()
 
         await fetch(`api/r2/delete?docId=${item.id}`, {
