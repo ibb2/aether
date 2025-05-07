@@ -37,6 +37,7 @@ import { Cone } from 'lucide-react'
 import { releaseVersion_0_4_0 } from '@/lib/data/whats-new/release-v0.4.0'
 import { releaseVersion_0_4_1 } from '@/lib/data/whats-new/release-v0.4.1'
 import Cookies from 'js-cookie'
+import { Toaster } from '@/components/ui/toaster'
 
 const queryClient = new QueryClient()
 
@@ -276,6 +277,7 @@ export default function AppLayout({
                             : children}
                     </EditorProvider>
                 </SidebarInset>
+                <Toaster />
             </SidebarProvider>
         </TooltipProvider>
     )

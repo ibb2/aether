@@ -2,6 +2,19 @@ import * as S from '@effect/schema/Schema'
 import useNoteStore from '@/store/note'
 import { handleFileUploadOPFS } from './images'
 import { Editor } from '@tiptap/react'
+import canUserUpload from './utils/canUserUpload'
+import { toast } from '@/hooks/use-toast'
+import { Alert } from '@/components/ui/alert'
+
+function errorToast(plan: string) {
+    const limit = plan === 'pro' ? '5MB' : '1MB'
+
+    toast({
+        title: 'Could not upload file',
+        description: `File is to large, please upload a file smaller than ${limit}`,
+        variant: 'destructive',
+    })
+}
 
 export async function handlePasteAndDrop(
     editor: Editor,
@@ -13,6 +26,13 @@ export async function handlePasteAndDrop(
 
     const fileId = await handleFileUploadOPFS(docId, file)
     const url = URL.createObjectURL(file)
+
+    const [canUpload, plan] = await canUserUpload(file.size)
+
+    if (!canUpload) {
+        errorToast(plan)
+        return
+    }
 
     editor
         .chain()

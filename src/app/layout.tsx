@@ -13,6 +13,7 @@ import { SessionProvider } from 'next-auth/react'
 import { EditorProvider } from '@tiptap/react'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+import { Toaster } from '@/components/ui/toaster'
 
 // import ClientComponents from "@/components/Layout/ClientComponents";
 
@@ -90,6 +91,7 @@ export default async function RootLayout({
                 </PHProvider>
                 <Analytics />
                 <SpeedInsights />
+                <Toaster />
             </body>
         </html>
     )
