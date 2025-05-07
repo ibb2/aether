@@ -7,7 +7,7 @@ export default function HeroImage() {
     const { resolvedTheme } = useTheme()
 
     return (
-        <div className="w-2/3 xl:w-5/6">
+        <div className="w-2/3 xl:w-5/6 2xl:3/5">
             <Image
                 src={
                     resolvedTheme === 'light'
