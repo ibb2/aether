@@ -242,44 +242,46 @@ export default function AppLayout({
     const [readOnly, setReadOnly] = useState(false)
 
     return (
-        <TooltipProvider>
-            <SidebarProvider>
-                <QueryClientProvider client={queryClient}>
-                    <AppSidebar canvasRef={canvasRef} id={evoluId!} />
-                </QueryClientProvider>
-                <SidebarInset>
-                    <EditorProvider
-                        editorContainerProps={{
-                            className: 'grow',
-                        }}
-                        autofocus={false}
-                        immediatelyRender={true}
-                        shouldRerenderOnTransaction={false}
-                        extensions={extensions}
-                        editorProps={editorProps}
-                        onUpdate={(props) => {
-                            handleUpdate(props)
-                            // await handleImageDelete(props)
-                        }}
-                        slotBefore={
-                            <MemoizedEditorHeader
-                                canvasRef={canvasRef}
-                                readOnly={readOnly}
-                                setReadOnly={setReadOnly}
-                            />
-                        }
-                        content={content}
-                    >
-                        {React.isValidElement(children)
-                            ? React.cloneElement(children, {
-                                  ref: canvasRef,
-                              })
-                            : children}
-                    </EditorProvider>
-                </SidebarInset>
-                <Toaster />
-            </SidebarProvider>
-        </TooltipProvider>
+        <>
+            <TooltipProvider>
+                <SidebarProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <AppSidebar canvasRef={canvasRef} id={evoluId!} />
+                    </QueryClientProvider>
+                    <SidebarInset>
+                        <EditorProvider
+                            editorContainerProps={{
+                                className: 'grow',
+                            }}
+                            autofocus={false}
+                            immediatelyRender={true}
+                            shouldRerenderOnTransaction={false}
+                            extensions={extensions}
+                            editorProps={editorProps}
+                            onUpdate={(props) => {
+                                handleUpdate(props)
+                                // await handleImageDelete(props)
+                            }}
+                            slotBefore={
+                                <MemoizedEditorHeader
+                                    canvasRef={canvasRef}
+                                    readOnly={readOnly}
+                                    setReadOnly={setReadOnly}
+                                />
+                            }
+                            content={content}
+                        >
+                            {React.isValidElement(children)
+                                ? React.cloneElement(children, {
+                                      ref: canvasRef,
+                                  })
+                                : children}
+                        </EditorProvider>
+                    </SidebarInset>
+                </SidebarProvider>
+            </TooltipProvider>
+            <Toaster />
+        </>
     )
 }
 

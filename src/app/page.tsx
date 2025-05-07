@@ -5,6 +5,7 @@ import HeroImage from '@/components/landing/image'
 import BoxReveal from '@/components/magicui/box-reveal'
 import DotPattern from '@/components/magicui/dot-pattern'
 import { TopNavbar } from '@/components/top-navbar'
+import { Toaster } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 
 export default function Homepage() {
@@ -20,6 +21,7 @@ export default function Homepage() {
             <HeroImage />
             <BentoFeatures />
             <Action />
+            <Toaster />
         </div>
     )
 }
