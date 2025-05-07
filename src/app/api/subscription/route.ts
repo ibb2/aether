@@ -6,10 +6,11 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
+    const session = await auth.api.getSession({
+        headers: await headers(), // you need to pass the headers object.
+    })
+
     try {
-        const session = await auth.api.getSession({
-            headers: await headers(), // you need to pass the headers object.
-        })
         if (!session?.user) {
             return new NextResponse('Unauthorized', { status: 401 })
         }
