@@ -284,6 +284,14 @@ export default function AppLayout({
                                     : children}
                             </EditorProvider>
                         </div>
+                        <div
+                            className={
+                                type !== 'Blank' ? 'invisible' : 'visible'
+                            }
+                        >
+                            <p>Hey</p>
+                            {/* Add page component */}
+                        </div>
                     </SidebarInset>
                 </SidebarProvider>
             </TooltipProvider>

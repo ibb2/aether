@@ -86,7 +86,14 @@ export const Document = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
     return (
         <>
             {DarkModeSwitcher}
-            {type !== 'Blank' ? <MemoizedBlockEditor ref={canvasRef} /> : <></>}
+            {type !== 'Blank' ? (
+              <div 
+                <MemoizedBlockEditor ref={canvasRef} />
+            ) : (
+                <div className="flex items-center justify-center">
+                    <text>Hey</text>
+                </div>
+            )}
         </>
     )
 })
