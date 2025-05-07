@@ -27,12 +27,12 @@ export async function handlePasteAndDrop(
     const fileId = await handleFileUploadOPFS(docId, file)
     const url = URL.createObjectURL(file)
 
-    const [canUpload, plan] = await canUserUpload(file.size)
+    // const [canUpload, plan] = await canUserUpload(file.size)
 
-    if (!canUpload) {
-        errorToast(plan)
-        return
-    }
+    // if (!canUpload) {
+    //     errorToast(plan)
+    //     return
+    // }
 
     editor
         .chain()
