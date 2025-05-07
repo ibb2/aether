@@ -277,7 +277,6 @@ export default function AppLayout({
                             : children}
                     </EditorProvider>
                 </SidebarInset>
-                <Toaster />
             </SidebarProvider>
         </TooltipProvider>
     )
