@@ -85,7 +85,9 @@ export default async function RootLayout({
                             defaultTheme="system"
                             enableSystem
                         >
-                            <ClientComponents>{children}</ClientComponents>
+                            <ClientComponents>
+                                {children} <Toaster />
+                            </ClientComponents>
                         </ThemeProvider>
                     </EvoluProvider>
                 </PHProvider>
