@@ -19,6 +19,24 @@ import { NonEmptyString50, NotebookId, NoteId, SectionId } from '@/db/schema'
 import { useEvolu, NonEmptyString1000, cast } from '@evolu/react'
 import { Database } from '@/db/db'
 import { initialContent } from '@/lib/data/initialContent'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+
+const NoteTypes = [
+    {
+        key: '1',
+        type: 'Default',
+    },
+    {
+        key: '2',
+        type: 'Blank',
+    },
+]
 
 export default function NotesContextMenu({
     type,
@@ -35,6 +53,7 @@ export default function NotesContextMenu({
 
     // Handling renaming of notebooks, sections and notes
     const [currentName, setCurrentName] = React.useState<string>('')
+    const [selectedNoteType, setSelectedNoteType] = React.useState('Default')
 
     React.useEffect(() => {
         setCurrentName(type === 'rename' ? item.name || item.title : '')
@@ -89,6 +108,7 @@ export default function NotesContextMenu({
             const { id: noteId } = create('notes', {
                 title: S.decodeSync(NonEmptyString1000)(noteName),
                 notebookId: S.decodeSync(NotebookId)(item.id),
+                noteType: S.decodeSync(NonEmptyString50)(selectedNoteType),
             })
 
             newNote = noteId
@@ -97,6 +117,7 @@ export default function NotesContextMenu({
                 title: S.decodeSync(NonEmptyString1000)(noteName),
                 notebookId: S.decodeSync(NotebookId)(item.notebookId),
                 sectionId: S.decodeSync(SectionId)(item.id),
+                noteType: S.decodeSync(NonEmptyString50)(selectedNoteType),
             })
 
             newNote = noteId
@@ -105,12 +126,12 @@ export default function NotesContextMenu({
         create('exportedData', {
             noteId: newNote,
             jsonExportedName: S.decodeSync(NonEmptyString50)(`doc_${newNote}`),
-            jsonData: initialContent,
+            jsonData: selectedNoteType === 'Default' ?? initialContent,
         })
 
         create('noteSettings', {
             noteId: newNote,
-            pageType: 1,
+            pageType: selectedNoteType === 'Default' ? 1 : 2,
             isInkEnabled: cast(true),
             isPageSplit: cast(false),
         })
@@ -126,6 +147,8 @@ export default function NotesContextMenu({
                     item,
                     currentName,
                     setCurrentName,
+                    selectedNoteType,
+                    setSelectedNoteType,
                     rename,
                     newSection,
                     newNote
@@ -140,6 +163,8 @@ function getDialog(
     item: any,
     currentName: any,
     setCurrentName: React.Dispatch<any>,
+    selectedNoteType: any,
+    setSelectedNoteType: React.Dispatch<any>,
     rename: (newName: string) => void,
     newSection: (sectionName: string) => void,
     newNote: (noteName: string) => void
@@ -164,6 +189,8 @@ function getDialog(
                 item,
                 currentName,
                 setCurrentName,
+                selectedNoteType,
+                setSelectedNoteType,
                 newNote
             )
         default:
@@ -267,6 +294,8 @@ function noteDialogComponent(
     item: any,
     currentName: any,
     setCurrentName: React.Dispatch<any>,
+    selectedNoteType: any,
+    setSelectedNoteType: React.Dispatch<any>,
     newNote: (noteName: string) => void
 ) {
     return (
@@ -287,6 +316,32 @@ function noteDialogComponent(
                     placeholder="new note"
                     onChange={(e) => setCurrentName(e.target.value)}
                 />
+            </div>
+            <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
+                <Label htmlFor="name">Note Type</Label>
+                <Select
+                    value={selectedNoteType}
+                    onValueChange={setSelectedNoteType}
+                >
+                    <SelectTrigger>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {NoteTypes.map((nt) => (
+                            <SelectItem key={nt.key} value={nt.type}>
+                                {nt.type}
+                            </SelectItem>
+                        ))}
+                        {/* {sections.rows.map((section) => (
+                            <SelectItem
+                                key={section.id}
+                                value={section.id}
+                            >
+                                {section.title}
+                            </SelectItem>
+                        ))} */}
+                    </SelectContent>
+                </Select>
             </div>
             <DialogFooter>
                 <DialogClose>

@@ -149,7 +149,7 @@ export const ExportedDatasTable = table({
     id: ExportedDataId,
     noteId: NoteId,
     jsonExportedName: S.NullOr(NonEmptyString50),
-    jsonData: S.Struct({}),
+    jsonData: S.NullOr(S.Struct({})),
     yjsExportedName: S.NullOr(NonEmptyString50),
     inkData: S.NullOr(CanvasPathArray),
     // yjsExportedData: S.Uint8Array,
