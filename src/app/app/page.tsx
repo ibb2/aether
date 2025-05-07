@@ -70,7 +70,7 @@ export const Document = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
     }, [setTheme])
 
     const DarkModeSwitcher = createPortal(
-        <Surface className="flex items-center gap-1 fixed bottom-6 right-6 z-[99999] p-1">
+        <Surface className="flex items-center gap-1 fixed bottom-6 right-6 z-50 p-1">
             <Toolbar.Button onClick={lightTheme} active={theme === 'light'}>
                 <Icon name="Sun" />
             </Toolbar.Button>
