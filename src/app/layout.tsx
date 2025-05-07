@@ -91,7 +91,6 @@ export default async function RootLayout({
                 </PHProvider>
                 <Analytics />
                 <SpeedInsights />
-                <Toaster />
             </body>
         </html>
     )
