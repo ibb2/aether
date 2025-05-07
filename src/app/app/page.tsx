@@ -28,6 +28,7 @@ import { db } from '@/db/drizzle'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useEditorStore from '@/store/editor'
 import { useCurrentEditor, useEditorState } from '@tiptap/react'
+import useNoteStore from '@/store/note'
 
 type DocumentProps = {
     params: { room: string }
@@ -39,6 +40,7 @@ export const Document = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
     const { data: session } = useSession()
 
     const setEditor = useEditorStore((s) => s.setEditor)
+    const type = useNoteStore((s) => s.type)
 
     const { editor } = useCurrentEditor()
     setEditor(editor)
@@ -84,7 +86,7 @@ export const Document = forwardRef<ReactSketchCanvasRef>((canvasRef) => {
     return (
         <>
             {DarkModeSwitcher}
-            <MemoizedBlockEditor ref={canvasRef} />
+            {type !== 'Blank' ? <MemoizedBlockEditor ref={canvasRef} /> : <></>}
         </>
     )
 })

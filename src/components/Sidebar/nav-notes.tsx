@@ -132,10 +132,11 @@ export default function NavNotes({
             const children = findChildren(item.id, item.id).map(processItem)
             const result = {
                 id: item.id,
-                name: item.name || item.title || '[Unnamed]',
+                name: item.name || item.title || '[Unamed]',
                 type: item.type,
                 notebookId: item.notebookId,
                 parentId: item.parentId,
+                noteType: item.noteType,
             }
             if (item.type !== 'note') {
                 result.children = children
@@ -163,13 +164,19 @@ export default function NavNotes({
                 notebookId: section.notebookId,
                 parentId: section.parentId,
             })),
-            notes: notes.rows.map((note) => ({
-                id: note.id,
-                name: note.title,
-                type: 'note',
-                notebookId: note.notebookId,
-                sectionId: note.sectionId,
-            })),
+            notes: notes.rows.map(
+                (note) => (
+                    console.log(note.noteType),
+                    {
+                        id: note.id,
+                        name: note.title,
+                        type: 'note',
+                        notebookId: note.notebookId,
+                        sectionId: note.sectionId,
+                        noteType: note.noteType,
+                    }
+                )
+            ),
         }
 
         return normalizedData
@@ -189,6 +196,7 @@ export default function NavNotes({
     const { update } = useEvolu<Database>()
 
     const setNote = useNoteStore((state) => state.setNote)
+    const setType = useNoteStore((state) => state.setType)
 
     const exportedDataQuery = React.useCallback(() => {
         return evolu.createQuery((db) =>
@@ -208,10 +216,13 @@ export default function NavNotes({
         setNote(item)
         setTreeData(initialTreeData)
 
+        console.log('Note', item)
+
         // Update the editor's content directly
         const data = exportedData.rows.find(
             (row) => row.noteId === S.decodeSync(NoteId)(item.id)
         )
+        console.log('Data', data)
 
         if (data) {
             const inkData = Array.isArray(data.inkData)
@@ -223,13 +234,18 @@ export default function NavNotes({
                 if (inkData) {
                     canvasRef.current.loadPaths(inkData)
                 }
-                editor.commands.setContent(data.jsonData!)
+                if (data.jsonData !== null)
+                    editor.commands.setContent(data.jsonData)
             } else {
-                editor.commands.setContent(data.jsonData!)
+                if (data.jsonData !== null)
+                    editor.commands.setContent(data.jsonData)
             }
+
             setTimeout(() => processImages(editor), 0)
             setId(data.id)
             setNoteId(data.noteId!)
+            console.log('Note type', item.noteType)
+            setType(item.noteType)
         }
     }
 

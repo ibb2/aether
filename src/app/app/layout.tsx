@@ -101,10 +101,11 @@ export default function AppLayout({
     const { update } = useEvolu<Database>()
 
     // Zustand Stores
-    const { item, exportedId, noteId } = useNoteStore((state) => ({
+    const { item, exportedId, noteId, type } = useNoteStore((state) => ({
         item: state.item,
         exportedId: state.id,
         noteId: state.noteId,
+        type: state.type,
     }))
 
     /**
@@ -249,34 +250,40 @@ export default function AppLayout({
                         <AppSidebar canvasRef={canvasRef} id={evoluId!} />
                     </QueryClientProvider>
                     <SidebarInset>
-                        <EditorProvider
-                            editorContainerProps={{
-                                className: 'grow',
-                            }}
-                            autofocus={false}
-                            immediatelyRender={true}
-                            shouldRerenderOnTransaction={false}
-                            extensions={extensions}
-                            editorProps={editorProps}
-                            onUpdate={(props) => {
-                                handleUpdate(props)
-                                // await handleImageDelete(props)
-                            }}
-                            slotBefore={
-                                <MemoizedEditorHeader
-                                    canvasRef={canvasRef}
-                                    readOnly={readOnly}
-                                    setReadOnly={setReadOnly}
-                                />
+                        <div
+                            className={
+                                type === 'Blank' ? 'invisible' : 'visible'
                             }
-                            content={content}
                         >
-                            {React.isValidElement(children)
-                                ? React.cloneElement(children, {
-                                      ref: canvasRef,
-                                  })
-                                : children}
-                        </EditorProvider>
+                            <EditorProvider
+                                editorContainerProps={{
+                                    className: 'grow',
+                                }}
+                                autofocus={false}
+                                immediatelyRender={true}
+                                shouldRerenderOnTransaction={false}
+                                extensions={extensions}
+                                editorProps={editorProps}
+                                onUpdate={(props) => {
+                                    handleUpdate(props)
+                                    // await handleImageDelete(props)
+                                }}
+                                slotBefore={
+                                    <MemoizedEditorHeader
+                                        canvasRef={canvasRef}
+                                        readOnly={readOnly}
+                                        setReadOnly={setReadOnly}
+                                    />
+                                }
+                                content={content}
+                            >
+                                {React.isValidElement(children)
+                                    ? React.cloneElement(children, {
+                                          ref: canvasRef,
+                                      })
+                                    : children}
+                            </EditorProvider>
+                        </div>
                     </SidebarInset>
                 </SidebarProvider>
             </TooltipProvider>

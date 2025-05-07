@@ -10,9 +10,11 @@ interface NoteState {
     isInkEnabled: boolean
     isPageSplit: boolean
     item: any
+    type: string | undefined | null
     setNote: (item: any) => void
     setId: (id: any) => void
     setNoteId: (id: any) => void
+    setType: (type: string | undefined | null) => void
     setInk: (data: any) => void
     setInkStatus: () => void
     setPageSplit: () => void
@@ -27,10 +29,11 @@ const useNoteStore = create<NoteState>()((set) => ({
     isInkEnabled: false,
     isPageSplit: false,
     item: null,
-
+    type: undefined,
     setNote: (item) => set(() => ({ item })),
     setId: (id) => set(() => ({ id })),
     setNoteId: (id) => set(() => ({ noteId: id })),
+    setType: (type) => set(() => ({ type })),
     setInk: (data: any) =>
         set(() => ({
             ink: data,
