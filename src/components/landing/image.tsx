@@ -17,14 +17,13 @@ export default function HeroImage() {
             className="flex relative h-lvh max-w-5xl items-center justify-center rounded-lg"
             width={0}
             height={0}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 33vw"
             // style={{ width: 'auto', height: 'auto' }} // optional
             // sizes="100vw"
             style={{
                 width: '100%',
                 height: 'auto',
             }}
-            quality={100}
         />
     )
 }
