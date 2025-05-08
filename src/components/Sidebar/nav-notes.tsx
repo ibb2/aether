@@ -220,19 +220,16 @@ export default function NavNotes({
             const inkData = Array.isArray(data.inkData)
                 ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
                 : null
-            console.log(0, inkData)
+
             if (canvasRef.current) {
-                console.log(1)
                 canvasRef.current.resetCanvas()
                 if (inkData) {
                     canvasRef.current.loadPaths(inkData)
-                    console.log('Loaded ink')
                 }
-                console.log(2)
+
                 if (data.jsonData !== null)
                     editor.commands.setContent(data.jsonData)
             } else {
-                console.log(3)
                 if (data.jsonData !== null)
                     editor.commands.setContent(data.jsonData)
             }

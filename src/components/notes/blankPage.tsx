@@ -27,7 +27,7 @@ const BlankPage = forwardRef((item, canvasRef) => {
     const { update } = useEvolu<Database>()
 
     // State for Themes
-    const { theme } = useTheme()
+    const { theme, resolvedTheme } = useTheme()
 
     const exportedDataQuery = React.useCallback(() => {
         return evolu.createQuery((db) =>
@@ -70,17 +70,31 @@ const BlankPage = forwardRef((item, canvasRef) => {
     )
     const debouncedInkSave = useDebouncedCallback(saveInkData, 500)
 
+    function getInkColor(
+        theme: string | undefined,
+        resolvedTheme: string | undefined
+    ): string {
+        if (theme === 'light') {
+            return 'black'
+        } else if (theme === 'dark') {
+            return 'white'
+        } else if (theme === 'system') {
+            return resolvedTheme === 'light' ? 'black' : 'white'
+        }
+        return 'black' // fallback
+    }
+
     // Debounced effect to change stroke color based on theme
     const debouncedChangeExistingStrokeColor = useDebouncedCallback(
         async () => {
             if (canvasRef?.current) {
+                console.log(getInkColor(theme, resolvedTheme))
                 // Get current paths
                 const paths = await canvasRef.current.exportPaths()
-
                 // Modify the color of all paths
                 const updatedPaths = paths.map((path) => ({
                     ...path,
-                    strokeColor: theme === 'light' ? 'black' : 'white',
+                    strokeColor: getInkColor(theme, resolvedTheme),
                 }))
 
                 // Clear the canvas
@@ -90,16 +104,17 @@ const BlankPage = forwardRef((item, canvasRef) => {
                 await canvasRef.current.loadPaths(updatedPaths)
             }
         },
-        300
+        200
     )
 
     React.useEffect(() => {
+        console.log('Theme: ', theme, resolvedTheme)
         debouncedChangeExistingStrokeColor()
         // Cleanup on unmount
         return () => {
             debouncedChangeExistingStrokeColor.cancel()
         }
-    }, [theme, debouncedChangeExistingStrokeColor])
+    }, [theme, resolvedTheme, debouncedChangeExistingStrokeColor])
 
     const reactSketchCanvasClass = React.useMemo(
         () => cn('absolute', readOnly && 'z-[-1]'),
