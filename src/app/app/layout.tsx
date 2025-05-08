@@ -38,6 +38,8 @@ import { releaseVersion_0_4_0 } from '@/lib/data/whats-new/release-v0.4.0'
 import { releaseVersion_0_4_1 } from '@/lib/data/whats-new/release-v0.4.1'
 import Cookies from 'js-cookie'
 import { Toaster } from '@/components/ui/toaster'
+import { cn } from '@/lib/utils'
+import BlankPage from '@/components/notes/blankPage'
 
 const queryClient = new QueryClient()
 
@@ -250,48 +252,49 @@ export default function AppLayout({
                         <AppSidebar canvasRef={canvasRef} id={evoluId!} />
                     </QueryClientProvider>
                     <SidebarInset>
-                        <div
-                            className={
-                                type === 'Blank' ? 'invisible' : 'visible'
-                            }
-                        >
-                            <EditorProvider
-                                editorContainerProps={{
-                                    className: 'grow',
-                                }}
-                                autofocus={false}
-                                immediatelyRender={true}
-                                shouldRerenderOnTransaction={false}
-                                extensions={extensions}
-                                editorProps={editorProps}
-                                onUpdate={(props) => {
-                                    handleUpdate(props)
-                                    // await handleImageDelete(props)
-                                }}
-                                slotBefore={
-                                    <MemoizedEditorHeader
-                                        canvasRef={canvasRef}
-                                        readOnly={readOnly}
-                                        setReadOnly={setReadOnly}
-                                    />
+                        <>
+                            <EditorHeader
+                                canvasRef={null}
+                                readOnly={false}
+                                setReadOnly={() => {}}
+                            />
+                            <div
+                                className={
+                                    type === 'Blank' ? 'hidden' : 'visible'
                                 }
-                                content={content}
                             >
-                                {React.isValidElement(children)
-                                    ? React.cloneElement(children, {
-                                          ref: canvasRef,
-                                      })
-                                    : children}
-                            </EditorProvider>
-                        </div>
-                        <div
-                            className={
-                                type !== 'Blank' ? 'invisible' : 'visible'
-                            }
-                        >
-                            <p>Hey</p>
-                            {/* Add page component */}
-                        </div>
+                                <EditorProvider
+                                    editorContainerProps={{
+                                        className: 'grow',
+                                    }}
+                                    autofocus={false}
+                                    immediatelyRender={true}
+                                    shouldRerenderOnTransaction={false}
+                                    extensions={extensions}
+                                    editorProps={editorProps}
+                                    onUpdate={(props) => {
+                                        handleUpdate(props)
+                                        // await handleImageDelete(props)
+                                    }}
+                                    content={content}
+                                >
+                                    {React.isValidElement(children)
+                                        ? React.cloneElement(children, {
+                                              ref: canvasRef,
+                                          })
+                                        : children}
+                                </EditorProvider>
+                            </div>
+                            <div
+                                className={cn('flex h-full w-lvw', {
+                                    invisible: type !== 'Blank',
+                                    visible: type === 'Blank',
+                                })}
+                            >
+                                {/* Add page component */}
+                                <BlankPage ref={canvasRef} />
+                            </div>
+                        </>
                     </SidebarInset>
                 </SidebarProvider>
             </TooltipProvider>
