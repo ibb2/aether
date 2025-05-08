@@ -259,9 +259,10 @@ export default function AppLayout({
                                 setReadOnly={() => {}}
                             />
                             <div
-                                className={
-                                    type === 'Blank' ? 'hidden' : 'visible'
-                                }
+                                className={cn('grow', {
+                                    hidden: type === 'Blank',
+                                    visible: type !== 'Blank',
+                                })}
                             >
                                 <EditorProvider
                                     editorContainerProps={{
@@ -286,8 +287,8 @@ export default function AppLayout({
                                 </EditorProvider>
                             </div>
                             <div
-                                className={cn('flex h-full w-lvw', {
-                                    invisible: type !== 'Blank',
+                                className={cn('grow', {
+                                    hidden: type !== 'Blank',
                                     visible: type === 'Blank',
                                 })}
                             >

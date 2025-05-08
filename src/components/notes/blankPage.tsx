@@ -62,12 +62,11 @@ const BlankPage = forwardRef((canvasRef) => {
     const canvasStyle = React.useMemo(() => ({ border: 0 }), [])
 
     return (
-        <div className="flex w-full h-full">
-            <p>hey</p>
+        <div className="flex w-full">
             <ReactSketchCanvas
                 ref={canvasRef?.current}
                 readOnly={readOnly}
-                height="100%"
+                height="92.5%"
                 style={canvasStyle}
                 canvasColor="transparent"
                 strokeColor={strokeColor}
