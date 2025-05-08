@@ -164,19 +164,14 @@ export default function NavNotes({
                 notebookId: section.notebookId,
                 parentId: section.parentId,
             })),
-            notes: notes.rows.map(
-                (note) => (
-                    console.log(note.noteType),
-                    {
-                        id: note.id,
-                        name: note.title,
-                        type: 'note',
-                        notebookId: note.notebookId,
-                        sectionId: note.sectionId,
-                        noteType: note.noteType,
-                    }
-                )
-            ),
+            notes: notes.rows.map((note) => ({
+                id: note.id,
+                name: note.title,
+                type: 'note',
+                notebookId: note.notebookId,
+                sectionId: note.sectionId,
+                noteType: note.noteType,
+            })),
         }
 
         return normalizedData
@@ -216,27 +211,28 @@ export default function NavNotes({
         setNote(item)
         setTreeData(initialTreeData)
 
-        console.log('Note', item)
-
         // Update the editor's content directly
         const data = exportedData.rows.find(
             (row) => row.noteId === S.decodeSync(NoteId)(item.id)
         )
-        console.log('Data', data)
 
         if (data) {
             const inkData = Array.isArray(data.inkData)
                 ? (data.inkData as unknown as import('react-sketch-canvas').CanvasPath[])
                 : null
-
+            console.log(0, inkData)
             if (canvasRef.current) {
+                console.log(1)
                 canvasRef.current.resetCanvas()
                 if (inkData) {
                     canvasRef.current.loadPaths(inkData)
+                    console.log('Loaded ink')
                 }
+                console.log(2)
                 if (data.jsonData !== null)
                     editor.commands.setContent(data.jsonData)
             } else {
+                console.log(3)
                 if (data.jsonData !== null)
                     editor.commands.setContent(data.jsonData)
             }
@@ -244,7 +240,6 @@ export default function NavNotes({
             setTimeout(() => processImages(editor), 0)
             setId(data.id)
             setNoteId(data.noteId!)
-            console.log('Note type', item.noteType)
             setType(item.noteType)
         }
     }

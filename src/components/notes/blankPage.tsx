@@ -1,3 +1,5 @@
+import * as S from '@effect/schema/Schema'
+
 import { Icon } from '@/components/ui/Icon'
 import { WebSocketStatus } from '@hocuspocus/provider'
 import { Toolbar } from '@/components/ui/Toolbar'
@@ -10,13 +12,63 @@ import { EditorInfo } from '../BlockEditor/components/EditorInfo'
 import { cn } from '@/lib/utils'
 import { useDebouncedCallback } from 'use-debounce'
 import { useTheme } from 'next-themes'
+import { convertCanvasPathsForDatabase } from '@/lib/utils/convertCanvasPaths'
+import { useEvolu, useQuery } from '@evolu/react'
+import { Database, evolu } from '@/db/db'
+import { CanvasPathArray, ExportedDataId, NoteId } from '@/db/schema'
+import path from 'node:path/posix'
+import useNoteStore from '@/store/note'
 
-const BlankPage = forwardRef((canvasRef) => {
+const BlankPage = forwardRef((item, canvasRef) => {
     // States for React Sketch Canvas
     const [readOnly, setReadOnly] = React.useState(false)
 
+    // Evolu
+    const { update } = useEvolu<Database>()
+
     // State for Themes
     const { theme } = useTheme()
+
+    const exportedDataQuery = React.useCallback(() => {
+        return evolu.createQuery((db) =>
+            db
+                .selectFrom('exportedData')
+                .select('id')
+                .select('jsonData')
+                .select('noteId')
+                .select('inkData')
+        )
+    }, [])
+
+    // Use the query result here
+    const exportedData = useQuery(exportedDataQuery())
+
+    const { itemstore, exportedId, noteId, type } = useNoteStore((state) => ({
+        itemstore: state.item,
+        exportedId: state.id,
+        noteId: state.noteId,
+        type: state.type,
+    }))
+
+    const saveInkData = React.useCallback(
+        async (canvasRef: ReactSketchCanvasRef) => {
+            if (item === null) return
+
+            if (exportedId === null || canvasRef === null) return
+
+            const time = await canvasRef?.getSketchingTime()
+            const paths = await canvasRef?.exportPaths()
+
+            const cleanedData = convertCanvasPathsForDatabase(paths)
+
+            update('exportedData', {
+                id: exportedId,
+                inkData: S.decodeSync(CanvasPathArray)(cleanedData),
+            })
+        },
+        [item, exportedData.rows, update]
+    )
+    const debouncedInkSave = useDebouncedCallback(saveInkData, 500)
 
     // Debounced effect to change stroke color based on theme
     const debouncedChangeExistingStrokeColor = useDebouncedCallback(
@@ -64,18 +116,18 @@ const BlankPage = forwardRef((canvasRef) => {
     return (
         <div className="flex w-full">
             <ReactSketchCanvas
-                ref={canvasRef?.current}
+                ref={canvasRef}
                 readOnly={readOnly}
                 height="92.5%"
                 style={canvasStyle}
                 canvasColor="transparent"
                 strokeColor={strokeColor}
                 className={reactSketchCanvasClass}
-                // onChange={() => {
-                //     if (canvasRef?.current) {
-                //         debouncedInkSave(canvasRef?.current)
-                //     }
-                // }}
+                onChange={() => {
+                    if (canvasRef?.current) {
+                        debouncedInkSave(canvasRef?.current)
+                    }
+                }}
                 withTimestamp
             />
         </div>

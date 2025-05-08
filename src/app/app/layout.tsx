@@ -293,7 +293,7 @@ export default function AppLayout({
                                 })}
                             >
                                 {/* Add page component */}
-                                <BlankPage ref={canvasRef} />
+                                <BlankPage ref={canvasRef} item={item} />
                             </div>
                         </>
                     </SidebarInset>
