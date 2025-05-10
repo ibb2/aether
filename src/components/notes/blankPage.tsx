@@ -210,11 +210,7 @@ const BlankPage = forwardRef((item, canvasRef) => {
     }
 
     return (
-        <div
-            ref={ref}
-            id="canvas-container"
-            className="flex w-full h-auto aspect-[210/297]"
-        >
+        <div ref={ref} className="flex w-full h-auto aspect-[210/297]">
             <Stage
                 className="overflow-hidden"
                 width={bounds.width}
