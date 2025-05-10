@@ -21,6 +21,7 @@ import useNoteStore from '@/store/note'
 import { Layer, Line, Shape, Stage } from 'react-konva'
 import { getStroke } from 'perfect-freehand'
 import getSvgPathFromStroke from '@/lib/utils/getSvgPathFromStroke'
+import useMeasure from 'react-use-measure'
 
 const BlankPage = forwardRef((item, canvasRef) => {
     // States for React Sketch Canvas
@@ -132,6 +133,8 @@ const BlankPage = forwardRef((item, canvasRef) => {
     const canvasStyle = React.useMemo(() => ({ border: 0 }), [])
 
     // Custom React canvas
+    const [ref, bounds] = useMeasure()
+
     const isDrawing = React.useRef(false)
     const [strokes, setStrokes] = React.useState<any>([])
     const currentStroke = React.useRef<any>([])
@@ -207,22 +210,29 @@ const BlankPage = forwardRef((item, canvasRef) => {
     }
 
     return (
-        <Stage
-            width={window.innerWidth}
-            height={window.innerHeight}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onPointerLeave={handlePointerUp}
+        <div
+            ref={ref}
+            id="canvas-container"
+            className="flex w-full h-auto aspect-[210/297]"
         >
-            <Layer>
-                {strokes.map((strokePoints, i) => (
-                    <>{renderStroke(strokePoints)}</>
-                ))}
-                {isDrawing.current && renderStroke(currentStroke.current)}
-            </Layer>
-        </Stage>
+            <Stage
+                className="overflow-hidden"
+                width={bounds.width}
+                height={bounds.height}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                onPointerLeave={handlePointerUp}
+            >
+                <Layer>
+                    {strokes.map((strokePoints, i) => (
+                        <>{renderStroke(strokePoints)}</>
+                    ))}
+                    {isDrawing.current && renderStroke(currentStroke.current)}
+                </Layer>
+            </Stage>
+        </div>
     )
 })
 

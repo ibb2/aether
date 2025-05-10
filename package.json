@@ -136,6 +136,7 @@
         "react-konva": "^18.2.10",
         "react-resizable-panels": "^2.1.7",
         "react-sketch-canvas": "^7.0.0-next.4",
+        "react-use-measure": "^2.1.7",
         "resend": "^4.4.1",
         "stripe": "^17.5.0",
         "tailwind-merge": "^2.6.0",
