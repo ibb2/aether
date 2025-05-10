@@ -117,7 +117,12 @@ const BlankPage = forwardRef((item, canvasRef) => {
     }, [theme, resolvedTheme, debouncedChangeExistingStrokeColor])
 
     const reactSketchCanvasClass = React.useMemo(
-        () => cn('absolute', readOnly && 'z-[-1]'),
+        () =>
+            cn(
+                'absolute',
+                'mx-auto h-auto w-full aspect-[210/297] block',
+                readOnly && 'z-[-1]'
+            ),
         [readOnly]
     )
 
@@ -128,25 +133,7 @@ const BlankPage = forwardRef((item, canvasRef) => {
 
     const canvasStyle = React.useMemo(() => ({ border: 0 }), [])
 
-    return (
-        <div className="flex w-full">
-            <ReactSketchCanvas
-                ref={canvasRef}
-                readOnly={readOnly}
-                height="92.5%"
-                style={canvasStyle}
-                canvasColor="transparent"
-                strokeColor={strokeColor}
-                className={reactSketchCanvasClass}
-                onChange={() => {
-                    if (canvasRef?.current) {
-                        debouncedInkSave(canvasRef?.current)
-                    }
-                }}
-                withTimestamp
-            />
-        </div>
-    )
+    return <div className="flex w-full"></div>
 })
 
 BlankPage.displayName = 'BlockEditor'

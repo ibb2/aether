@@ -46,6 +46,14 @@
     pointer-events: none; /* Prevent interaction with the placeholder */
 }
 
+.canvas-page {
+    width: 210mm;
+    height: 297mm;
+    background: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    margin: 1rem auto;
+}
+
 @import './partials/animations.css';
 @import './partials/blocks.css';
 @import './partials/code.css';

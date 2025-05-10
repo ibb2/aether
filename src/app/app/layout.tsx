@@ -251,7 +251,7 @@ export default function AppLayout({
                     <QueryClientProvider client={queryClient}>
                         <AppSidebar canvasRef={canvasRef} id={evoluId!} />
                     </QueryClientProvider>
-                    <SidebarInset>
+                    <SidebarInset className="flex overflow-auto overflow-y-auto">
                         <>
                             <EditorHeader
                                 canvasRef={null}
