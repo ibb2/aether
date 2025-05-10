@@ -40,12 +40,17 @@ import Cookies from 'js-cookie'
 import { Toaster } from '@/components/ui/toaster'
 import { cn } from '@/lib/utils'
 import BlankPage from '@/components/notes/blankPage'
+import dynamic from 'next/dynamic'
 
 const queryClient = new QueryClient()
 
 const VERSION = process.env.NEXT_PUBLIC_VISITED_VERSION
 const COOKIE_NAME = `hasVisited_${VERSION}`
 const DEFAULT_CONTENT = '<h1></h1><p></p>'
+
+const Canvas = dynamic(() => import('@/components/notes/blankPage'), {
+    ssr: false,
+})
 
 export default function AppLayout({
     children, // will be a page or nested layout
@@ -293,7 +298,7 @@ export default function AppLayout({
                                 })}
                             >
                                 {/* Add page component */}
-                                <BlankPage ref={canvasRef} item={item} />
+                                <Canvas ref={canvasRef} item={item} />
                             </div>
                         </>
                     </SidebarInset>

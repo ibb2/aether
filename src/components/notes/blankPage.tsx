@@ -18,6 +18,9 @@ import { Database, evolu } from '@/db/db'
 import { CanvasPathArray, ExportedDataId, NoteId } from '@/db/schema'
 import path from 'node:path/posix'
 import useNoteStore from '@/store/note'
+import { Layer, Line, Shape, Stage } from 'react-konva'
+import { getStroke } from 'perfect-freehand'
+import getSvgPathFromStroke from '@/lib/utils/getSvgPathFromStroke'
 
 const BlankPage = forwardRef((item, canvasRef) => {
     // States for React Sketch Canvas
@@ -126,14 +129,101 @@ const BlankPage = forwardRef((item, canvasRef) => {
         [readOnly]
     )
 
-    const strokeColor = React.useMemo(
-        () => (theme === 'light' ? 'black' : 'white'),
-        [theme]
-    )
-
     const canvasStyle = React.useMemo(() => ({ border: 0 }), [])
 
-    return <div className="flex w-full"></div>
+    // Custom React canvas
+    const isDrawing = React.useRef(false)
+    const [strokes, setStrokes] = React.useState<any>([])
+    const currentStroke = React.useRef<any>([])
+
+    const [strokeColor, setStrokeColor] = React.useState('#000')
+
+    function getInkColour(
+        theme: string | undefined,
+        resolvedTheme: string | undefined
+    ): string {
+        if (theme === 'light') {
+            return 'black'
+        } else if (theme === 'dark') {
+            return 'white'
+        } else if (theme === 'system') {
+            return resolvedTheme === 'light' ? 'black' : 'white'
+        }
+        return 'black' // fallback
+    }
+
+    React.useEffect(() => {
+        setStrokeColor(getInkColour(theme, resolvedTheme))
+        console.log(strokeColor)
+    }, [theme, resolvedTheme])
+
+    const handlePointerDown = (e) => {
+        isDrawing.current = true
+        const stage = e.target.getStage()
+        const point = stage.getPointerPosition()
+        const pressure = e.evt.pressure || 0.5
+        currentStroke.current = [[point.x, point.y, pressure]]
+    }
+
+    const handlePointerMove = (e) => {
+        if (!isDrawing.current) return
+        const stage = e.target.getStage()
+        const point = stage.getPointerPosition()
+        const pressure = e.evt.pressure || 0.5
+        currentStroke.current = [
+            ...currentStroke.current,
+            [point.x, point.y, pressure],
+        ]
+        // Trigger a re-render
+        setStrokes([...strokes])
+    }
+
+    const handlePointerUp = () => {
+        isDrawing.current = false
+        setStrokes([...strokes, currentStroke.current])
+        currentStroke.current = []
+    }
+
+    const renderStroke = (points) => {
+        const stroke = getStroke(points, {
+            size: 8,
+            thinning: 0.5,
+            smoothing: 0.5,
+            streamline: 0.5,
+        })
+        const pathData = getSvgPathFromStroke(stroke)
+        return (
+            <Line
+                sceneFunc={(context, shape) => {
+                    context.beginPath()
+                    const path = new Path2D(pathData)
+                    context.fillStyle = strokeColor
+                    context.fill(path)
+                    context.fillStrokeShape(shape)
+                }}
+                strokeWidth={2}
+            />
+        )
+    }
+
+    return (
+        <Stage
+            width={window.innerWidth}
+            height={window.innerHeight}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+        >
+            <Layer>
+                {strokes.map((strokePoints, i) => (
+                    <>{renderStroke(strokePoints)}</>
+                ))}
+                {isDrawing.current && renderStroke(currentStroke.current)}
+            </Layer>
+        </Stage>
+    )
 })
 
 BlankPage.displayName = 'BlockEditor'
