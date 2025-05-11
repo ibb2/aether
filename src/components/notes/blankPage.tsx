@@ -24,6 +24,7 @@ import getSvgPathFromStroke from '@/lib/utils/getSvgPathFromStroke'
 import useMeasure from 'react-use-measure'
 import { currentUser } from '@clerk/nextjs/server'
 import { useDrawingStore } from '@/store/drawingStore'
+import debounce from 'lodash.debounce'
 
 const BlankPage = forwardRef((item, canvasRef) => {
     // States for React Sketch Canvas
@@ -117,6 +118,8 @@ const BlankPage = forwardRef((item, canvasRef) => {
     // Custom React canvas
     const [ref, bounds] = useMeasure()
 
+    const loaded = React.useRef(false)
+
     const [shadowStrokes, setShadowStrokes] = React.useState<any>([])
 
     const {
@@ -159,8 +162,12 @@ const BlankPage = forwardRef((item, canvasRef) => {
 
     const debouncedInkSave = useDebouncedCallback(saveInkData, 500)
 
-    React.useLayoutEffect(() => {
-        if (type !== 'Blank') return
+    React.useEffect(() => {
+        debouncedInkSave()
+    }, [debouncedInkSave, strokes])
+
+    React.useEffect(() => {
+        if (type !== 'Blank' || loaded.current === true) return
         console.log(1)
         const data = exportedData.rows.find((ed) => ed.id === exportedId)
         console.log(2)

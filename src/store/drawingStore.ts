@@ -14,6 +14,7 @@ interface DrawingState {
     push: (stroke: any) => void
     undo: () => void
     redo: () => void
+    clear: () => void
 }
 
 export const useDrawingStore = create<DrawingState>((set, get) => ({
@@ -30,7 +31,7 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
     },
     setStrokes: (strokes) => {
         set({ strokes })
-    }, // placeholder; you'll inject it
+    },
     push: (stroke) => {
         const { history, step } = get()
         const newHistory = [...history.slice(0, step), stroke]
@@ -49,5 +50,12 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
         const newStep = step + 1
         set({ step: newStep })
         setStrokes(history.slice(0, newStep))
+    },
+    clear: () => {
+        const { push, step, setStrokes } = get()
+        const newStep = step + 1
+        set({ step: newStep })
+        push([])
+        setStrokes([])
     },
 }))

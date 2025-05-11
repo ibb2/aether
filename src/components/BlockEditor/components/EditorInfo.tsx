@@ -69,7 +69,7 @@ export const EditorInfo = memo(
 
         // Konva history
         const [strokes, setStrokes] = React.useState<any>([])
-        const { push, undo, redo } = useDrawingStore()
+        const { push, undo, redo, clear } = useDrawingStore()
 
         // const noteSettingsQuery = React.useCallback(
         //   () => evolu.createQuery((db) => db.selectFrom("noteSettings").selectAll()),
@@ -164,14 +164,10 @@ export const EditorInfo = memo(
                         <Button variant="ghost" size="sm" onClick={redo}>
                             <Redo />
                         </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleClearClick}
-                        >
+                        <Button variant="ghost" size="sm" onClick={clear}>
                             <Trash />
                         </Button>
-                        <Button
+                        {/* <Button
                             variant="ghost"
                             size="sm"
                             onClick={handleResetClick}
@@ -185,7 +181,7 @@ export const EditorInfo = memo(
                             className="mr-2"
                         >
                             {isInkEnabled ? <ToggleRight /> : <ToggleLeft />}
-                        </Button>
+                        </Button> */}
                     </div>
                 )}
                 <div className="flex flex-row justify-self-end items-center">
