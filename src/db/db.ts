@@ -42,11 +42,6 @@ const Database = database({
 })
 export type Database = typeof Database.Type
 
-console.log(
-    'process.env.EVOLU_SERVER_URL',
-    process.env.NEXT_PUBLIC_EVOLU_SERVER_URL!
-)
-
 export const evolu = createEvolu(Database, {
     indexes,
     syncUrl: process.env.NEXT_PUBLIC_EVOLU_SERVER_URL,

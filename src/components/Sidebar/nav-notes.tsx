@@ -132,10 +132,11 @@ export default function NavNotes({
             const children = findChildren(item.id, item.id).map(processItem)
             const result = {
                 id: item.id,
-                name: item.name || item.title || '[Unnamed]',
+                name: item.name || item.title || '[Unamed]',
                 type: item.type,
                 notebookId: item.notebookId,
                 parentId: item.parentId,
+                noteType: item.noteType,
             }
             if (item.type !== 'note') {
                 result.children = children
@@ -169,6 +170,7 @@ export default function NavNotes({
                 type: 'note',
                 notebookId: note.notebookId,
                 sectionId: note.sectionId,
+                noteType: note.noteType,
             })),
         }
 
@@ -189,6 +191,7 @@ export default function NavNotes({
     const { update } = useEvolu<Database>()
 
     const setNote = useNoteStore((state) => state.setNote)
+    const setType = useNoteStore((state) => state.setType)
 
     const exportedDataQuery = React.useCallback(() => {
         return evolu.createQuery((db) =>
@@ -223,13 +226,18 @@ export default function NavNotes({
                 if (inkData) {
                     canvasRef.current.loadPaths(inkData)
                 }
-                editor.commands.setContent(data.jsonData!)
+
+                if (data.jsonData !== null)
+                    editor.commands.setContent(data.jsonData)
             } else {
-                editor.commands.setContent(data.jsonData!)
+                if (data.jsonData !== null)
+                    editor.commands.setContent(data.jsonData)
             }
+
             setTimeout(() => processImages(editor), 0)
             setId(data.id)
             setNoteId(data.noteId!)
+            setType(item.noteType)
         }
     }
 

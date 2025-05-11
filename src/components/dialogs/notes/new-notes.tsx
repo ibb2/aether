@@ -73,6 +73,17 @@ import { initialContent } from '@/lib/data/initialContent'
 
 type ItemType = 'note' | 'notebook' | 'section'
 
+const NoteTypes = [
+    {
+        key: '1',
+        type: 'Default',
+    },
+    {
+        key: '2',
+        type: 'Blank',
+    },
+]
+
 export default function NewNotes() {
     const { create, update } = useEvolu<Database>()
 
@@ -93,6 +104,8 @@ export default function NewNotes() {
     const [newItemType, setNewItemType] = React.useState<ItemType>('note')
     const [newItemName, setNewItemName] = React.useState('')
 
+    const [selectedNoteType, setSelectedNoteType] = React.useState('Default')
+
     const openDialog = (type: ItemType) => {
         setNewItemType(type)
         setNewItemName('')
@@ -111,6 +124,8 @@ export default function NewNotes() {
                     const { id: fragmentNoteId } = create('notes', {
                         title: S.decodeSync(NonEmptyString1000)(newItemName),
                         isFragment: true,
+                        noteType:
+                            S.decodeSync(NonEmptyString50)(selectedNoteType),
                     })
 
                     create('exportedData', {
@@ -118,7 +133,15 @@ export default function NewNotes() {
                         jsonExportedName: S.decodeSync(NonEmptyString50)(
                             `doc_${fragmentNoteId}`
                         ),
-                        jsonData: initialContent,
+                        jsonData:
+                            selectedNoteType === 'Default' ?? initialContent,
+                    })
+
+                    create('noteSettings', {
+                        noteId: fragmentNoteId,
+                        pageType: selectedNoteType === 'Default' ? 1 : 2,
+                        isInkEnabled: cast(true),
+                        isPageSplit: cast(false),
                     })
 
                     try {
@@ -145,6 +168,7 @@ export default function NewNotes() {
                         selectedSection === undefined
                             ? null
                             : S.decodeSync(SectionId)(selectedSection),
+                    noteType: S.decodeSync(NonEmptyString50)(selectedNoteType),
                 })
 
                 create('exportedData', {
@@ -152,12 +176,12 @@ export default function NewNotes() {
                     jsonExportedName: S.decodeSync(NonEmptyString50)(
                         `doc_${noteId}`
                     ),
-                    jsonData: initialContent,
+                    jsonData: selectedNoteType === 'Default' ?? initialContent,
                 })
 
                 create('noteSettings', {
                     noteId: noteId,
-                    pageType: 1,
+                    pageType: selectedNoteType === 'Default' ? 1 : 2,
                     isInkEnabled: cast(true),
                     isPageSplit: cast(false),
                 })
@@ -303,6 +327,37 @@ export default function NewNotes() {
                                                 {section.title}
                                             </SelectItem>
                                         ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+                        {newItemType === 'note' && (
+                            <div className="flex flex-col w-full gap-y-2">
+                                <Label htmlFor="name">Type</Label>
+                                <Select
+                                    value={selectedNoteType}
+                                    onValueChange={setSelectedNoteType}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {NoteTypes.map((nt) => (
+                                            <SelectItem
+                                                key={nt.key}
+                                                value={nt.type}
+                                            >
+                                                {nt.type}
+                                            </SelectItem>
+                                        ))}
+                                        {/* {sections.rows.map((section) => (
+                                            <SelectItem
+                                                key={section.id}
+                                                value={section.id}
+                                            >
+                                                {section.title}
+                                            </SelectItem>
+                                        ))} */}
                                     </SelectContent>
                                 </Select>
                             </div>

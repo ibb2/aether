@@ -21,17 +21,12 @@ export const EditorHeader = ({
     setReadOnly,
 }: EditorHeaderProps) => {
     return (
-        <header className="flex h-16 w-full shrink-0 items-center gap-2 z-10">
-            <div className="flex w-full justify-between items-center gap-2 px-4">
-                <div className="flex items-center">
-                    <SidebarTrigger className="-ml-1" />
-                </div>
-                <EditorInfo
-                    canvasRef={canvasRef?.current}
-                    readOnly={readOnly}
-                    setReadOnly={setReadOnly}
-                />
-            </div>
+        <header className="flex sticky top-0 h-16 w-full items-center z-10">
+            <EditorInfo
+                canvasRef={canvasRef?.current}
+                readOnly={readOnly}
+                setReadOnly={setReadOnly}
+            />
         </header>
     )
 }

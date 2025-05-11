@@ -44,6 +44,17 @@ interface NoteDialogProps {
     children: any
 }
 
+const NoteTypes = [
+    {
+        key: '1',
+        type: 'Default',
+    },
+    {
+        key: '2',
+        type: 'Blank',
+    },
+]
+
 export const NoteDialog = ({
     notebookId,
     notebookTitle,
@@ -67,6 +78,7 @@ export const NoteDialog = ({
     const { create } = useEvolu<Database>()
 
     const [selectedNotebook, setSelectedNotebook] = React.useState(notebookId)
+    const [selectedNoteType, setSelectedNoteType] = React.useState('Default')
 
     const create = () => {
         const { id: noteId } = create('notes', {
@@ -95,14 +107,30 @@ export const NoteDialog = ({
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid w-full max-w-sm items-center gap-1.5 py-3.5">
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                        type="text"
-                        id="name"
-                        placeholder="new section"
-                        value={noteName}
-                        onChange={(e) => setNoteName(e.target.value)}
-                    />
+                    <Label htmlFor="name">Note Type</Label>
+                    <Select
+                        value={selectedNoteType}
+                        onValueChange={setSelectedNoteType}
+                    >
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {NoteTypes.map((nt) => (
+                                <SelectItem key={nt.key} value={nt.type}>
+                                    {nt.type}
+                                </SelectItem>
+                            ))}
+                            {/* {sections.rows.map((section) => (
+                                <SelectItem
+                                    key={section.id}
+                                    value={section.id}
+                                >
+                                    {section.title}
+                                </SelectItem>
+                            ))} */}
+                        </SelectContent>
+                    </Select>
                 </div>
                 <DialogFooter>
                     <Button variant="secondary" onClick={() => setOpen(false)}>

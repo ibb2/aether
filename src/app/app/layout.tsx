@@ -38,12 +38,19 @@ import { releaseVersion_0_4_0 } from '@/lib/data/whats-new/release-v0.4.0'
 import { releaseVersion_0_4_1 } from '@/lib/data/whats-new/release-v0.4.1'
 import Cookies from 'js-cookie'
 import { Toaster } from '@/components/ui/toaster'
+import { cn } from '@/lib/utils'
+import BlankPage from '@/components/notes/blankPage'
+import dynamic from 'next/dynamic'
 
 const queryClient = new QueryClient()
 
 const VERSION = process.env.NEXT_PUBLIC_VISITED_VERSION
 const COOKIE_NAME = `hasVisited_${VERSION}`
 const DEFAULT_CONTENT = '<h1></h1><p></p>'
+
+const Canvas = dynamic(() => import('@/components/notes/blankPage'), {
+    ssr: false,
+})
 
 export default function AppLayout({
     children, // will be a page or nested layout
@@ -101,10 +108,11 @@ export default function AppLayout({
     const { update } = useEvolu<Database>()
 
     // Zustand Stores
-    const { item, exportedId, noteId } = useNoteStore((state) => ({
+    const { item, exportedId, noteId, type } = useNoteStore((state) => ({
         item: state.item,
         exportedId: state.id,
         noteId: state.noteId,
+        type: state.type,
     }))
 
     /**
@@ -248,35 +256,51 @@ export default function AppLayout({
                     <QueryClientProvider client={queryClient}>
                         <AppSidebar canvasRef={canvasRef} id={evoluId!} />
                     </QueryClientProvider>
-                    <SidebarInset>
-                        <EditorProvider
-                            editorContainerProps={{
-                                className: 'grow',
-                            }}
-                            autofocus={false}
-                            immediatelyRender={true}
-                            shouldRerenderOnTransaction={false}
-                            extensions={extensions}
-                            editorProps={editorProps}
-                            onUpdate={(props) => {
-                                handleUpdate(props)
-                                // await handleImageDelete(props)
-                            }}
-                            slotBefore={
-                                <MemoizedEditorHeader
-                                    canvasRef={canvasRef}
-                                    readOnly={readOnly}
-                                    setReadOnly={setReadOnly}
-                                />
-                            }
-                            content={content}
-                        >
-                            {React.isValidElement(children)
-                                ? React.cloneElement(children, {
-                                      ref: canvasRef,
-                                  })
-                                : children}
-                        </EditorProvider>
+                    <SidebarInset className="flex flex-col">
+                        <>
+                            <EditorHeader
+                                canvasRef={null}
+                                readOnly={false}
+                                setReadOnly={() => {}}
+                            />
+                            <div
+                                className={cn('grow', {
+                                    hidden: type === 'Blank',
+                                    visible: type !== 'Blank',
+                                })}
+                            >
+                                <EditorProvider
+                                    editorContainerProps={{
+                                        className: 'grow',
+                                    }}
+                                    autofocus={false}
+                                    immediatelyRender={true}
+                                    shouldRerenderOnTransaction={false}
+                                    extensions={extensions}
+                                    editorProps={editorProps}
+                                    onUpdate={(props) => {
+                                        handleUpdate(props)
+                                        // await handleImageDelete(props)
+                                    }}
+                                    content={content}
+                                >
+                                    {React.isValidElement(children)
+                                        ? React.cloneElement(children, {
+                                              ref: canvasRef,
+                                          })
+                                        : children}
+                                </EditorProvider>
+                            </div>
+                            <div
+                                className={cn('grow', {
+                                    hidden: type !== 'Blank',
+                                    visible: type === 'Blank',
+                                })}
+                            >
+                                {/* Add page component */}
+                                <Canvas ref={canvasRef} item={item} />
+                            </div>
+                        </>
                     </SidebarInset>
                 </SidebarProvider>
             </TooltipProvider>
