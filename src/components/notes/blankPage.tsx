@@ -22,6 +22,7 @@ import { Layer, Line, Shape, Stage } from 'react-konva'
 import { getStroke } from 'perfect-freehand'
 import getSvgPathFromStroke from '@/lib/utils/getSvgPathFromStroke'
 import useMeasure from 'react-use-measure'
+import { currentUser } from '@clerk/nextjs/server'
 
 const BlankPage = forwardRef((item, canvasRef) => {
     // States for React Sketch Canvas
@@ -139,6 +140,9 @@ const BlankPage = forwardRef((item, canvasRef) => {
     const [strokes, setStrokes] = React.useState<any>([])
     const currentStroke = React.useRef<any>([])
 
+    const history = React.useRef<any>([])
+    const historyStep = React.useRef<number>(0)
+
     const [strokeColor, setStrokeColor] = React.useState('#000')
 
     function getInkColour(
@@ -159,6 +163,24 @@ const BlankPage = forwardRef((item, canvasRef) => {
         setStrokeColor(getInkColour(theme, resolvedTheme))
         console.log(strokeColor)
     }, [theme, resolvedTheme])
+
+    const handleUndo = () => {
+        if (historyStep.current === 0) return
+
+        historyStep.current -= 1
+        const previous = history.current.slice(0, historyStep.current)
+
+        setStrokes(previous)
+    }
+
+    const handleRedo = () => {
+        if (historyStep.current === history.current.length) return
+
+        historyStep.current += 1
+        const next = history.current.slice(0, historyStep.current)
+
+        setStrokes(next)
+    }
 
     const handlePointerDown = (e) => {
         isDrawing.current = true
@@ -184,6 +206,13 @@ const BlankPage = forwardRef((item, canvasRef) => {
     const handlePointerUp = () => {
         isDrawing.current = false
         setStrokes([...strokes, currentStroke.current])
+
+        history.current = [...strokes, currentStroke.current]
+        historyStep.current += 1
+
+        if (historyStep.current > strokes.length)
+            historyStep.current = strokes.length + 1
+
         currentStroke.current = []
     }
 
@@ -209,12 +238,22 @@ const BlankPage = forwardRef((item, canvasRef) => {
         )
     }
 
+    const MemoUndoRedo = React.memo(function MemoUndoRedo() {
+        return (
+            <>
+                <Button onClick={handleUndo}>Undo</Button>
+                <Button onClick={handleRedo}>Redo</Button>
+            </>
+        )
+    })
+
     return (
         <div ref={ref} className="flex w-full h-auto aspect-[210/297]">
+            <MemoUndoRedo />
             <Stage
-                className="overflow-hidden"
-                width={bounds.width}
-                height={bounds.height}
+                className="overflow-hidden border-2 border-green-300"
+                width={1000}
+                height={2000}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
