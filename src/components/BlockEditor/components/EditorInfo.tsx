@@ -34,6 +34,7 @@ import { ReactSketchCanvasRef } from 'react-sketch-canvas'
 import useNoteStore from '@/store/note'
 import { cn } from '@/lib/utils'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { useDrawingStore } from '@/store/drawingStore'
 
 type Checked = DropdownMenuCheckboxItemProps['checked']
 
@@ -65,6 +66,10 @@ export const EditorInfo = memo(
 
         const isInkEnabled = useNoteStore((state) => state.isInkEnabled)
         const toggleInking = useNoteStore((state) => state.setInkStatus)
+
+        // Konva history
+        const [strokes, setStrokes] = React.useState<any>([])
+        const { push, undo, redo } = useDrawingStore()
 
         // const noteSettingsQuery = React.useCallback(
         //   () => evolu.createQuery((db) => db.selectFrom("noteSettings").selectAll()),
@@ -153,18 +158,10 @@ export const EditorInfo = memo(
                         >
                             <Eraser />
                         </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleUndoClick}
-                        >
+                        <Button variant="ghost" size="sm" onClick={undo}>
                             <Undo />
                         </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleRedoClick}
-                        >
+                        <Button variant="ghost" size="sm" onClick={redo}>
                             <Redo />
                         </Button>
                         <Button

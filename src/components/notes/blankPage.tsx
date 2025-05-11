@@ -23,6 +23,7 @@ import { getStroke } from 'perfect-freehand'
 import getSvgPathFromStroke from '@/lib/utils/getSvgPathFromStroke'
 import useMeasure from 'react-use-measure'
 import { currentUser } from '@clerk/nextjs/server'
+import { useDrawingStore } from '@/store/drawingStore'
 
 const BlankPage = forwardRef((item, canvasRef) => {
     // States for React Sketch Canvas
@@ -136,12 +137,17 @@ const BlankPage = forwardRef((item, canvasRef) => {
     // Custom React canvas
     const [ref, bounds] = useMeasure()
 
-    const isDrawing = React.useRef(false)
-    const [strokes, setStrokes] = React.useState<any>([])
-    const currentStroke = React.useRef<any>([])
+    const [shadowStrokes, setShadowStrokes] = React.useState<any>([])
 
-    const history = React.useRef<any>([])
-    const historyStep = React.useRef<number>(0)
+    const {
+        isDrawing,
+        strokes,
+        currentStroke,
+        setIsDrawing,
+        setCurrentStroke,
+        setStrokes,
+        push,
+    } = useDrawingStore()
 
     const [strokeColor, setStrokeColor] = React.useState('#000')
 
@@ -161,59 +167,37 @@ const BlankPage = forwardRef((item, canvasRef) => {
 
     React.useEffect(() => {
         setStrokeColor(getInkColour(theme, resolvedTheme))
-        console.log(strokeColor)
     }, [theme, resolvedTheme])
 
-    const handleUndo = () => {
-        if (historyStep.current === 0) return
-
-        historyStep.current -= 1
-        const previous = history.current.slice(0, historyStep.current)
-
-        setStrokes(previous)
-    }
-
-    const handleRedo = () => {
-        if (historyStep.current === history.current.length) return
-
-        historyStep.current += 1
-        const next = history.current.slice(0, historyStep.current)
-
-        setStrokes(next)
-    }
-
     const handlePointerDown = (e) => {
-        isDrawing.current = true
+        setIsDrawing(true)
         const stage = e.target.getStage()
         const point = stage.getPointerPosition()
         const pressure = e.evt.pressure || 0.5
-        currentStroke.current = [[point.x, point.y, pressure]]
+        setCurrentStroke([[point.x, point.y, pressure]])
     }
 
     const handlePointerMove = (e) => {
-        if (!isDrawing.current) return
+        if (!isDrawing) return
         const stage = e.target.getStage()
         const point = stage.getPointerPosition()
         const pressure = e.evt.pressure || 0.5
-        currentStroke.current = [
-            ...currentStroke.current,
-            [point.x, point.y, pressure],
-        ]
+        setCurrentStroke([...currentStroke, [point.x, point.y, pressure]])
         // Trigger a re-render
-        setStrokes([...strokes])
+        setShadowStrokes([...shadowStrokes])
     }
 
     const handlePointerUp = () => {
-        isDrawing.current = false
-        setStrokes([...strokes, currentStroke.current])
+        setIsDrawing(false)
+        setStrokes([...strokes, currentStroke])
+        setShadowStrokes([...shadowStrokes, currentStroke])
 
-        history.current = [...strokes, currentStroke.current]
-        historyStep.current += 1
+        push(currentStroke)
 
-        if (historyStep.current > strokes.length)
-            historyStep.current = strokes.length + 1
+        // if (historyStep.current > strokes.length)
+        //     historyStep.current = strokes.length + 1
 
-        currentStroke.current = []
+        setCurrentStroke([])
     }
 
     const renderStroke = (points) => {
@@ -238,18 +222,8 @@ const BlankPage = forwardRef((item, canvasRef) => {
         )
     }
 
-    const MemoUndoRedo = React.memo(function MemoUndoRedo() {
-        return (
-            <>
-                <Button onClick={handleUndo}>Undo</Button>
-                <Button onClick={handleRedo}>Redo</Button>
-            </>
-        )
-    })
-
     return (
         <div ref={ref} className="flex w-full h-auto aspect-[210/297]">
-            <MemoUndoRedo />
             <Stage
                 className="overflow-hidden border-2 border-green-300"
                 width={1000}
@@ -264,7 +238,7 @@ const BlankPage = forwardRef((item, canvasRef) => {
                     {strokes.map((strokePoints, i) => (
                         <>{renderStroke(strokePoints)}</>
                     ))}
-                    {isDrawing.current && renderStroke(currentStroke.current)}
+                    {isDrawing && renderStroke(currentStroke)}
                 </Layer>
             </Stage>
         </div>
