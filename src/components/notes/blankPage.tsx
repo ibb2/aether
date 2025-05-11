@@ -75,7 +75,6 @@ const BlankPage = forwardRef((item, canvasRef) => {
     const debouncedChangeExistingStrokeColor = useDebouncedCallback(
         async () => {
             if (canvasRef?.current) {
-                console.log(getInkColor(theme, resolvedTheme))
                 // Get current paths
                 const paths = await canvasRef.current.exportPaths()
                 // Modify the color of all paths
@@ -95,7 +94,6 @@ const BlankPage = forwardRef((item, canvasRef) => {
     )
 
     React.useEffect(() => {
-        console.log('Theme: ', theme, resolvedTheme)
         debouncedChangeExistingStrokeColor()
         // Cleanup on unmount
         return () => {
@@ -149,9 +147,7 @@ const BlankPage = forwardRef((item, canvasRef) => {
     }
 
     const saveInkData = React.useCallback(async () => {
-        console.log('Saved')
         if (item === null) return
-        console.log('Item: ', item)
         if (exportedId === null) return
 
         update('exportedData', {
@@ -168,13 +164,13 @@ const BlankPage = forwardRef((item, canvasRef) => {
 
     React.useEffect(() => {
         if (type !== 'Blank' || loaded.current === true) return
-        console.log(1)
+
         const data = exportedData.rows.find((ed) => ed.id === exportedId)
-        console.log(2)
+
         if (data === undefined || data.inkData === null) return
-        console.log(3)
+
         const s = data.inkData
-        console.log(s)
+
         setStrokes(s)
     }, [exportedData.rows, exportedId, setStrokes, type])
 
