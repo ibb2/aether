@@ -151,7 +151,7 @@ export const ExportedDatasTable = table({
     jsonExportedName: S.NullOr(NonEmptyString50),
     jsonData: S.NullOr(S.Struct({})),
     yjsExportedName: S.NullOr(NonEmptyString50),
-    inkData: S.NullOr(CanvasPathArray),
+    inkData: S.NullOr(S.mutable(S.Array(S.Any))),
     // yjsExportedData: S.Uint8Array,
 })
 export type ExportedDatasTable = typeof ExportedDatasTable.Type

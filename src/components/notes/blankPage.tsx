@@ -56,26 +56,6 @@ const BlankPage = forwardRef((item, canvasRef) => {
         type: state.type,
     }))
 
-    const saveInkData = React.useCallback(
-        async (canvasRef: ReactSketchCanvasRef) => {
-            if (item === null) return
-
-            if (exportedId === null || canvasRef === null) return
-
-            const time = await canvasRef?.getSketchingTime()
-            const paths = await canvasRef?.exportPaths()
-
-            const cleanedData = convertCanvasPathsForDatabase(paths)
-
-            update('exportedData', {
-                id: exportedId,
-                inkData: S.decodeSync(CanvasPathArray)(cleanedData),
-            })
-        },
-        [item, exportedData.rows, update]
-    )
-    const debouncedInkSave = useDebouncedCallback(saveInkData, 500)
-
     function getInkColor(
         theme: string | undefined,
         resolvedTheme: string | undefined
@@ -165,6 +145,32 @@ const BlankPage = forwardRef((item, canvasRef) => {
         return 'black' // fallback
     }
 
+    const saveInkData = React.useCallback(async () => {
+        console.log('Saved')
+        if (item === null) return
+        console.log('Item: ', item)
+        if (exportedId === null) return
+
+        update('exportedData', {
+            id: exportedId,
+            inkData: strokes,
+        })
+    }, [item, exportedId, update, strokes])
+
+    const debouncedInkSave = useDebouncedCallback(saveInkData, 500)
+
+    React.useLayoutEffect(() => {
+        if (type !== 'Blank') return
+        console.log(1)
+        const data = exportedData.rows.find((ed) => ed.id === exportedId)
+        console.log(2)
+        if (data === undefined || data.inkData === null) return
+        console.log(3)
+        const s = data.inkData
+        console.log(s)
+        setStrokes(s)
+    }, [exportedId, type])
+
     React.useEffect(() => {
         setStrokeColor(getInkColour(theme, resolvedTheme))
     }, [theme, resolvedTheme])
@@ -194,10 +200,9 @@ const BlankPage = forwardRef((item, canvasRef) => {
 
         push(currentStroke)
 
-        // if (historyStep.current > strokes.length)
-        //     historyStep.current = strokes.length + 1
-
         setCurrentStroke([])
+
+        debouncedInkSave()
     }
 
     const renderStroke = (points) => {
