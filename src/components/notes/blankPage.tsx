@@ -169,7 +169,7 @@ const BlankPage = forwardRef((item, canvasRef) => {
         const s = data.inkData
         console.log(s)
         setStrokes(s)
-    }, [exportedId, type])
+    }, [exportedData.rows, exportedId, setStrokes, type])
 
     React.useEffect(() => {
         setStrokeColor(getInkColour(theme, resolvedTheme))
@@ -230,9 +230,9 @@ const BlankPage = forwardRef((item, canvasRef) => {
     return (
         <div ref={ref} className="flex w-full h-auto aspect-[210/297]">
             <Stage
-                className="overflow-hidden border-2 border-green-300"
-                width={1000}
-                height={2000}
+                className="overflow-hidden"
+                width={bounds.width}
+                height={bounds.height}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
