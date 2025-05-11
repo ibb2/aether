@@ -28,8 +28,8 @@ export function TopNavbar() {
                         className="flex items-center"
                         prefetch={false}
                     >
-                        <Cloud className="h-6 w-6" />
-                        <span className="sr-only">Aether</span>
+                        <Cloud className="h-6 w-6 mr-2" />
+                        <span className="font-bold self-center">Aether</span>
                     </Link>
                     <nav className="hidden md:flex gap-4">
                         <Link
