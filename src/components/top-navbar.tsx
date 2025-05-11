@@ -29,7 +29,9 @@ export function TopNavbar() {
                         prefetch={false}
                     >
                         <Cloud className="h-6 w-6 mr-2" />
-                        <span className="font-bold self-center">Aether</span>
+                        <span className="font-bold self-center mt-0.5">
+                            Aether
+                        </span>
                     </Link>
                     <nav className="hidden md:flex gap-4">
                         <Link
