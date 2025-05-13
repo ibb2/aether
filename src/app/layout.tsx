@@ -20,25 +20,56 @@ import { Toaster } from '@/components/ui/toaster'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'Aether',
-    description: 'aether - a traditional notetaking experience',
+    title: {
+        default: 'Aethernotes',
+        template: '%s | Aethernotes',
+    },
+    description:
+        'Aethernotes is a secure, end-to-end encrypted note-taking app that combines the intuitive feel of handwriting with the structure of block-based organization.',
     keywords: [
-        'notebook',
-        'notes',
-        'notion',
-        'onenote',
-        'ink',
-        'pen',
-        'e2ee',
-        'encryption',
+        'Aethernotes',
+        'note-taking app',
+        'handwriting notes',
+        'block-based organization',
+        'end-to-end encryption',
+        'secure notes',
+        'digital notebook',
+        'Think in Ink',
+        'Organize in Blocks',
     ],
+    metadataBase: new URL(
+        process.env.VERCEL_URL
+            ? 'https://' + process.env.VERCEL_URL
+            : 'http://localhost:3000'
+    ),
+    openGraph: {
+        title: 'Think in Ink. Organize in Blocks | Aethernotes',
+        description:
+            'Aethernotes is a secure, end-to-end encrypted note-taking app that combines the intuitive feel of handwriting with the structure of block-based organization.',
+        url: process.env.VERCEL_URL
+            ? 'https://' + process.env.VERCEL_URL
+            : 'http://localhost:3000',
+        siteName: 'Aethernotes',
+        images: [''],
+        locale: 'en_US',
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Think in Ink. Organize in Blocks | Aethernotes',
+        description:
+            'Aethernotes is a secure, end-to-end encrypted note-taking app that combines the intuitive feel of handwriting with the structure of block-based organization.',
+        images: [''],
+        creator: '@aethernotes',
+    },
+    alternates: {
+        canonical: process.env.VERCEL_URL
+            ? 'https://' + process.env.VERCEL_URL
+            : 'http://localhost:3000',
+    },
     robots: {
         index: true,
         follow: true,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-        'max-video-preview': -1,
-        googleBot: 'index, follow',
     },
 }
 
