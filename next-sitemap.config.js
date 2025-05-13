@@ -1,22 +1,12 @@
 /** @type {import('next-sitemap').IConfig} */
 
 module.exports = {
-    siteUrl: 'https://www.aethernotes.ink',
+    siteUrl: 'http://localhost:3000', // Or your local testing URL,
     changefreq: 'daily',
     priority: 0.7,
     sitemapSize: 5000,
     generateRobotsTxt: true,
-    exclude: ['/server-sitemap.xml'], // <= exclude here
-    // alternateRefs: [
-    //     {
-    //         href: 'https://es.example.com',
-    //         hreflang: 'es',
-    //     },
-    //     {
-    //         href: 'https://fr.example.com',
-    //         hreflang: 'fr',
-    //     },
-    // ],
+    exclude: ['/server-sitemap.xml', '/api/*'], // <= exclude here
     // Default transformation function
     transform: async (config, path) => {
         return {
@@ -33,9 +23,6 @@ module.exports = {
                 userAgent: '*',
                 allow: '/',
             },
-        ],
-        additionalSitemaps: [
-            'https://example.com/server-sitemap.xml', // <==== Add here
         ],
     },
 }
