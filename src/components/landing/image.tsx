@@ -2,6 +2,8 @@
 
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
+import AetherIconLight from '../../../public/hero/Aethernotes-light.jpeg'
+import AetherIconDark from '../../../public/hero/Aethernotes.jpeg'
 
 export default function HeroImage() {
     const { resolvedTheme } = useTheme()
@@ -10,9 +12,7 @@ export default function HeroImage() {
         <div className="w-2/3 xl:w-5/6 2xl:3/5 mb-28">
             <Image
                 src={
-                    resolvedTheme === 'light'
-                        ? '/hero/Aethernotes-light.jpeg'
-                        : '/hero/Aethernotes.jpeg'
+                    resolvedTheme === 'light' ? AetherIconLight : AetherIconDark
                 }
                 className="flex relative h-lvh items-center justify-center rounded-lg"
                 alt="Hero Image"
