@@ -1,6 +1,6 @@
 import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { User } from 'next-auth'
+import { User } from 'better-auth'
 
 const UserCard = ({ user }: { user: User }) => {
     return (
