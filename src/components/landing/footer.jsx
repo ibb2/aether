@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import AetherIconSvg from '@/assets/aether-icon'
+import AetherIconSvg from '@/assets/aicon'
 
 export default function FooterSection() {
     return (
