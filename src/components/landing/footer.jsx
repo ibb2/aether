@@ -1,13 +1,12 @@
 import Image from 'next/image'
-import aetherIcon from '../../../public/assets/aether-icon.svg'
+import AetherIconSvg from '@/assets/aether-icon'
 
 export default function FooterSection() {
     return (
         <footer className="py-12 px-12 w-full border-t border-gray-800">
             <div className="mx-auto w-full px-6 p-20 text-center">
                 <div className="flex justify-center items-center mb-6 mt-12 gap-x-2">
-                    <Image
-                        src={aetherIcon}
+                    <AetherIconSvg
                         width={38}
                         alt="Aethernotes Icon"
                         className="dark:bg-white rounded-sm"

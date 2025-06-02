@@ -11,7 +11,7 @@ import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud } from 'lucide-react'
 import { useSession } from '@/lib/auth-client'
 import Image from 'next/image'
-import aetherIcon from '../../public/assets/aether-icon.svg'
+import AetherIconSvg from '@/assets/aether-icon'
 
 export function TopNavbar() {
     const { data: session } = useSession()
@@ -30,8 +30,7 @@ export function TopNavbar() {
                         className="flex items-center gap-x-2"
                         prefetch={false}
                     >
-                        <Image
-                            src={aetherIcon}
+                        <AetherIconSvg
                             width={38}
                             alt="Aethernotes Icon"
                             className="dark:bg-white rounded-sm"

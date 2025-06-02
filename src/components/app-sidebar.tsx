@@ -28,10 +28,10 @@ import {
 } from '@/components/ui/sidebar'
 import NavNotes from '@/components/Sidebar/nav-notes'
 import NavFragmentNotes from '@/components/Sidebar/nav-fragment-notes'
-import aetherIcon from '../../public/assets/aether-icon.svg'
 import Image from 'next/image'
 import NewNotes from './dialogs/notes/new-notes'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
+import AetherIconSvg from '@/assets/aether-icon'
 
 const data = {
     user: {
@@ -173,12 +173,11 @@ export function AppSidebar({
                             <a href="#">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg dark:bg-white text-sidebar-primary-foreground">
                                     {/* <Cloud className="size-4" /> */}
-                                    <Image
+                                    <AetherIconSvg
                                         width={24}
                                         height={24}
-                                        src={aetherIcon}
-                                        alt="Favicon"
-                                        className=""
+                                        alt="Aethernotes Icon"
+                                        className="dark:bg-white rounded-sm"
                                     />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
