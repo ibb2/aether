@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/sidebar'
 import NavNotes from '@/components/Sidebar/nav-notes'
 import NavFragmentNotes from '@/components/Sidebar/nav-fragment-notes'
-import aetherIcon from '@/assets/aether-icon.svg'
+import aetherIcon from '../../public/assets/aether-icon.svg'
 import Image from 'next/image'
 import NewNotes from './dialogs/notes/new-notes'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'

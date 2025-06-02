@@ -11,7 +11,7 @@ import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud } from 'lucide-react'
 import { useSession } from '@/lib/auth-client'
 import Image from 'next/image'
-import aetherIcon from '@/assets/aether-icon.svg'
+import aetherIcon from '../../public/assets/aether-icon.svg'
 
 export function TopNavbar() {
     const { data: session } = useSession()
