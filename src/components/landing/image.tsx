@@ -7,12 +7,12 @@ export default function HeroImage() {
     const { resolvedTheme } = useTheme()
 
     return (
-        <div className="w-2/3 xl:w-5/6 2xl:3/5">
+        <div className="w-2/3 xl:w-5/6 2xl:3/5 mb-28">
             <Image
                 src={
                     resolvedTheme === 'light'
-                        ? '/hero/app-light.png'
-                        : '/hero/app.png'
+                        ? '/hero/Aethernotes-light.jpeg'
+                        : '/hero/Aethernotes.jpeg'
                 }
                 className="flex relative h-lvh items-center justify-center rounded-lg"
                 alt="Hero Image"

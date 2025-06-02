@@ -52,7 +52,7 @@ export function PricingCard({
     }
 
     return (
-        <Card className="flex flex-col h-full">
+        <Card className="flex flex-col h-full transform hover:scale-[1.03]">
             <CardHeader className="text-center pb-2">
                 <CardTitle className="mb-7">{plan.name}</CardTitle>
                 <div className="space-y-1">

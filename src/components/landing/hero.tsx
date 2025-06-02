@@ -31,42 +31,52 @@ export default function Hero() {
 
     return (
         <EvoluProvider value={evolu}>
-            <div className="flex flex-col h-full w-full max-w-3xl items-center justify-center overflow-hidden pt-16">
-                <div className="z-10 flex items-center justify-center">
-                    <div
-                        className={cn(
-                            'group rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800'
-                        )}
-                    >
-                        <AnimatedShinyText
-                            className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400"
-                            onClick={() => router.push('/')}
+            <div className="flex flex-col h-full w-full max-w-3xl items-center justify-center overflow-hidden mb-28">
+                <section className="hero-gradient pt-32 pb-16 md:pt-40 md:pb-24 text-center relative overflow-hidden">
+                    {/* <div className="z-10 flex mb-6 items-center justify-center">
+                        <div
+                            className={cn(
+                                'group rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800'
+                            )}
                         >
-                            <span>✨ Introducing Aethernotes Beta</span>
-                            <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
-                        </AnimatedShinyText>
+                            <AnimatedShinyText
+                                className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400"
+                                onClick={() => router.push('/')}
+                            >
+                                <span>✨ Introducing Aethernotes Beta</span>
+                                <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+                            </AnimatedShinyText>
+                        </div>
+                    </div> */}
+                    <div className="container mx-auto px-6 relative z-10">
+                        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                            Think in{' '}
+                            <span className="text-purple-600 dark:text-purple-400">
+                                ink
+                            </span>
+                            .
+                            <br /> Organise in{' '}
+                            <span className="text-blue-600 dark:text-blue-400">
+                                blocks
+                            </span>
+                            .
+                        </h1>
+                        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10">
+                            Write with your pen. Build with blocks. Store it all
+                            securely, offline. The best of both worlds for a
+                            seamless note-taking experience.
+                        </p>
                     </div>
-                </div>
-                <div className="flex flex-col items-center mb-6">
-                    <p className="text-[5rem] font-semibold -mb-5">
-                        Think in ink.
-                    </p>
-                    <p className="text-[5rem] font-semibold">
-                        Organise in blocks.
-                    </p>
-                </div>
-                <p className="flex text-xl text-center max-w-2xl">
-                    Write with your pen. Build with blocks. Store it all
-                    securely, offline.
-                </p>
+                    <Button className="mt-8 z-10 p-6 bg-white text-black text-lg font-semibold rounded-lg hover:bg-gray-200 transition-colors shadow-lg">
+                        <Link href="/app">Get Started</Link>
+                    </Button>
+                </section>
                 {/* {ownerExists ? (
                         <Button className="mt-[1.6rem] bg-[#5046e6]" asChild>
                             <Link href="/app">Go to app</Link>
                         </Button>
                     ) : ( */}
-                <Button className="mt-8 z-10 p-6">
-                    <Link href="/app">Get Started</Link>
-                </Button>
+
                 {/* )} */}
             </div>
         </EvoluProvider>
