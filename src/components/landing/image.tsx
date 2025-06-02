@@ -16,10 +16,9 @@ export default function HeroImage() {
                 }
                 className="flex relative h-lvh items-center justify-center rounded-lg"
                 alt="Hero Image"
-                width={1920}
-                height={1080}
-                // sizes="100vh"
-                quality={100}
+                width={0}
+                height={0}
+                sizes="100vh"
                 style={{
                     width: '100%',
                     height: 'auto',
