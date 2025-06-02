@@ -11,8 +11,8 @@ export default function HeroImage() {
             <Image
                 src={
                     resolvedTheme === 'light'
-                        ? '/aethernotes-light.jpeg'
-                        : '/aethernotes.jpeg'
+                        ? '/Aethernotes-light.png'
+                        : '/Aethernotes.png'
                 }
                 className="flex relative h-lvh items-center justify-center rounded-lg"
                 alt="Hero Image"
