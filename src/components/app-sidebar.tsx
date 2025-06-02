@@ -31,7 +31,7 @@ import NavFragmentNotes from '@/components/Sidebar/nav-fragment-notes'
 import Image from 'next/image'
 import NewNotes from './dialogs/notes/new-notes'
 import { ReactSketchCanvasRef } from 'react-sketch-canvas'
-import AetherIconSvg from '@/assets/aether-icon'
+import AetherIconSvg from '@/assets/aicon'
 
 const data = {
     user: {
