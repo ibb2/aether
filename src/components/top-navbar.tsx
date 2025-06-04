@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button'
 import { JSX, SVGProps } from 'react'
 import { ChevronRight, Cloud } from 'lucide-react'
 import { useSession } from '@/lib/auth-client'
+import Image from 'next/image'
+import AetherIconSvg from '@/assets/aicon'
 
 export function TopNavbar() {
     const { data: session } = useSession()
@@ -20,16 +22,22 @@ export function TopNavbar() {
             : 'http://localhost:3000'
 
     return (
-        <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90">
+        <nav className="fixed flex justify-center items-center w-lvw top-0 z-50 bg-white shadow-sm dark:bg-gray-950/90 mb-28">
             <div className="w-full max-w-7xl px-4">
                 <div className="flex justify-between h-14 items-center">
                     <Link
                         href="/"
-                        className="flex items-center"
+                        className="flex items-center gap-x-2"
                         prefetch={false}
                     >
-                        <Cloud className="h-6 w-6" />
-                        <span className="sr-only">Aether</span>
+                        <AetherIconSvg
+                            width={38}
+                            alt="Aethernotes Icon"
+                            className="dark:bg-white rounded-sm"
+                        />
+                        <span className="font-bold self-center mt-0.5">
+                            Aether
+                        </span>
                     </Link>
                     <nav className="hidden md:flex gap-4">
                         <Link

@@ -11,7 +11,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { signOut } from 'next-auth/react'
+import { signOut } from '@/lib/auth-client'
 
 export function SignOutDialog() {
     return (
@@ -26,14 +26,7 @@ export function SignOutDialog() {
                         Are you sure you want to sign out?.
                     </DialogDescription>
                 </DialogHeader>
-                <Button
-                    variant="destructive"
-                    onClick={() =>
-                        signOut({
-                            redirectTo: '/',
-                        })
-                    }
-                >
+                <Button variant="destructive" onClick={() => signOut()}>
                     Sign Out
                 </Button>
             </DialogContent>
