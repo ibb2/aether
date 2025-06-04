@@ -7,8 +7,10 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: ['/api/'],
         },
-        sitemap: process.env.VERCEL_URL
-            ? 'https://' + process.env.VERCEL_URL + '/sitemap.xml'
+        sitemap: process.env.VERCEL_PROJECT_PRODUCTION_URL
+            ? 'https://' +
+              process.env.VERCEL_PROJECT_PRODUCTION_URL +
+              '/sitemap.xml'
             : 'http://localhost:3000/sitemap.xml',
     }
 }
