@@ -5,7 +5,16 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: ['/api/'],
+            disallow: [
+                '/api/',
+                '/app/',
+                '/sign-in',
+                '/sign-up',
+                '/checkout/',
+                '/settings/',
+                '/features',
+                '/pricing',
+            ],
         },
         sitemap: process.env.VERCEL_PROJECT_PRODUCTION_URL
             ? 'https://' +
