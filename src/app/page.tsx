@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
 
 export default function Homepage() {
     return (
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center scroll-smooth">
             <TopNavbar />
             <DotPattern
                 className={cn(

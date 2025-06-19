@@ -41,14 +41,14 @@ export function TopNavbar() {
                     </Link>
                     <nav className="hidden md:flex gap-4">
                         <Link
-                            href="/features"
+                            href="/#features"
                             className="font-medium flex items-center text-sm transition-colors hover:underline"
                             prefetch={false}
                         >
                             Features
                         </Link>
                         <Link
-                            href="/pricing"
+                            href="/#pricing"
                             className="font-medium flex items-center text-sm transition-colors hover:underline"
                             prefetch={false}
                         >
